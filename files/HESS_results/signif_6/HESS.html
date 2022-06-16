@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Multiwavelength Identification of Galactic High-Energy Sources</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous" />
+  </head>
+  <body class="py-4">
+    <div class="container">
+      <h1 class="mb-5">Multiwavelength Identification of Galactic High-Energy Sources</h1>
+      <h2>Project goals</h2>
+      <p>We plan to investigate the nature of particle accelerators in unidentified Galactic TeV gamma-ray sources with the aid of a comprehensive, 
+    automated multi-wavelength (MW) analysis tool we developed. We focus on unidentified TeV sources in the Galactic plane (within 10 degrees from the plane) 
+    that have been observed by Chandra and/or XMM-Newton and have a good-quality optical/IR and radio data. As the result of this project, we expect 
+    to 
+    <ol>
+      <li>increase the number of identified gamma-ray sources,</li>
+      <li>isolate a fraction of gamma-ray sources without plausible counterparts at other wavelengths (e.g. transients), </li>
+      <li>gain insight into the particle acceleration processes in gamma-ray sources,</li>
+      <li>classify a large number of Galactic X-ray sources.</li>
+    </ol> </p>
+      <h2>Work performed</h2>
+      <p>We collected  multwavelength properties of all X-ray sources in these fields using the Chandra X-ray Source catalog and multiwavelength properties from  Gaia-DR2, 2MASS, Spitzer, 
+        and WISE catalogs. We used the machine-learning approach implemented in our MUWCLASS pipeline (see e.g., <a href='https://ui.adsabs.harvard.edu/abs/2020ApJ...901..157K/'>Klingler et al., 2020</a>). 
+        The pipeline relies on the training dataset of ~10,000 X-ray sources that have known astrophysical types (currently these are STAR, YSO, WR star, AGN, LMXB, HMXB, CV, NS, NS binary). 
+        We used this pipeline to classify 204 X-ray sources whose classifications are provided in the table below.</p>
+      <h2>Funding support</h2>
+      <p>This work is supported by the National Aeronautics and Space Administration (NASA) through the Astrophysics Data Analysis Program (ADAP) award 80NSSC19K0576.</p>
+      <div class="sticky-top" style="z-index: 2; background-color: white;">
+        <h4 class="text-center mt-5">Unidentified Galactic H.E.S.S. sources observed with Chandra X-ray Observatory.</h4>
+        <h5 class="text-center">Classifications of X-ray sources detected with CXO ACIS and located within the H.E.S.S. sources.</h5>
+        <p class="text-center">Click on the button to toggle between showing and hiding content.</p>
+        <a class="btn btn-outline-primary" href=".multi-collapse" role="button" data-bs-toggle="collapse">expand all</a>
+        <div class="row gx-1 mb-1 justify-content-center sticky-top" style="z-index: 2; background-color: white;">
+          <div class="col themed-grid-col col-md-auto">
+            <p>#</p>
+          </div>
+          <div class="col themed-grid-col col-md-2">
+            <p>HESS id</p>
+          </div>
+          <div class="col themed-grid-col col-md-1">
+            <p># of sources</p>
+          </div>
+          <div class="col themed-grid-col col-md-1">
+            <p>Gal l</p>
+          </div>
+          <div class="col themed-grid-col col-md-1">
+            <p>Gal b</p>
+          </div>
+          <div class="col themed-grid-col col-md-1">
+            <p>PU(')</p>
+          </div>
+          <div class="col themed-grid-col col-md-1">
+            <p>extent</p>
+          </div>
+          <div class="col themed-grid-col col-md-2">
+            <p>ObsIDs</p>
+          </div>
+        </div>
+      </div>
+      <div class="row gx-1 justify-content-center">
+        <div class="col themed-grid-col col-md-auto">
+          <p>1</p>
+        </div>
+        <div class="col themed-grid-col col-md-2 justify-content-center">
+          <a class="btn btn-outline-primary text-center" href=".row_0" role="button" data-bs-toggle="collapse">J1912+101</a>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>5</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>44.46</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>-0.13</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>58.80</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>extent</p>
+        </div>
+        <div class="col themed-grid-col col-md-2">
+          <p>4590, 3854</p>
+        </div>
+      </div>
+      <div class="row gx-2">
+        <div class="col collapse multi-collapse row_0" id="row_0_img">
+          <img src="webdata/J1912+101.jpeg" class="img-fluid" alt="" />
+        </div>
+        <div class="col collapse multi-collapse row_0" id="row_0_tbl">
+          <img src="webdata/J1912+101.png" class="img-fluid" alt="" />
+        </div>
+      </div>
+      <div class="row gx-1 justify-content-center">
+        <div class="col themed-grid-col col-md-auto">
+          <p>2</p>
+        </div>
+        <div class="col themed-grid-col col-md-2 justify-content-center">
+          <a class="btn btn-outline-primary text-center" href=".row_1" role="button" data-bs-toggle="collapse">J1614-518</a>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>7</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>331.47</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>-0.60</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>50.40</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>extent</p>
+        </div>
+        <div class="col themed-grid-col col-md-2">
+          <p>2546</p>
+        </div>
+      </div>
+      <div class="row gx-2">
+        <div class="col collapse multi-collapse row_1" id="row_1_img">
+          <img src="webdata/J1614-518.jpeg" class="img-fluid" alt="" />
+        </div>
+        <div class="col collapse multi-collapse row_1" id="row_1_tbl">
+          <img src="webdata/J1614-518.png" class="img-fluid" alt="" />
+        </div>
+      </div>
+      <div class="row gx-1 justify-content-center">
+        <div class="col themed-grid-col col-md-auto">
+          <p>3</p>
+        </div>
+        <div class="col themed-grid-col col-md-2 justify-content-center">
+          <a class="btn btn-outline-primary text-center" href=".row_2" role="button" data-bs-toggle="collapse">J1841-055</a>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>15</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>26.71</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>-0.23</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>48.99</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>extent</p>
+        </div>
+        <div class="col themed-grid-col col-md-2">
+          <p>4649, 7630, 8144, 9754, 7552, 7493</p>
+        </div>
+      </div>
+      <div class="row gx-2">
+        <div class="col collapse multi-collapse row_2" id="row_2_img">
+          <img src="webdata/J1841-055.jpeg" class="img-fluid" alt="" />
+        </div>
+        <div class="col collapse multi-collapse row_2" id="row_2_tbl">
+          <img src="webdata/J1841-055.png" class="img-fluid" alt="" />
+        </div>
+      </div>
+      <div class="row gx-1 justify-content-center">
+        <div class="col themed-grid-col col-md-auto">
+          <p>4</p>
+        </div>
+        <div class="col themed-grid-col col-md-2 justify-content-center">
+          <a class="btn btn-outline-primary text-center" href=".row_3" role="button" data-bs-toggle="collapse">J1458-608</a>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>2</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>317.95</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>-1.70</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>44.77</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>extent</p>
+        </div>
+        <div class="col themed-grid-col col-md-2">
+          <p>13288</p>
+        </div>
+      </div>
+      <div class="row gx-2">
+        <div class="col collapse multi-collapse row_3" id="row_3_img">
+          <img src="webdata/J1458-608.jpeg" class="img-fluid" alt="" />
+        </div>
+        <div class="col collapse multi-collapse row_3" id="row_3_tbl">
+          <img src="webdata/J1458-608.png" class="img-fluid" alt="" />
+        </div>
+      </div>
+      <div class="row gx-1 justify-content-center">
+        <div class="col themed-grid-col col-md-auto">
+          <p>5</p>
+        </div>
+        <div class="col themed-grid-col col-md-2 justify-content-center">
+          <a class="btn btn-outline-primary text-center" href=".row_4" role="button" data-bs-toggle="collapse">J1800-240</a>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>22</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>5.96</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>-0.42</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>37.97</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>extent</p>
+        </div>
+        <div class="col themed-grid-col col-md-2">
+          <p>10997, 2828</p>
+        </div>
+      </div>
+      <div class="row gx-2">
+        <div class="col collapse multi-collapse row_4" id="row_4_img">
+          <img src="webdata/J1800-240.jpeg" class="img-fluid" alt="" />
+        </div>
+        <div class="col collapse multi-collapse row_4" id="row_4_tbl">
+          <img src="webdata/J1800-240.png" class="img-fluid" alt="" />
+        </div>
+      </div>
+      <div class="row gx-1 justify-content-center">
+        <div class="col themed-grid-col col-md-auto">
+          <p>6</p>
+        </div>
+        <div class="col themed-grid-col col-md-2 justify-content-center">
+          <a class="btn btn-outline-primary text-center" href=".row_5" role="button" data-bs-toggle="collapse">J1857+026</a>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>8</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>36.06</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>-0.06</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>31.14</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>extent</p>
+        </div>
+        <div class="col themed-grid-col col-md-2">
+          <p>8150, 10513, 9613, 12557</p>
+        </div>
+      </div>
+      <div class="row gx-2">
+        <div class="col collapse multi-collapse row_5" id="row_5_img">
+          <img src="webdata/J1857+026.jpeg" class="img-fluid" alt="" />
+        </div>
+        <div class="col collapse multi-collapse row_5" id="row_5_tbl">
+          <img src="webdata/J1857+026.png" class="img-fluid" alt="" />
+        </div>
+      </div>
+      <div class="row gx-1 justify-content-center">
+        <div class="col themed-grid-col col-md-auto">
+          <p>7</p>
+        </div>
+        <div class="col themed-grid-col col-md-2 justify-content-center">
+          <a class="btn btn-outline-primary text-center" href=".row_6" role="button" data-bs-toggle="collapse">J1848-018</a>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>7</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>30.92</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>-0.21</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>29.80</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>extent</p>
+        </div>
+        <div class="col themed-grid-col col-md-2">
+          <p>12152, 6587, 9612, 10512, 2692</p>
+        </div>
+      </div>
+      <div class="row gx-2">
+        <div class="col collapse multi-collapse row_6" id="row_6_img">
+          <img src="webdata/J1848-018.jpeg" class="img-fluid" alt="" />
+        </div>
+        <div class="col collapse multi-collapse row_6" id="row_6_tbl">
+          <img src="webdata/J1848-018.png" class="img-fluid" alt="" />
+        </div>
+      </div>
+      <div class="row gx-1 justify-content-center">
+        <div class="col themed-grid-col col-md-auto">
+          <p>8</p>
+        </div>
+        <div class="col themed-grid-col col-md-2 justify-content-center">
+          <a class="btn btn-outline-primary text-center" href=".row_7" role="button" data-bs-toggle="collapse">J1843-033</a>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>32</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>28.90</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>0.07</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>28.73</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>extent</p>
+        </div>
+        <div class="col themed-grid-col col-md-2">
+          <p>11832, 15360, 8163, 7582, 3897, 11232, 7583, 949, 11801, 8169, 2298, 15365, 7578, 7581, 1523</p>
+        </div>
+      </div>
+      <div class="row gx-2">
+        <div class="col collapse multi-collapse row_7" id="row_7_img">
+          <img src="webdata/J1843-033.jpeg" class="img-fluid" alt="" />
+        </div>
+        <div class="col collapse multi-collapse row_7" id="row_7_tbl">
+          <img src="webdata/J1843-033.png" class="img-fluid" alt="" />
+        </div>
+      </div>
+      <div class="row gx-1 justify-content-center">
+        <div class="col themed-grid-col col-md-auto">
+          <p>9</p>
+        </div>
+        <div class="col themed-grid-col col-md-2 justify-content-center">
+          <a class="btn btn-outline-primary text-center" href=".row_8" role="button" data-bs-toggle="collapse">J1616-508</a>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>32</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>332.48</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>-0.17</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>27.81</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>extent</p>
+        </div>
+        <div class="col themed-grid-col col-md-2">
+          <p>1960, 3516, 12415, 3517, 4599, 12224, 5592, 5595, 4598, 4597, 970, 2317, 3515, 1040, 2314, 4596, 5594, 2315, 6684, 15393, 2316, 3514, 11823, 5593</p>
+        </div>
+      </div>
+      <div class="row gx-2">
+        <div class="col collapse multi-collapse row_8" id="row_8_img">
+          <img src="webdata/J1616-508.jpeg" class="img-fluid" alt="" />
+        </div>
+        <div class="col collapse multi-collapse row_8" id="row_8_tbl">
+          <img src="webdata/J1616-508.png" class="img-fluid" alt="" />
+        </div>
+      </div>
+      <div class="row gx-1 justify-content-center">
+        <div class="col themed-grid-col col-md-auto">
+          <p>10</p>
+        </div>
+        <div class="col themed-grid-col col-md-2 justify-content-center">
+          <a class="btn btn-outline-primary text-center" href=".row_9" role="button" data-bs-toggle="collapse">J1813-126</a>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>6</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>17.31</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>2.49</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>25.59</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>extent</p>
+        </div>
+        <div class="col themed-grid-col col-md-2">
+          <p>14399</p>
+        </div>
+      </div>
+      <div class="row gx-2">
+        <div class="col collapse multi-collapse row_9" id="row_9_img">
+          <img src="webdata/J1813-126.jpeg" class="img-fluid" alt="" />
+        </div>
+        <div class="col collapse multi-collapse row_9" id="row_9_tbl">
+          <img src="webdata/J1813-126.png" class="img-fluid" alt="" />
+        </div>
+      </div>
+      <div class="row gx-1 justify-content-center">
+        <div class="col themed-grid-col col-md-auto">
+          <p>11</p>
+        </div>
+        <div class="col themed-grid-col col-md-2 justify-content-center">
+          <a class="btn btn-outline-primary text-center" href=".row_10" role="button" data-bs-toggle="collapse">J1626-490</a>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>2</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>334.82</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>-0.12</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>23.60</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>extent</p>
+        </div>
+        <div class="col themed-grid-col col-md-2">
+          <p>13287</p>
+        </div>
+      </div>
+      <div class="row gx-2">
+        <div class="col collapse multi-collapse row_10" id="row_10_img">
+          <img src="webdata/J1626-490.jpeg" class="img-fluid" alt="" />
+        </div>
+        <div class="col collapse multi-collapse row_10" id="row_10_tbl">
+          <img src="webdata/J1626-490.png" class="img-fluid" alt="" />
+        </div>
+      </div>
+      <div class="row gx-1 justify-content-center">
+        <div class="col themed-grid-col col-md-auto">
+          <p>12</p>
+        </div>
+        <div class="col themed-grid-col col-md-2 justify-content-center">
+          <a class="btn btn-outline-primary text-center" href=".row_11" role="button" data-bs-toggle="collapse">J1632-478</a>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>9</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>336.39</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>0.26</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>21.84</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>extent</p>
+        </div>
+        <div class="col themed-grid-col col-md-2">
+          <p>15625, 12532, 12530, 10088, 12533</p>
+        </div>
+      </div>
+      <div class="row gx-2">
+        <div class="col collapse multi-collapse row_11" id="row_11_img">
+          <img src="webdata/J1632-478.jpeg" class="img-fluid" alt="" />
+        </div>
+        <div class="col collapse multi-collapse row_11" id="row_11_tbl">
+          <img src="webdata/J1632-478.png" class="img-fluid" alt="" />
+        </div>
+      </div>
+      <div class="row gx-1 justify-content-center">
+        <div class="col themed-grid-col col-md-auto">
+          <p>13</p>
+        </div>
+        <div class="col themed-grid-col col-md-2 justify-content-center">
+          <a class="btn btn-outline-primary text-center" href=".row_12" role="button" data-bs-toggle="collapse">J1745-303</a>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>2</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>358.64</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>-0.56</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>21.47</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>extent</p>
+        </div>
+        <div class="col themed-grid-col col-md-2">
+          <p>14584, 13807, 6260</p>
+        </div>
+      </div>
+      <div class="row gx-2">
+        <div class="col collapse multi-collapse row_12" id="row_12_img">
+          <img src="webdata/J1745-303.jpeg" class="img-fluid" alt="" />
+        </div>
+        <div class="col collapse multi-collapse row_12" id="row_12_tbl">
+          <img src="webdata/J1745-303.png" class="img-fluid" alt="" />
+        </div>
+      </div>
+      <div class="row gx-1 justify-content-center">
+        <div class="col themed-grid-col col-md-auto">
+          <p>14</p>
+        </div>
+        <div class="col themed-grid-col col-md-2 justify-content-center">
+          <a class="btn btn-outline-primary text-center" href=".row_13" role="button" data-bs-toggle="collapse">J1507-622</a>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>4</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>317.97</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>-3.48</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>21.04</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>extent</p>
+        </div>
+        <div class="col themed-grid-col col-md-2">
+          <p>9975</p>
+        </div>
+      </div>
+      <div class="row gx-2">
+        <div class="col collapse multi-collapse row_13" id="row_13_img">
+          <img src="webdata/J1507-622.jpeg" class="img-fluid" alt="" />
+        </div>
+        <div class="col collapse multi-collapse row_13" id="row_13_tbl">
+          <img src="webdata/J1507-622.png" class="img-fluid" alt="" />
+        </div>
+      </div>
+      <div class="row gx-1 justify-content-center">
+        <div class="col themed-grid-col col-md-auto">
+          <p>15</p>
+        </div>
+        <div class="col themed-grid-col col-md-2 justify-content-center">
+          <a class="btn btn-outline-primary text-center" href=".row_14" role="button" data-bs-toggle="collapse">J1634-472</a>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>12</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>337.12</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>0.26</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>20.92</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>extent</p>
+        </div>
+        <div class="col themed-grid-col col-md-2">
+          <p>12526, 15625, 12523, 12520, 12532, 10087, 12530, 3877, 12521, 12533, 12528, 10519, 12529, 5573, 12531, 12527, 12524, 5574, 1981, 12525</p>
+        </div>
+      </div>
+      <div class="row gx-2">
+        <div class="col collapse multi-collapse row_14" id="row_14_img">
+          <img src="webdata/J1634-472.jpeg" class="img-fluid" alt="" />
+        </div>
+        <div class="col collapse multi-collapse row_14" id="row_14_tbl">
+          <img src="webdata/J1634-472.png" class="img-fluid" alt="" />
+        </div>
+      </div>
+      <div class="row gx-1 justify-content-center">
+        <div class="col themed-grid-col col-md-auto">
+          <p>16</p>
+        </div>
+        <div class="col themed-grid-col col-md-2 justify-content-center">
+          <a class="btn btn-outline-primary text-center" href=".row_15" role="button" data-bs-toggle="collapse">J1023-575</a>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>145</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>284.19</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>-0.40</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>19.96</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>extent</p>
+        </div>
+        <div class="col themed-grid-col col-md-2">
+          <p>3501, 12151, 6410, 9113, 6411</p>
+        </div>
+      </div>
+      <div class="row gx-2">
+        <div class="col collapse multi-collapse row_15" id="row_15_img">
+          <img src="webdata/J1023-575.jpeg" class="img-fluid" alt="" />
+        </div>
+        <div class="col collapse multi-collapse row_15" id="row_15_tbl">
+          <img src="webdata/J1023-575.png" class="img-fluid" alt="" />
+        </div>
+      </div>
+      <div class="row gx-1 justify-content-center">
+        <div class="col themed-grid-col col-md-auto">
+          <p>17</p>
+        </div>
+        <div class="col themed-grid-col col-md-2 justify-content-center">
+          <a class="btn btn-outline-primary text-center" href=".row_16" role="button" data-bs-toggle="collapse">J1826-130</a>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>19</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>18.48</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>-0.39</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>18.28</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>extent</p>
+        </div>
+        <div class="col themed-grid-col col-md-2">
+          <p>7641, 11883, 10527, 3851</p>
+        </div>
+      </div>
+      <div class="row gx-2">
+        <div class="col collapse multi-collapse row_16" id="row_16_img">
+          <img src="webdata/J1826-130.jpeg" class="img-fluid" alt="" />
+        </div>
+        <div class="col collapse multi-collapse row_16" id="row_16_tbl">
+          <img src="webdata/J1826-130.png" class="img-fluid" alt="" />
+        </div>
+      </div>
+      <div class="row gx-1 justify-content-center">
+        <div class="col themed-grid-col col-md-auto">
+          <p>18</p>
+        </div>
+        <div class="col themed-grid-col col-md-2 justify-content-center">
+          <a class="btn btn-outline-primary text-center" href=".row_17" role="button" data-bs-toggle="collapse">J1018-589</a>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>12</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>284.22</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>-1.77</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>17.97</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>extent</p>
+        </div>
+        <div class="col themed-grid-col col-md-2">
+          <p>14657, 3855, 16560, 11831</p>
+        </div>
+      </div>
+      <div class="row gx-2">
+        <div class="col collapse multi-collapse row_17" id="row_17_img">
+          <img src="webdata/J1018-589.jpeg" class="img-fluid" alt="" />
+        </div>
+        <div class="col collapse multi-collapse row_17" id="row_17_tbl">
+          <img src="webdata/J1018-589.png" class="img-fluid" alt="" />
+        </div>
+      </div>
+      <div class="row gx-1 justify-content-center">
+        <div class="col themed-grid-col col-md-auto">
+          <p>19</p>
+        </div>
+        <div class="col themed-grid-col col-md-2 justify-content-center">
+          <a class="btn btn-outline-primary text-center" href=".row_18" role="button" data-bs-toggle="collapse">J1923+141</a>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>11</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>49.08</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>-0.40</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>14.37</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>extent</p>
+        </div>
+        <div class="col themed-grid-col col-md-2">
+          <p>3711, 2524, 3841, 3839, 3840</p>
+        </div>
+      </div>
+      <div class="row gx-2">
+        <div class="col collapse multi-collapse row_18" id="row_18_img">
+          <img src="webdata/J1923+141.jpeg" class="img-fluid" alt="" />
+        </div>
+        <div class="col collapse multi-collapse row_18" id="row_18_tbl">
+          <img src="webdata/J1923+141.png" class="img-fluid" alt="" />
+        </div>
+      </div>
+      <div class="row gx-1 justify-content-center">
+        <div class="col themed-grid-col col-md-auto">
+          <p>20</p>
+        </div>
+        <div class="col themed-grid-col col-md-2 justify-content-center">
+          <a class="btn btn-outline-primary text-center" href=".row_19" role="button" data-bs-toggle="collapse">J1718-385</a>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>11</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>348.88</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>-0.48</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>13.81</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>extent</p>
+        </div>
+        <div class="col themed-grid-col col-md-2">
+          <p>9079, 12547</p>
+        </div>
+      </div>
+      <div class="row gx-2">
+        <div class="col collapse multi-collapse row_19" id="row_19_img">
+          <img src="webdata/J1718-385.jpeg" class="img-fluid" alt="" />
+        </div>
+        <div class="col collapse multi-collapse row_19" id="row_19_tbl">
+          <img src="webdata/J1718-385.png" class="img-fluid" alt="" />
+        </div>
+      </div>
+      <div class="row gx-1 justify-content-center">
+        <div class="col themed-grid-col col-md-auto">
+          <p>21</p>
+        </div>
+        <div class="col themed-grid-col col-md-2 justify-content-center">
+          <a class="btn btn-outline-primary text-center" href=".row_20" role="button" data-bs-toggle="collapse">J1713-381</a>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>4</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>348.62</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>0.38</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>11.01</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>extent</p>
+        </div>
+        <div class="col themed-grid-col col-md-2">
+          <p>6692</p>
+        </div>
+      </div>
+      <div class="row gx-2">
+        <div class="col collapse multi-collapse row_20" id="row_20_img">
+          <img src="webdata/J1713-381.jpeg" class="img-fluid" alt="" />
+        </div>
+        <div class="col collapse multi-collapse row_20" id="row_20_tbl">
+          <img src="webdata/J1713-381.png" class="img-fluid" alt="" />
+        </div>
+      </div>
+      <div class="row gx-1 justify-content-center">
+        <div class="col themed-grid-col col-md-auto">
+          <p>22</p>
+        </div>
+        <div class="col themed-grid-col col-md-2 justify-content-center">
+          <a class="btn btn-outline-primary text-center" href=".row_21" role="button" data-bs-toggle="collapse">J1858+020</a>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>5</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>35.54</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>-0.58</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>9.46</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>extent</p>
+        </div>
+        <div class="col themed-grid-col col-md-2">
+          <p>9116</p>
+        </div>
+      </div>
+      <div class="row gx-2">
+        <div class="col collapse multi-collapse row_21" id="row_21_img">
+          <img src="webdata/J1858+020.jpeg" class="img-fluid" alt="" />
+        </div>
+        <div class="col collapse multi-collapse row_21" id="row_21_tbl">
+          <img src="webdata/J1858+020.png" class="img-fluid" alt="" />
+        </div>
+      </div>
+      <div class="row gx-1 justify-content-center">
+        <div class="col themed-grid-col col-md-auto">
+          <p>23</p>
+        </div>
+        <div class="col themed-grid-col col-md-2 justify-content-center">
+          <a class="btn btn-outline-primary text-center" href=".row_22" role="button" data-bs-toggle="collapse">J1808-204</a>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>1</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>10.01</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>-0.24</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>5.12</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>point</p>
+        </div>
+        <div class="col themed-grid-col col-md-2">
+          <p>746, 6224, 1827</p>
+        </div>
+      </div>
+      <div class="row gx-2">
+        <div class="col collapse multi-collapse row_22" id="row_22_img">
+          <img src="webdata/J1808-204.jpeg" class="img-fluid" alt="" />
+        </div>
+        <div class="col collapse multi-collapse row_22" id="row_22_tbl">
+          <img src="webdata/J1808-204.png" class="img-fluid" alt="" />
+        </div>
+      </div>
+      <div class="row gx-1 justify-content-center">
+        <div class="col themed-grid-col col-md-auto">
+          <p>24</p>
+        </div>
+        <div class="col themed-grid-col col-md-2 justify-content-center">
+          <a class="btn btn-outline-primary text-center" href=".row_23" role="button" data-bs-toggle="collapse">J1747-248</a>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>95</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>3.78</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>1.71</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>7.36</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>extent</p>
+        </div>
+        <div class="col themed-grid-col col-md-2">
+          <p>654, 14339, 13706, 3798, 15615, 655, 14478, 14475, 14625, 11051, 10059, 12454, 13705, 13225, 14476, 13708, 13252, 14477</p>
+        </div>
+      </div>
+      <div class="row gx-2">
+        <div class="col collapse multi-collapse row_23" id="row_23_img">
+          <img src="webdata/J1747-248.jpeg" class="img-fluid" alt="" />
+        </div>
+        <div class="col collapse multi-collapse row_23" id="row_23_tbl">
+          <img src="webdata/J1747-248.png" class="img-fluid" alt="" />
+        </div>
+      </div>
+      <div class="row gx-1 justify-content-center">
+        <div class="col themed-grid-col col-md-auto">
+          <p>25</p>
+        </div>
+        <div class="col themed-grid-col col-md-2 justify-content-center">
+          <a class="btn btn-outline-primary text-center" href=".row_24" role="button" data-bs-toggle="collapse">J1844-030</a>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>3</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>29.41</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>0.09</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>2.79</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>point</p>
+        </div>
+        <div class="col themed-grid-col col-md-2">
+          <p>8163, 7582, 3897, 11232, 7583, 11801, 7578, 7581</p>
+        </div>
+      </div>
+      <div class="row gx-2">
+        <div class="col collapse multi-collapse row_24" id="row_24_img">
+          <img src="webdata/J1844-030.jpeg" class="img-fluid" alt="" />
+        </div>
+        <div class="col collapse multi-collapse row_24" id="row_24_tbl">
+          <img src="webdata/J1844-030.png" class="img-fluid" alt="" />
+        </div>
+      </div>
+      <div class="row gx-1 justify-content-center">
+        <div class="col themed-grid-col col-md-auto">
+          <p>26</p>
+        </div>
+        <div class="col themed-grid-col col-md-2 justify-content-center">
+          <a class="btn btn-outline-primary text-center" href=".row_25" role="button" data-bs-toggle="collapse">J1746-285</a>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>9</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>0.14</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>-0.11</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>1.94</p>
+        </div>
+        <div class="col themed-grid-col col-md-1">
+          <p>point</p>
+        </div>
+        <div class="col themed-grid-col col-md-2">
+          <p>9173, 9169, 1561, 3663, 6640, 2943, 3549, 13508, 2273, 6113, 945, 7558, 7556, 13017, 7555, 13016, 9170, 4500, 9172, 3392, 2951, 11843, 2282, 6639, 9171, 2276, 2287, 14941, 3665, 7554, 9174, 2954, 6646, 7048, 2284, 14897, 2953, 3393, 10556, 13438, 12949, 2952, 14942, 7559, 6645</p>
+        </div>
+      </div>
+      <div class="row gx-2">
+        <div class="col collapse multi-collapse row_25" id="row_25_img">
+          <img src="webdata/J1746-285.jpeg" class="img-fluid" alt="" />
+        </div>
+        <div class="col collapse multi-collapse row_25" id="row_25_tbl">
+          <img src="webdata/J1746-285.png" class="img-fluid" alt="" />
+        </div>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+  </body>
+</html>
