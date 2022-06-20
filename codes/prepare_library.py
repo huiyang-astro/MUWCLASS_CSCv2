@@ -1251,8 +1251,8 @@ def TD_clean_vizier(TD, NS_clean=True, remove_codes = [1, 32, 64]):
     CSC = TD[cols_f]
 
 
-    CSC.loc[CSC['Plx_gaia']<0, ['Plx_gaia', 'e_Plx_gaia']]=np.nan
-    CSC.loc[CSC['Plx_gaia']/CSC['e_Plx_gaia']<2, ['Plx_gaia', 'e_Plx_gaia']]=np.nan
+    #CSC.loc[CSC['Plx_gaia']<0, ['Plx_gaia', 'e_Plx_gaia']]=np.nan
+    #CSC.loc[CSC['Plx_gaia']/CSC['e_Plx_gaia']<2, ['Plx_gaia', 'e_Plx_gaia']]=np.nan
 
     CSC.loc[:, 'W1mag_unwise'], CSC.loc[:, 'W2mag_unwise'] = np.nan, np.nan
     CSC.loc[CSC['FW1_unwise']>0,'W1mag_unwise'] = 22.5-2.5*np.log10(CSC.loc[CSC['FW1_unwise']>0,'FW1_unwise']) - 0.004

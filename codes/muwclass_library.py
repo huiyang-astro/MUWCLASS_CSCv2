@@ -908,7 +908,7 @@ def class_train_and_classify(arr):
 
     #test_path, test_pred = get_classification_path(clf, X_test, sample_id=0, verb=False)
 
-    return df_test, df_imp#, test_path, test_pred
+    return df_test#, df_imp#, test_path, test_pred
 
 def loo_save_res(res, dir_out):
     
@@ -951,12 +951,12 @@ def class_save_res(res, dir_out):
     paths = []
 
     for i, r in enumerate(res):
-        df_test, df_imp = r #, test_path, test_pred = r
+        df_test= r #, test_path, test_pred = r
 
         ii.append(i)
 
         df_classes.append(df_test)
-        df_imps.append(df_imp)
+        #df_imps.append(df_imp)
         #paths.append([test_path, test_pred])
 
     ii = np.argsort(ii)  
