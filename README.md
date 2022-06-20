@@ -1,12 +1,23 @@
-# MUWCLASS_demo
+# MUWCLASS_CSCv2
  
-## MUWCLASS Pipeline on CSCv2 Demonstration
-### Hui Yang1, Jeremy Hare2, Oleg Kargaltsev1, Igor Volkov1
-### 1 The George Washington University 2 NASA GSFC
+## Classifying Unidentified X-ray Sources in the Chandra Source Catalog Using a Multi-wavelength Machine Learning Approach
+### Hui Yang1, Jeremy Hare2, Oleg Kargaltsev1, Igor Volkov1, Steven Chen1, Blagoy Rangelov3
+### 1 The George Washington University 2 NASA GSFC 3 Texas State University
 
 ### contact huiyang@gwu.edu if you have any questions
 
-This notebook presents a demonstration of classifying Chandra Source Catalog v2 (CSCv2) using the MUltiWavelength Machine Learning CLASSification Pipeline with CSCv2 and multiwavelength data
+This github repo provides the MUltiWavelength Machine Learning CLASSification Pipeline (MUWCLASS) and the classification results on the Chandra Source Catalog v2 (CSCv2). 
+
+The layout of this github repo is 
+
+codes/demo
+- This is a notebook of a demonstration of classifying CSCv2 sources using MUWCLASS with CSCv2 and multiwavelength data
+
+codes/builtTD
+- This is a notebook that rebuild the training dataset used for the MUWCLASS
+
+files/HESS_results
+- This includes the classification results of X-ray sources within the extent of unidentified HESS sources with detection significance S/N>6 (files/HESS_results/signif_6) and S/N>3 (files/HESS_results/signif_3)
 
 * This notebook was run in CIAO 4.14 with Python 3.9 
 * conda create -n ciao-4.14 -c https://cxc.cfa.harvard.edu/conda/ciao -c conda-forge ciao sherpa ds9 ciao-contrib caldb_main marx python=3.9
