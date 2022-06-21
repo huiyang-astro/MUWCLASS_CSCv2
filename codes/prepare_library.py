@@ -658,6 +658,7 @@ def MW_counterpart_confusion(ras, decs, R, Es=[], N=10, catalog='wise',ref_mjd=5
     
     cats = {
         'gaia':     'I/350/gaiaedr3',
+        #'gaia':  'I/355/gaiadr3',
         'gaiadist': 'I/352/gedr3dis',
         '2mass':    'II/246/out',
         'catwise':  'II/365/catwise',
@@ -690,7 +691,7 @@ def MW_counterpart_confusion(ras, decs, R, Es=[], N=10, catalog='wise',ref_mjd=5
         sys.exit(f"wrong catalog name, should be {' or '.join(cats)}")
 
     viz = Vizier(row_limit=-1,  timeout=5000, columns=["**", "+_r"], catalog=cats[catalog])
-
+    print(cats[catalog])
 
     df_rho = pd.DataFrame(columns=['_rs'])#'d_nr','d_out','num','rho','prob','_q','_rs'])
     df_MW = pd.DataFrame(columns=['_q'])#+cols[catalog])
@@ -767,7 +768,7 @@ def MW_counterpart_confusion(ras, decs, R, Es=[], N=10, catalog='wise',ref_mjd=5
         df.loc[:, '_r_nopmcor'] = df['_r']
         df['_r'] = df.apply(lambda row:  SkyCoord(row.RA_pmcor*u.deg, row.DEC_pmcor*u.deg, frame='icrs').separation(SkyCoord(row.ra_X*u.deg, row.dec_X*u.deg, frame='icrs')).arcsecond,axis=1)
     '''
-
+    #print(df)
     for i, e in zip(range(len(ras)), Es):
         #print(i,e)
         df_sub = df.loc[df['_q']==i+1].reset_index(drop=True)
@@ -812,10 +813,11 @@ def MW_counterpart_confusion(ras, decs, R, Es=[], N=10, catalog='wise',ref_mjd=5
 
         else:
             rs = df_sub.loc[df_sub['_r']<10.,'_r'].tolist()
-            new_row = {'_q':i+1,'_rs':rs}
+            #new_row = pd.DataFrame(
+            new_row = {'_q':i+1,'_rs':rs}#)
         
-        #df_rho = df_rho.append(new_row, ignore_index=True)
-        df_rho = pd.concat([df_rho, new_row], ignore_index=True)
+        df_rho = df_rho.append(new_row, ignore_index=True)
+        #df_rho = pd.concat([df_rho, new_row], ignore_index=True)
 
 
         if second_nearest:
@@ -851,6 +853,7 @@ def MW_counterpart_confusion(ras, decs, R, Es=[], N=10, catalog='wise',ref_mjd=5
         df_gaiadist = df_gaiadist.add_suffix('_gaiadist')
         df_gaiadist = df_gaiadist.rename(columns= {'Source_gaiadist':'Source_gaia','_q_gaiadist':'_q'})
 
+        # df_MWs = df_MWs.rename(columns={'DR3Name_gaia':'EDR3Name_gaia'})
         df_MWs = df_MWs[df_MWs['EDR3Name_gaia'].notna()]
         df_MWs['Source_gaia'] = df_MWs.apply(lambda row: np.int64(row.EDR3Name_gaia[10:]), axis=1)
         #print(df_MWs[['Source_gaia','_q']], df_gaiadist[['Source_gaia','_q']])
