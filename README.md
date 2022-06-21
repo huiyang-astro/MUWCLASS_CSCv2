@@ -8,7 +8,7 @@
 
 This github repo provides the MUltiWavelength Machine Learning CLASSification Pipeline (MUWCLASS) and the classification results on the Chandra Source Catalog v2 (CSCv2). 
 
-The layout of this github repo is 
+The main components of this github repo are
 
 codes/demo
 - This is a notebook of a demonstration of classifying CSCv2 sources using MUWCLASS with CSCv2 and multiwavelength data
