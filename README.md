@@ -29,7 +29,7 @@ files/HESS_results
 * then, make sure to enable widgetsnbextension and ipyaladin, run 
 * jupyter nbextension enable --py widgetsnbextension
 * jupyter nbextension enable --py --sys-prefix ipyaladin
-on your terminal 
+- on your terminal 
 
 * You might also need to manually register the existing ds9 with the xapns name server by selecting the ds9 File->XPA->Connect menu option so your ds9 will be fully accessible to pyds9. 
 
