@@ -681,7 +681,7 @@ def plot_class_matrix(field_name, df_plot, dir_plot, class_labels):
 
     #print(df_plot)
     '''
-
+    df_plot = df_plot[df_plot.Class_prob>=0.1].reset_index(drop=True)
     probs_ave = df_plot[[ 'P_'+clas for clas in class_labels] ]
     probs_std = df_plot[[ 'e_P_'+clas for clas in class_labels]]
     sources   = df_plot['name'].values
