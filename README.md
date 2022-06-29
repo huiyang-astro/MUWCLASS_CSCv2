@@ -8,7 +8,7 @@
 
 ### contact huiyang@gwu.edu if you have any questions
 
-This github repo provides the MUltiWavelength Machine Learning CLASSification Pipeline (MUWCLASS) and the classification results on the Chandra Source Catalog v2 (CSCv2). See our paper at https://arxiv.org/abs/2206.13656
+This github repo provides the MUltiWavelength Machine Learning CLASSification Pipeline (MUWCLASS) and the classification results on the Chandra Source Catalog v2 (CSCv2).
 
 The main components of this github repo are
 
