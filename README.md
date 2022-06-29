@@ -4,9 +4,11 @@
 ### Hui Yang1, Jeremy Hare2, Oleg Kargaltsev1, Igor Volkov1, Steven Chen1, Blagoy Rangelov3
 ### 1 The George Washington University 2 NASA GSFC 3 Texas State University
 
+## CHECK our paper at https://arxiv.org/abs/2206.13656
+
 ### contact huiyang@gwu.edu if you have any questions
 
-This github repo provides the MUltiWavelength Machine Learning CLASSification Pipeline (MUWCLASS) and the classification results on the Chandra Source Catalog v2 (CSCv2). 
+This github repo provides the MUltiWavelength Machine Learning CLASSification Pipeline (MUWCLASS) and the classification results on the Chandra Source Catalog v2 (CSCv2). See our paper at https://arxiv.org/abs/2206.13656
 
 The main components of this github repo are
 
@@ -22,8 +24,8 @@ files/HESS_results
 -- 
 
 * This notebook was run in CIAO 4.14 with Python 3.9 
+* run the follow code to create a new conda environment ciao-4.14-muwclass; if you already have ciao-4.14 installed with Python 3.9, you can use your own conda environment with additional Python packages installed from below
 * conda create -n ciao-4.14-muwclass -c https://cxc.cfa.harvard.edu/conda/ciao -c conda-forge ciao sherpa ds9 ciao-contrib caldb_main marx python=3.9
-* this will create a new conda environment ciao-4.14-muwclass; if you already have ciao-4.14 installed with Python 3.9, you can use your own conda environment with additional Python packages installed from below
 
 * run 'bash install-packages.sh' under ciao-4.14-muwclass environment to install all required packages 
 
