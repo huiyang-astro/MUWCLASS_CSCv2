@@ -1614,7 +1614,7 @@ def plot_classifier_matrix_withSTD_old(df, title='Classifier matrix', nocmap=Fal
     fig.tight_layout()
     return fig
 
-plt.rcParams.update({'font.size': 30})
+plt.rcParams.update({'font.size': 40})
 params = {'legend.fontsize': 'large',
           #'figure.figsize': (15, 5),
          'axes.labelsize': 'large',
@@ -1629,10 +1629,13 @@ def plot_classifier_matrix_withSTD(probs, stds, pred, yaxis, classes, normalize=
     if not title:
         title = 'Classifier matrix'
     length = len(pred)
+    '''
     if length !=2:
         fig, ax = plt.subplots(figsize=(21, length*1.5+3))
     if length ==2:
         fig, ax = plt.subplots(figsize=(21, length*1.5+3))
+    '''
+    fig, ax = plt.subplots(figsize=(12, length+2))
     im = ax.imshow(probs, interpolation='nearest', cmap=cmap)
     if nocmap ==False:
         ax.figure.colorbar(im, ax=ax)

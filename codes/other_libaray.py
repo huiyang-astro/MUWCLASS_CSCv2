@@ -639,7 +639,9 @@ def plot_bbsed(TD, field, dir_plot, plot_class='YSO', save_class=['YSO','AGN'], 
     #return None#plot
     #%%
 
-def plot_class_matrix(field_name, df, dir_plot, class_labels):
+def plot_class_matrix(field_name, df_plot, dir_plot, class_labels):
+
+    '''
 
     probs_ave = df[[ 'P_'+clas for clas in class_labels] ]
     probs_std = df[[ 'e_P_'+clas for clas in class_labels]]
@@ -678,6 +680,7 @@ def plot_class_matrix(field_name, df, dir_plot, class_labels):
     #df_plot = df[(df.name==df_conf.iloc[0]['name']) | (df.name==df[~df.name.isin(df_conf.name)].iloc[0]['name'])].reset_index(drop=True)
 
     #print(df_plot)
+    '''
 
     probs_ave = df_plot[[ 'P_'+clas for clas in class_labels] ]
     probs_std = df_plot[[ 'e_P_'+clas for clas in class_labels]]

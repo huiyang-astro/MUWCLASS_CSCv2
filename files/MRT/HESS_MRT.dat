@@ -1,75 +1,75 @@
-Title:
-Authors:
-Table:
+Title: Classifying Unidentified X-ray Sources in the Chandra Source Catalog Using a Multi-wavelength Machine Learning Approach
+Authors: Yang H., Hare J., Kargaltsev O., Volkov I., Chen S., Rangelov B.
+Table: Properties and classification results of the X-ray sources within the unidentified HESS sources using MUWCLASS
 ================================================================================
-Byte-by-byte Description of file: table.dat
+Byte-by-byte Description of file: HESS_MRT.dat
 --------------------------------------------------------------------------------
  Bytes Format Units  Label     Explanations
 --------------------------------------------------------------------------------
-  1- 21  A21    ---    CSCv2_name   Description of CSCv2_name              
- 23- 40  F18.14 ---    CSCv2_RA     Description of CSCv2_RA                
- 42- 61  F20.16 ---    CSCv2_DEC    Description of CSCv2_DEC               
- 63- 67  F5.2   ---    CSCv2_PU     [0.71/17.07] Description of CSCv2_PU   
- 69- 74  F6.2   ---    CSCv2_S/N    [2.17/107.71] Description of CSCv2_S/N 
- 76- 86  E11.6  ---    Fb           [0.0/0.01] Description of Fb           
- 88- 98  E11.6  ---    e_Fb         [0.0/0.01] Description of e_Fb         
-100-110  E11.6  ---    Fh           [0.0/0.01] Description of Fh           
-112-122  E11.6  ---    e_Fh         [0.0/0.01] Description of e_Fh         
-124-134  E11.6  ---    Fm           [0.0/0.01] Description of Fm           
-136-146  E11.6  ---    e_Fm         [0.0/0.01] Description of e_Fm         
-148-158  E11.6  ---    Fs           [0.0/0.01] Description of Fs           
-160-170  E11.6  ---    e_Fs         [0.0/0.01] Description of e_Fs         
-172-176  F5.3   ---    P_intra      ? Description of P_intra               
-178-182  F5.3   ---    P_inter      ? Description of P_inter               
-184-201  A18    ---    CSCv2_flags  Description of CSCv2_flags             
-203-211  F9.6   ---    Gmag         ? Description of Gmag                  
-213-220  F8.6   ---    e_Gmag       ? Description of e_Gmag                
-222-230  F9.6   ---    BPmag        ? Description of BPmag                 
-232-239  F8.6   ---    e_BPmag      ? Description of e_BPmag               
-241-249  F9.6   ---    RPmag        ? Description of RPmag                 
-251-258  F8.6   ---    e_RPmag      ? Description of e_RPmag               
-260-265  F6.3   ---    Jmag         ? Description of Jmag                  
-267-271  F5.3   ---    e_Jmag       ? Description of e_Jmag                
-273-278  F6.3   ---    Hmag         ? Description of Hmag                  
-280-284  F5.3   ---    e_Hmag       ? Description of e_Hmag                
-286-291  F6.3   ---    Kmag         ? Description of Kmag                  
-293-297  F5.3   ---    e_Kmag       ? Description of e_Kmag                
-299-317  F19.15 ---    W1mag        ? Description of W1mag                 
-319-337  F19.16 ---    e_W1mag      ? Description of e_W1mag               
-339-356  F18.15 ---    W2mag        ? Description of W2mag                 
-358-376  F19.16 ---    e_W2mag      ? Description of e_W2mag               
-378-384  F7.3   ---    W3mag        ? Description of W3mag                 
-386-390  F5.3   ---    e_W3mag      ? Description of e_W3mag               
-392-399  F8.4   ---    Plx          ? Description of Plx                   
-401-406  F6.4   ---    e_Plx        ? Description of e_Plx                 
-408-414  F7.3   ---    PM           ? Description of PM                    
-416-427  F12.7  ---    rgeo         ? Description of rgeo                  
-429-440  F12.7  ---    b_rgeo       ? Description of b_rgeo                
-442-454  F13.7  ---    B_rgeo       ? Description of B_rgeo                
-456-466  E11.6  ---    P_AGN        Description of P_AGN                   
-468-478  E11.6  ---    e_P_AGN      Description of e_P_AGN                 
-480-490  E11.6  ---    P_CV         [0.0/0.77] Description of P_CV         
-492-502  E11.6  ---    e_P_CV       [0.0/0.25] Description of e_P_CV       
-504-514  E11.6  ---    P_HM-STAR    [0.0/0.95] Description of P_HM-STAR    
-516-526  E11.6  ---    e_P_HM-STAR  [0.0/0.24] Description of e_P_HM-STAR  
-528-538  E11.6  ---    P_HMXB       Description of P_HMXB                  
-540-550  E11.6  ---    e_P_HMXB     Description of e_P_HMXB                
-552-562  E11.6  ---    P_LM-STAR    Description of P_LM-STAR               
-564-574  E11.6  ---    e_P_LM-STAR  Description of e_P_LM-STAR             
-576-586  E11.6  ---    P_LMXB       [0.0/0.75] Description of P_LMXB       
-588-598  E11.6  ---    e_P_LMXB     [0.0/0.3] Description of e_P_LMXB      
-600-610  E11.6  ---    P_NS         Description of P_NS                    
-612-622  E11.6  ---    e_P_NS       Description of e_P_NS                  
-624-634  E11.6  ---    P_YSO        [0.0/1.0] Description of P_YSO         
-636-646  E11.6  ---    e_P_YSO      [0.0/0.23] Description of e_P_YSO      
-648-654  A7     ---    Class        Description of Class                   
-656-666  E11.6  ---    Class_prob   [0.21/1.0] Description of Class_prob   
-668-678  E11.6  ---    e_Class_prob [0.01/0.32] Description of e_Class_prob
-680-690  E11.6  ---    CT           [0.0/44.41] Description of CT          
-692-714  A23    ---    Catalog_name Description of Catalog_name            
-716-722  A7     ---    True_Class   Description of True_Class              
-724-757  A34    ---    Class_ref    Description of Class_ref               
-759-772  A14    ---    HESS_name    Description of HESS_name               
+  1- 21  A21    ---    CSCv2_name   CSCv2 source name in the form “2CXO Jhhmmss.s{+|–}ddmmss”              
+ 23- 40  F18.14 deg    CSCv2_RA     CSCv2 master source J2000 Right Ascension              
+ 42- 61  F20.16 deg    CSCv2_DEC    CSCv2 master source J2000 Declination                
+ 63- 67  F5.2   arcsec CSCv2_PU     [0.71/17.07] CSCv2 master source err_ellipse_r0, the major radius of the 95% confidence level position error ellipse       
+ 69- 74  F6.2   ---    CSCv2_S/N    [2.17/107.71] CSCv2 master source X-ray significance
+ 76- 86  E11.6  mW/m2  Fb           [0.0/0.01] average broad (0.5-7 keV) band flux           
+ 88- 98  E11.6  mW/m2  e_Fb         [0.0/0.01] 1-sigma Fb Uncertainty         
+100-110  E11.6  mW/m2  Fh           [0.0/0.01] average hard (2-7 keV) band flux            
+112-122  E11.6  mW/m2  e_Fh         [0.0/0.01] 1-sigma Fh Uncertainty       
+124-134  E11.6  mW/m2  Fm           [0.0/0.01] average medium (1.2-2 keV) band flux          
+136-146  E11.6  mW/m2  e_Fm         [0.0/0.01] 1-sigma Fm Uncertainty        
+148-158  E11.6  mW/m2  Fs           [0.0/0.01] average soft (0.5-1.2 keV) band flux             
+160-170  E11.6  mW/m2  e_Fs         [0.0/0.01] 1-sigma Fs Uncertainty        
+172-176  F5.3   ---    P_intra      ? Highest value of Kuiper’s test variability probability across all observations available in CSCv2                 
+178-182  F5.3   ---    P_inter      ? Inter-observation variability probability                
+184-201  A18    ---    CSCv2_flags  The compilation of CSCv2 master source flags including conf flag (“conf”), extent flag (“extent”), and pileup flag (“pileup”), jointed by a “|”                     
+203-211  F9.6   mag    Gmag         ? Gaia EDR3 G band magnitude                
+213-220  F8.6   mag    e_Gmag       ? 1-sigma Gmag Uncertainty                
+222-230  F9.6   mag    BPmag        ? Gaia EDR3 BP band magnitude               
+232-239  F8.6   mag    e_BPmag      ? 1-sigma BPmag Uncertainty                
+241-249  F9.6   mag    RPmag        ? Gaia EDR3 RP band magnitude               
+251-258  F8.6   mag    e_RPmag      ? 1-sigma RPmag Uncertainty                
+260-265  F6.3   mag    Jmag         ? 2MASS J band magnitude               
+267-271  F5.3   mag    e_Jmag       ? 1-sigma Jmag Uncertainty                 
+273-278  F6.3   mag    Hmag         ? 2MASS H band magnitude                    
+280-284  F5.3   mag    e_Hmag       ? 1-sigma Hmag Uncertainty                  
+286-291  F6.3   mag    Kmag         ? 2MASS K band magnitude                   
+293-297  F5.3   mag    e_Kmag       ? 1-sigma Kmag Uncertainty               
+299-317  F19.15 mag    W1mag        ? W1 band magnitude from AllWISE, CatWISE2020 and unWISE catalogs                    
+319-337  F19.16 mag    e_W1mag      ? 1-sigma W1mag Uncertainty               
+339-356  F18.15 mag    W2mag        ? W2 band magnitude from AllWISE, CatWISE2020 and unWISE catalogs                    
+358-376  F19.16 mag    e_W2mag      ? 1-sigma W2mag Uncertainty                
+378-384  F7.3   mag    W3mag        ? W3 band magnitude from AllWISE, CatWISE2020 and unWISE catalogs                   
+386-390  F5.3   mag    e_W3mag      ? 1-sigma W3mag Uncertainty               
+392-399  F8.4   mas    Plx          ? Gaia EDR3 absolute stellar parallax                    
+401-406  F6.4   mas    e_Plx        ? 1-sigma Plx Uncertainty             
+408-414  F7.3   mas/yr PM           ? Gaia EDR3 total proper motion                    
+416-427  F12.7  pc     rgeo         ? Median of the geometric distance from Gaia EDR3 Distances catalog                 
+429-440  F12.7  pc     b_rgeo       ? 16th percentile of the geometric distance from Gaia EDR3 Distances catalog                
+442-454  F13.7  pc     B_rgeo       ? 84th percentile of the geometric distance from Gaia EDR3 Distances catalog                 
+456-466  E11.6  ---    P_AGN        Classification probability of the X-ray source to be classified as an AGN                    
+468-478  E11.6  ---    e_P_AGN      1-sigma P_AGN Uncertainty                  
+480-490  E11.6  ---    P_CV         [0.0/0.77] Classification probability of the X-ray source to be classified as a CV        
+492-502  E11.6  ---    e_P_CV       [0.0/0.25] 1-sigma P_CV Uncertainty       
+504-514  E11.6  ---    P_HM-STAR    [0.0/0.95] Classification probability of the X-ray source to be classified as a HM-STAR   
+516-526  E11.6  ---    e_P_HM-STAR  [0.0/0.24] 1-sigma P_HM-STAR Uncertainty   
+528-538  E11.6  ---    P_HMXB       Classification probability of the X-ray source to be classified as a HMXB                 
+540-550  E11.6  ---    e_P_HMXB     1-sigma P_HMXB Uncertainty                 
+552-562  E11.6  ---    P_LM-STAR    Classification probability of the X-ray source to be classified as a LM-STAR               
+564-574  E11.6  ---    e_P_LM-STAR  1-sigma P_LM-STAR Uncertainty              
+576-586  E11.6  ---    P_LMXB       [0.0/0.75] Classification probability of the X-ray source to be classified as a LMXB      
+588-598  E11.6  ---    e_P_LMXB     [0.0/0.3] 1-sigma P_LMXB Uncertainty        
+600-610  E11.6  ---    P_NS         Classification probability of the X-ray source to be classified as a NS                    
+612-622  E11.6  ---    e_P_NS       1-sigma P_NS Uncertainty                   
+624-634  E11.6  ---    P_YSO        [0.0/1.0] Classification probability of the X-ray source to be classified as a YSO       
+636-646  E11.6  ---    e_P_YSO      [0.0/0.23] 1-sigma P_YSO Uncertainty     
+648-654  A7     ---    Class        The predicted class of the source with the highest classification probability among eight classes                    
+656-666  E11.6  ---    Class_prob   [0.21/1.0] The classification probability of the predicted class calculated from MUWCLASS    
+668-678  E11.6  ---    e_Class_prob [0.01/0.32] 1-sigma Class_prob Uncertainty 
+680-690  E11.6  ---    CT           [0.0/44.41] The classification confidence threshold        
+692-714  A23    ---    Catalog_name The name of the source from the literature verified catalogs for the classification of TD sources              
+716-722  A7     ---    True_Class   The true class of the source from the TD               
+724-757  A34    ---    Class_ref    The reference of the classifications of the TD source                 
+759-772  A14    ---    HESS_name    The HESS source name that the CSCv2 source resides in             
 --------------------------------------------------------------------------------
 Notes:
 --------------------------------------------------------------------------------

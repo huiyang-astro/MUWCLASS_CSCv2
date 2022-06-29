@@ -1,74 +1,74 @@
-Title:
-Authors:
-Table:
+Title: Classifying Unidentified X-ray Sources in the Chandra Source Catalog Using a Multi-wavelength Machine Learning Approach
+Authors: Yang H., Hare J., Kargaltsev O., Volkov I., Chen S., Rangelov B.
+Table: Properties and classification results of the TD of MUWCLASS
 ================================================================================
-Byte-by-byte Description of file: table.dat
+Byte-by-byte Description of file: TD_MRT.dat
 --------------------------------------------------------------------------------
  Bytes Format Units  Label     Explanations
 --------------------------------------------------------------------------------
-  1- 21  A21    ---    CSCv2_name   Description of CSCv2_name              
- 23- 42  F20.16 ---    CSCv2_RA     Description of CSCv2_RA                
- 44- 63  F20.16 ---    CSCv2_DEC    Description of CSCv2_DEC               
- 65- 68  F4.2   ---    CSCv2_PU     [0.71/2.46] Description of CSCv2_PU    
- 70- 75  F6.2   ---    CSCv2_S/N    [0.91/376.06] Description of CSCv2_S/N 
- 77- 87  E11.6  ---    Fb           [0.0/0.01] Description of Fb           
- 89- 99  E11.6  ---    e_Fb         [0.0/0.01] Description of e_Fb         
-101-111  E11.6  ---    Fh           [0.0/0.01] Description of Fh           
-113-123  E11.6  ---    e_Fh         [0.0/0.01] Description of e_Fh         
-125-135  E11.6  ---    Fm           [0.0/0.01] Description of Fm           
-137-147  E11.6  ---    e_Fm         [0.0/0.01] Description of e_Fm         
-149-159  E11.6  ---    Fs           [0.0/0.01] Description of Fs           
-161-171  E11.6  ---    e_Fs         [0.0/0.01] Description of e_Fs         
-173-177  F5.3   ---    P_intra      ? Description of P_intra               
-179-183  F5.3   ---    P_inter      ? Description of P_inter               
-185-202  A18    ---    CSCv2_flags  Description of CSCv2_flags             
-204-212  F9.6   ---    Gmag         [3.32/21.86]? Description of Gmag      
-214-221  F8.6   ---    e_Gmag       [0.0/0.13]? Description of e_Gmag      
-223-231  F9.6   ---    BPmag        [4.02/22.61]? Description of BPmag     
-233-240  F8.6   ---    e_BPmag      [0.0/1.12]? Description of e_BPmag     
-242-250  F9.6   ---    RPmag        [2.64/20.98]? Description of RPmag     
-252-259  F8.6   ---    e_RPmag      [0.0/0.76]? Description of e_RPmag     
-261-266  F6.3   ---    Jmag         ? Description of Jmag                  
-268-272  F5.3   ---    e_Jmag       ? Description of e_Jmag                
-274-279  F6.3   ---    Hmag         ? Description of Hmag                  
-281-285  F5.3   ---    e_Hmag       ? Description of e_Hmag                
-287-292  F6.3   ---    Kmag         ? Description of Kmag                  
-294-298  F5.3   ---    e_Kmag       ? Description of e_Kmag                
-300-319  F20.16 ---    W1mag        [-1.8/18.87]? Description of W1mag     
-321-339  F19.16 ---    e_W1mag      [-0.21/0.5]? Description of e_W1mag    
-341-360  F20.16 ---    W2mag        [-2.15/18.31]? Description of W2mag    
-362-380  F19.16 ---    e_W2mag      [-1.72/0.52]? Description of e_W2mag   
-382-388  F7.3   ---    W3mag        [-6.65/13.65]? Description of W3mag    
-390-394  F5.3   ---    e_W3mag      [0.01/0.55]? Description of e_W3mag    
-396-403  F8.4   ---    Plx          [-4.18/31.81]? Description of Plx      
-405-410  F6.4   ---    e_Plx        [0.01/2.59]? Description of e_Plx      
-412-417  F6.3   ---    PM           [0.0/99.24]? Description of PM         
-419-431  F13.7  ---    rgeo         [31.4/20780.18]? Description of rgeo   
-433-445  F13.7  ---    b_rgeo       [31.38/16660.72]? Description of b_rgeo
-447-459  F13.7  ---    B_rgeo       [31.44/36991.77]? Description of B_rgeo
-461-471  E11.6  ---    P_AGN        Description of P_AGN                   
-473-483  E11.6  ---    e_P_AGN      Description of e_P_AGN                 
-485-495  E11.6  ---    P_CV         Description of P_CV                    
-497-507  E11.6  ---    e_P_CV       Description of e_P_CV                  
-509-519  E11.6  ---    P_HM-STAR    Description of P_HM-STAR               
-521-531  E11.6  ---    e_P_HM-STAR  Description of e_P_HM-STAR             
-533-543  E11.6  ---    P_HMXB       Description of P_HMXB                  
-545-555  E11.6  ---    e_P_HMXB     Description of e_P_HMXB                
-557-567  E11.6  ---    P_LM-STAR    Description of P_LM-STAR               
-569-579  E11.6  ---    e_P_LM-STAR  Description of e_P_LM-STAR             
-581-591  E11.6  ---    P_LMXB       Description of P_LMXB                  
-593-603  E11.6  ---    e_P_LMXB     Description of e_P_LMXB                
-605-615  E11.6  ---    P_NS         Description of P_NS                    
-617-627  E11.6  ---    e_P_NS       Description of e_P_NS                  
-629-639  E11.6  ---    P_YSO        Description of P_YSO                   
-641-651  E11.6  ---    e_P_YSO      Description of e_P_YSO                 
-653-659  A7     ---    Class        Description of Class                   
-661-671  E11.6  ---    Class_prob   [0.23/1.0] Description of Class_prob   
-673-683  E11.6  ---    e_Class_prob Description of e_Class_prob            
-685-695  E11.6  ---    CT           [0.0/100000.0] Description of CT       
-697-728  A32    ---    Catalog_name Description of Catalog_name            
-730-736  A7     ---    True_Class   Description of True_Class              
-738-771  A34    ---    Class_ref    Description of Class_ref               
+  1- 21  A21    ---    CSCv2_name   CSCv2 source name in the form “2CXO Jhhmmss.s{+|–}ddmmss”             
+ 23- 42  F20.16 deg    CSCv2_RA     CSCv2 master source J2000 Right Ascension              
+ 44- 63  F20.16 deg    CSCv2_DEC    CSCv2 master source J2000 Declination               
+ 65- 68  F4.2   arcsec CSCv2_PU     [0.71/2.46] CSCv2 master source err_ellipse_r0, the major radius of the 95% confidence level position error ellipse    
+ 70- 75  F6.2   ---    CSCv2_S/N    [0.91/376.06] CSCv2 master source X-ray significance
+ 77- 87  E11.6  mW/m2  Fb           [0.0/0.01] average broad (0.5-7 keV) band flux          
+ 89- 99  E11.6  mW/m2  e_Fb         [0.0/0.01] 1-sigma Fb Uncertainty         
+101-111  E11.6  mW/m2  Fh           [0.0/0.01] average hard (2-7 keV) band flux         
+113-123  E11.6  mW/m2  e_Fh         [0.0/0.01] 1-sigma Fh Uncertainty        
+125-135  E11.6  mW/m2  Fm           [0.0/0.01] average medium (1.2-2 keV) band flux          
+137-147  E11.6  mW/m2  e_Fm         [0.0/0.01] 1-sigma Fm Uncertainty         
+149-159  E11.6  mW/m2  Fs           [0.0/0.01] average soft (0.5-1.2 keV) band flux          
+161-171  E11.6  mW/m2  e_Fs         [0.0/0.01] 1-sigma Fs Uncertainty         
+173-177  F5.3   ---    P_intra      ? Highest value of Kuiper’s test variability probability across all observations available in CSCv2             
+179-183  F5.3   ---    P_inter      ? Inter-observation variability probability               
+185-202  A18    ---    CSCv2_flags  The compilation of CSCv2 master source flags including conf flag (“conf”), extent flag (“extent”), and pileup flag (“pileup”), jointed by a “|”           
+204-212  F9.6   mag    Gmag         [3.32/21.86]? Gaia EDR3 G band magnitude    
+214-221  F8.6   mag    e_Gmag       [0.0/0.13]? 1-sigma Gmag Uncertainty     
+223-231  F9.6   mag    BPmag        [4.02/22.61]? Gaia EDR3 BP band magnitude    
+233-240  F8.6   mag    e_BPmag      [0.0/1.12]? 1-sigma BPmag Uncertainty   
+242-250  F9.6   mag    RPmag        [2.64/20.98]? Gaia EDR3 RP band magnitude    
+252-259  F8.6   mag    e_RPmag      [0.0/0.76]? 1-sigma RPmag Uncertainty    
+261-266  F6.3   mag    Jmag         ? 2MASS J band magnitude                 
+268-272  F5.3   mag    e_Jmag       ? 1-sigma Jmag Uncertainty                 
+274-279  F6.3   mag    Hmag         ? 2MASS H band magnitude               
+281-285  F5.3   mag    e_Hmag       ? 1-sigma Hmag Uncertainty                
+287-292  F6.3   mag    Kmag         ? 2MASS K band magnitude                 
+294-298  F5.3   mag    e_Kmag       ? 1-sigma Kmag Uncertainty                 
+300-319  F20.16 mag    W1mag        [-1.8/18.87]? W1 band magnitude from AllWISE, CatWISE2020 and unWISE catalogs     
+321-339  F19.16 mag    e_W1mag      [-0.21/0.5]? 1-sigma W1 Uncertainty     
+341-360  F20.16 mag    W2mag        [-2.15/18.31]? W2 band magnitude from AllWISE, CatWISE2020 and unWISE catalogs  
+362-380  F19.16 mag    e_W2mag      [-1.72/0.52]? 1-sigma W2 Uncertainty    
+382-388  F7.3   mag    W3mag        [-6.65/13.65]? W3 band magnitude from AllWISE, CatWISE2020 and unWISE catalogs   
+390-394  F5.3   mag    e_W3mag      [0.01/0.55]? 1-sigma W3 Uncertainty    
+396-403  F8.4   mas    Plx          [-4.18/31.81]? Gaia EDR3 absolute stellar parallax     
+405-410  F6.4   mas    e_Plx        [0.01/2.59]? 1-sigma Plx Uncertainty      
+412-417  F6.3   mas/yr PM           [0.0/99.24]? Gaia EDR3 total proper motion       
+419-431  F13.7  pc     rgeo         [31.4/20780.18]? Median of the geometric distance from Gaia EDR3 Distances catalog
+433-445  F13.7  pc     b_rgeo       [31.38/16660.72]? 16th percentile of the geometric distance from Gaia EDR3 Distances catalog
+447-459  F13.7  pc     B_rgeo       [31.44/36991.77]? 84th percentile of the geometric distance from Gaia EDR3 Distances catalog
+461-471  E11.6  ---    P_AGN        Classification probability of the X-ray source to be classified as an AGN                 
+473-483  E11.6  ---    e_P_AGN      1-sigma P_AGN Uncertainty                
+485-495  E11.6  ---    P_CV         Classification probability of the X-ray source to be classified as a CV                  
+497-507  E11.6  ---    e_P_CV       1-sigma P_CV Uncertainty                  
+509-519  E11.6  ---    P_HM-STAR    Classification probability of the X-ray source to be classified as a HM-STAR           
+521-531  E11.6  ---    e_P_HM-STAR  1-sigma P_HM-STAR Uncertainty           
+533-543  E11.6  ---    P_HMXB       Classification probability of the X-ray source to be classified as a HMXB              
+545-555  E11.6  ---    e_P_HMXB     1-sigma P_HMXB Uncertainty               
+557-567  E11.6  ---    P_LM-STAR    Classification probability of the X-ray source to be classified as a LM-STAR          
+569-579  E11.6  ---    e_P_LM-STAR  1-sigma P_LM-STAR Uncertainty            
+581-591  E11.6  ---    P_LMXB       Classification probability of the X-ray source to be classified as a LMXB               
+593-603  E11.6  ---    e_P_LMXB     1-sigma P_LMXB Uncertainty              
+605-615  E11.6  ---    P_NS         Classification probability of the X-ray source to be classified as a NS               
+617-627  E11.6  ---    e_P_NS       1-sigma P_NS Uncertainty                 
+629-639  E11.6  ---    P_YSO        Classification probability of the X-ray source to be classified as a YSO               
+641-651  E11.6  ---    e_P_YSO      1-sigma P_YSO Uncertainty               
+653-659  A7     ---    Class        The predicted class of the source with the highest classification probability among eight classes                  
+661-671  E11.6  ---    Class_prob   [0.23/1.0] The classification probability of the predicted class calculated from MUWCLASS  
+673-683  E11.6  ---    e_Class_prob 1-sigma Class_prob Uncertainty            
+685-695  E11.6  ---    CT           [0.0/100000.0] The classification confidence threshold    
+697-728  A32    ---    Catalog_name The name of the source from the literature verified catalogs for the classification of TD sources          
+730-736  A7     ---    True_Class   The true class of the source from the TD              
+738-771  A34    ---    Class_ref    The reference of the classifications of the TD source              
 --------------------------------------------------------------------------------
 Notes:
 --------------------------------------------------------------------------------

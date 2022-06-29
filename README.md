@@ -22,9 +22,10 @@ files/HESS_results
 -- 
 
 * This notebook was run in CIAO 4.14 with Python 3.9 
-* conda create -n ciao-4.14 -c https://cxc.cfa.harvard.edu/conda/ciao -c conda-forge ciao sherpa ds9 ciao-contrib caldb_main marx python=3.9
+* conda create -n ciao-4.14-muwclass -c https://cxc.cfa.harvard.edu/conda/ciao -c conda-forge ciao sherpa ds9 ciao-contrib caldb_main marx python=3.9
+* this will create a new conda environment ciao-4.14-muwclass; if you already have ciao-4.14 installed with Python 3.9, you can use your own conda environment with additional Python packages installed from below
 
-* run 'bash install-packages.sh' under CIAO 4.14 environment to install all required packages 
+* run 'bash install-packages.sh' under ciao-4.14-muwclass environment to install all required packages 
 
 * then, make sure to enable widgetsnbextension and ipyaladin, run 
 * jupyter nbextension enable --py widgetsnbextension
