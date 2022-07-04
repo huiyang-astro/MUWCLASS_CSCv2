@@ -968,6 +968,7 @@ def counterpart_clean(df, X_PU='PU',catalog='gaia',X_mjd=57388.,pu_factor=1.5,pm
     elif catalog == '2mass':
         df['PU_CU_'+catalog] = df['errMaj_2mass']*2.
     elif catalog == 'catwise':
+        df = df.rename(columns={'_tab1_20_catwise':'MJD_catwise'})
         df['PU_CU_'+catalog] = df.apply(lambda row: max(row.e_RA_ICRS_catwise, row.e_DE_ICRS_catwise)*2., axis=1)
     elif catalog == 'unwise':
         df['PU_CU_'+catalog] = df.apply(lambda row: max(row.e_XposW1_unwise,row.e_XposW2_unwise,row.e_YposW1_unwise,row.e_YposW2_unwise)*2.75*2., axis=1)
@@ -1032,7 +1033,7 @@ def counterpart_clean(df, X_PU='PU',catalog='gaia',X_mjd=57388.,pu_factor=1.5,pm
         #print(df['_r2_'+catalog])
 
         s = np.where(( (df['_r2_'+catalog]<pu_factor*df['X_PU_'+catalog])) & (df['cp_flag_'+catalog]==-8) )[0]
-        df.loc[s,'cp_flag_'+catalog] = df.loc[s,'cp_flag_'+catalog] +2
+        df.loc[s,'cp_flag_'+catalog] = df.loc[s,'cp_flag_'+catalog] +0 # 2 before it was 2, change to 0 to be consistent with NGC 3532
     
     #s = np.where((df['_r_'+catalog] > pu_factor*df['X_PU_'+catalog] ) )[0]
     #df.loc[s,'cp_flag_'+catalog] = df.loc[s,'cp_flag_'+catalog] + 1 
@@ -1817,6 +1818,7 @@ def refsrc_gaia(field_name, field_dir, ref_mjd, ra=167.8665, dec=-60.66655, R=12
     return df_save
 
 def cal_astrometric_correction(xfm):#field_name,data_dir,residlim,sig_astro,count_astro):
+    # coordinate system for analysis of on-orbit chandra data
 
     #xfm = fits.open(f'{data_dir}/Astrometry/{field_name}_{residlim}_{sig_astro}_{count_astro}_xfm.fits')
     #logfile=data_dir+'/Astrometry/'+field_name+'_'+str(residlim)+'_'+str(sig_astro)+'_'+str(count_astro)+'_wcs_Xmatch.log')
@@ -1844,13 +1846,18 @@ def cal_astrometric_correction(xfm):#field_name,data_dir,residlim,sig_astro,coun
 
 def alignment_uncertainty(coords, df_X, df_ref):
     
+    #print(coords[['#Ref','Dup','RA','Dec']])
+
+    #print(df_X.iloc[coords['Dup'].values][['#RA','DEC','RA_ERR']])
+    #print(df_ref.iloc[coords['#Ref'].values][['#RA','DEC','RA_ERR']])
+    
     df_X = df_X.iloc[coords['Dup'].values].reset_index(drop=True)
-    #print(coords['Ref'].values)
+    
     df_ref = df_ref.iloc[coords['#Ref'].values].reset_index(drop=True)
 
     ra_astro_pu = np.sum(1./(df_X['RA_ERR']*3600)**2+(df_ref['RA_ERR']*3600)**2)**(-0.5)
     dec_astro_pu = np.sum(1./(df_X['DEC_ERR']*3600)**2+(df_ref['DEC_ERR']*3600)**2)**(-0.5)
-    #print(ra_astro_pu, dec_astro_pu)
+    print(ra_astro_pu, dec_astro_pu)
     astro_pu = (ra_astro_pu +dec_astro_pu)/2.
     
     return astro_pu
@@ -1868,7 +1875,8 @@ def cal_astro_pu(field_name,data_dir,residlim,sig_astro,count_astro):
     outF.write('\n')
     for li in lines[num_line-13-num_src:num_line-13]:
         if 'Y' in li:
-            outF.write(li[:-4])
+            outF.write(li[:-49]+li[-33:-27]+li[-10:-4])
+            #outF.write(li[:-4]) # previous wcs_match version did not produce uncertainty for Prior Resid and Transfm Resid
             outF.write('\n')
     outF.close()
 
@@ -1916,6 +1924,12 @@ def apply_astro_correct(field_name,data_dir,del_ra, del_dec, residlim,sig_astro,
     
     df_ref = pd.read_csv(f'{data_dir}/Astrometry/{field_name}_Gaia_eDR3_clean.txt', header=0,sep="\s+")
 
+    #print(df_src[['#Ref','Dup','RA','Dec']])
+
+    #print(df_X.iloc[df_src['Dup'].values][['#RA','DEC','ra_cor','dec_cor']])
+    #print(df_ref.iloc[df_src['#Ref'].values][['#RA','DEC','RA_ERR']])
+    
+
     df_X = df_X.iloc[df_src['Dup'].values].reset_index(drop=True)
     df_ref = df_ref.iloc[df_src['#Ref'].values].reset_index(drop=True)
 
@@ -1925,6 +1939,17 @@ def apply_astro_correct(field_name,data_dir,del_ra, del_dec, residlim,sig_astro,
     Xcat1[:, 0] = df_ref['#RA']
     Xcat1[:, 1] = df_ref['DEC']
 
+
+    Xcat2 = np.empty((len(df_X), 2), dtype=np.float64)
+    Xcat2[:, 0] = df_X['#RA']
+    Xcat2[:, 1] = df_X['DEC']
+
+    # crossmatch catalogs
+    max_radius = 1. / 3600  # 1 arcsec
+    dist_nocor, ind_nocor = crossmatch_angular(Xcat1, Xcat2, max_radius)
+
+    #print(dist_nocor*3600,np.sqrt(np.mean(dist_nocor**2))*3600)
+
     Xcat2 = np.empty((len(df_X), 2), dtype=np.float64)
     Xcat2[:, 0] = df_X['ra_cor']
     Xcat2[:, 1] = df_X['dec_cor']
@@ -1933,7 +1958,7 @@ def apply_astro_correct(field_name,data_dir,del_ra, del_dec, residlim,sig_astro,
     max_radius = 1. / 3600  # 1 arcsec
     dist1, ind1 = crossmatch_angular(Xcat1, Xcat2, max_radius)
 
-    #print(dist1*3600)
+    #print(dist1*3600,np.sqrt(np.mean(dist1**2))*3600)
 
 def prepare_field(arr):
     [df, data_dir, query_dir, field_name] = arr
