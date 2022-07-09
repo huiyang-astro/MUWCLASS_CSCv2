@@ -442,7 +442,7 @@ def get_red_par(ra, dec, dustmap='SFD', nhmap='LAB'):
     ebv = DustMap.ebv(coords, dustmap=dustmap) * 0.86 # 0.86 is the correction described in Schlafly et al. 2010 and Schlafly & Finkbeiner 2011
     nH_from_AV = 2.21 * 3.1 * ebv
     nH  = GasMap.nh(coords, nhmap=nhmap).value / 1.e21 # nH in unit of 1.e21 atoms /cm2
-    
+    #print(ebv, nH_from_AV)
     return ebv, nH_from_AV 
 
 def red_factor(ene, nH, Gamma, tbabs_ene, tbabs_cross):
@@ -985,6 +985,8 @@ def plot_confusion_matrix(df,
                           title='Normalized confusion matrix (%)',
                           cm_type='recall',
                           classes = ['AGN','CV','HM-STAR','LM-STAR','HMXB','LMXB','NS','YSO'],
+                          true_class = 'true_Class',
+                          pred_class = 'Class',
                           normalize=True,
                           count_fraction=False,
                           df_all = None,                           
@@ -1006,9 +1008,9 @@ def plot_confusion_matrix(df,
 
     #classes = np.sort(df.true_Class.unique())
     if cm_type=='recall':
-        cm = confusion_matrix(df.true_Class, df.Class, labels=classes)
+        cm = confusion_matrix(df[true_class], df[pred_class], labels=classes)
     if cm_type=='precision':
-        cm = confusion_matrix(df.Class, df.true_Class, labels=classes)
+        cm = confusion_matrix(df[pred_class], df[true_class], labels=classes)
     
     if normalize:
         cm = 100 * cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
@@ -1067,16 +1069,16 @@ def plot_confusion_matrix(df,
     p.axis.major_label_standoff = 5
         
     if cm_type == 'recall':
-        class_abun = df.true_Class.value_counts().to_dict()  
+        class_abun = df[true_class].value_counts().to_dict()  
     elif cm_type=='precision':
-        class_abun = df.Class.value_counts().to_dict()  
+        class_abun = df[pred_class].value_counts().to_dict()  
     y_labels = {_: f'{_}\n{class_abun[_] if _ in class_abun else 0}' for _ in p.y_range.factors}   
 
     if count_fraction == True:
         if cm_type == 'recall':
-            class_abun_all = df_all.true_Class.value_counts().to_dict()  
+            class_abun_all = df_all[true_class].value_counts().to_dict()  
         elif cm_type=='precision':
-            class_abun_all = df_all.Class.value_counts().to_dict()  
+            class_abun_all = df_all[pred_class].value_counts().to_dict()  
     
         y_labels = {_: f'{_}\n{class_abun[_]/class_abun_all[_] if _ in class_abun else 0:.2f}' for _ in p.y_range.factors}    
     p.yaxis.formatter = FuncTickFormatter(code=f'''
@@ -1289,10 +1291,10 @@ def confident_flag(df, method = 'sigma-mean', thres=2., class_cols=['AGN','CV','
 
     return df 
 
-def confident_sigma(df, class_cols=['AGN','CV','HM-STAR','LM-STAR','HMXB','LMXB','NS','YSO']):
+def confident_sigma(df, class_cols=['AGN','CV','HM-STAR','LM-STAR','HMXB','LMXB','NS','YSO'],class_prob='Class_prob',class_prob_e='Class_prob_e'):
 
     df['CT'] = np.nan
-    df['CT'] = df.apply(lambda row: sorted([(row.Class_prob - row['P_'+clas])/(row.Class_prob_e+row['e_P_'+clas] if row.Class_prob_e+row['e_P_'+clas]!=0 else 1e-5) for clas in class_cols])[1], axis=1) 
+    df['CT'] = df.apply(lambda row: sorted([(row[class_prob] - row['P_'+clas])/(row[class_prob_e]+row['e_P_'+clas] if row[class_prob_e]+row['e_P_'+clas]!=0 else 1e-5) for clas in class_cols])[1], axis=1) 
       
     return df 
 
