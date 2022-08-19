@@ -445,15 +445,15 @@ def get_red_par(ra, dec, dustmap='SFD', nhmap='LAB'):
     #print(ebv, nH_from_AV)
     return ebv, nH_from_AV 
 
-def red_factor(ene, nH, Gamma, tbabs_ene, tbabs_cross):
+def red_factor(ene, nH, Gamma, tbabs_ene, tbabs_cross): # energy in keV, nH in cm^-2
 
     if Gamma == 2:
         flux_unred_int = np.log(ene[1]) - np.log(ene[0])
     else:
         flux_unred_int   = (ene[1]**(2.-Gamma)-ene[0]**(2.-Gamma))/(2.-Gamma)
             
-    _ = np.array([_**(1 - Gamma) for _ in tbabs_ene])            
-    tbabs_flux_red = _ * np.exp(-nH * 1e-3 * tbabs_cross)
+    _ = np.array([_**(1 - Gamma) for _ in tbabs_ene]) # pseudo spectrum            
+    tbabs_flux_red = _ * np.exp(-nH * 1e-3 * tbabs_cross) # extincted spectrum
     
     finterp = InterpolatedUnivariateSpline(tbabs_ene, tbabs_flux_red, k=1)
     

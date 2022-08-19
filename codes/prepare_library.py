@@ -69,7 +69,7 @@ def atnf_pos(coord, e_coord, coord_format='hms', out='pos'):
         elif coord_format == 'dms':
             return float(e_deg)
 
-def create_perobs_data(data, query_dir, data_dir,  name_type='CSCview', name_col='name', ra_col='ra',dec_col='dec',coord_format='hms'):
+def create_perobs_data(data, query_dir, data_dir,  name_type='CSCview', name_col='name', ra_col='ra',dec_col='dec',coord_format='hms',csc_version='2.0'):
     '''
     description:
         extract the per-observation CSC 2.0 data using ADQL from http://cda.cfa.harvard.edu/csccli/getProperties URL  
@@ -134,6 +134,7 @@ def create_perobs_data(data, query_dir, data_dir,  name_type='CSCview', name_col
             text_file.close()
 
             os.system("curl -o "+query_dir+'/'+src+".txt \
+                --form version="+csc_version+"  \
                 --form query=@"+query_dir+'/'+src+".adql \
                 http://cda.cfa.harvard.edu/csccli/getProperties")
     
@@ -1338,7 +1339,7 @@ def TD_clean_vizier(TD, NS_clean=True, remove_codes = [1, 32, 64]):
     return CSC     
 
 
-def create_field_csc_data(data_dir,field_name,ra,dec,radius):#,name_type='CSCview', name_col='name', ra_col='ra',dec_col='dec',coord_format='hms'):
+def create_field_csc_data(data_dir,field_name,ra,dec,radius,csc_version='2.0'):#,name_type='CSCview', name_col='name', ra_col='ra',dec_col='dec',coord_format='hms'):
     '''
     description:
         extract the CSC 2.0 data for the field using ADQL from http://cda.cfa.harvard.edu/csccli/getProperties URL
@@ -1382,6 +1383,7 @@ def create_field_csc_data(data_dir,field_name,ra,dec,radius):#,name_type='CSCvie
     text_file.close()
 
     os.system("curl -o "+data_dir+'/'+field_name+"_csc.txt \
+        --form version="+csc_version+"  \
         --form query=@"+data_dir+'/'+field_name+".adql \
         http://cda.cfa.harvard.edu/csccli/getProperties")
 
