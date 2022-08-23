@@ -21,7 +21,7 @@ import matplotlib.pyplot as plt
 from collections import Counter
 
 #from cuml import RandomForestClassifier as cuRF
-
+ 
 MW_names = {'gaia':  ['Gmag', 'BPmag', 'RPmag'], \
             '2mass': ['Jmag', 'Hmag', 'Kmag'], \
             'wise':  ['W1mag', 'W2mag', 'W3mag'], \
@@ -964,10 +964,13 @@ from bokeh.plotting import figure
 from bokeh.transform import dodge, linear_cmap
 import colorcet as cc
 
-def plot_confusion_matrix(df,classes,
+def plot_confusion_matrix(df,
                           title='Normalized confusion matrix (%)',
                           cm_type='recall',
-                          normalize=True,                          
+                          classes = ['AGN','CV','HM-STAR','LM-STAR','HMXB','LMXB','NS','YSO'],
+                          normalize=True,  
+                          count_fraction=False,
+                          df_all = None,                            
                           pallete=cc.fire[::-1],
                           fill_alpha=0.6,
                           width=600, 
@@ -1045,6 +1048,15 @@ def plot_confusion_matrix(df,classes,
         
     class_abun = df[y_class].value_counts().to_dict()        
     y_labels = {_: f'{_}\n{class_abun[_]}' for _ in p.y_range.factors}    
+
+    if count_fraction == True:
+        if cm_type == 'recall':
+            class_abun_all = df_all.true_Class.value_counts().to_dict()  
+        elif cm_type=='precision':
+            class_abun_all = df_all.Class.value_counts().to_dict()  
+    
+        y_labels = {_: f'{_}\n{class_abun[_]/class_abun_all[_] if _ in class_abun else 0:.2f}' for _ in p.y_range.factors}    
+        
     p.yaxis.formatter = FuncTickFormatter(code=f'''
             var labels = {y_labels}
             return labels[tick]
