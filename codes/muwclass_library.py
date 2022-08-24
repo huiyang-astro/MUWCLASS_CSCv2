@@ -229,7 +229,7 @@ def prepare_cols(df, cp_thres=0, vphas=False,gaiadata=False,cp_conf_flag=False, 
 
 # MC sampling 
 
-def nonzero_sample(df, col, out_col,random_state=None):
+def nonzero_sample(df, col, out_col,random_state=None,factor=np.sqrt(2.)):
     '''
     description: 
         sampling the col column of df with its Gaussian uncertainty e_col column while making sure the sampled value is larger than zero (cases for fluxes)
@@ -244,11 +244,11 @@ def nonzero_sample(df, col, out_col,random_state=None):
     else:
         np.random.seed(random_state)
     
-    df['temp_'+col] = np.random.randn(df[col].size) * df['e_'+col] + df[col]
+    df['temp_'+col] = np.random.randn(df[col].size) * df['e_'+col] * factor + df[col]
     s = df.loc[df['temp_'+col]<=0].index
 
     while len(s) >0:
-        df.loc[s,'temp_'+col] = np.random.randn(df.loc[s,col].size) * df.loc[s,'e_'+col] + df.loc[s,col]
+        df.loc[s,'temp_'+col] = np.random.randn(df.loc[s,col].size) * df.loc[s,'e_'+col] * factor + df.loc[s,col]
         s = df.loc[df['temp_'+col]<=0].index
 
     df[out_col] = df['temp_'+col]
@@ -268,7 +268,7 @@ def asymmetric_errors(df,dist):
     
     return df
 
-def sample_data(df,Xray='CSC',distance='nodist',Uncer_flag=False,random_state=None,rep_num=False,verb=False):
+def sample_data(df,Xray='CSC',distance='nodist',Uncer_flag=False,random_state=None,rep_num=False,factor=np.sqrt(2.),verb=False):
     '''
     description: create sampled data from (Gaussian) distributions of measurements
     
@@ -299,7 +299,7 @@ def sample_data(df,Xray='CSC',distance='nodist',Uncer_flag=False,random_state=No
             
             bands = ['2','3','4','5','8']
             for band in bands:
-                df = nonzero_sample(df, 'Fxmm_'+band, 'Fxmm_'+band,random_state=random_state)
+                df = nonzero_sample(df, 'Fxmm_'+band, 'Fxmm_'+band,random_state=random_state,factor=factor)
 
         if Xray == 'CSC':
 
@@ -307,7 +307,7 @@ def sample_data(df,Xray='CSC',distance='nodist',Uncer_flag=False,random_state=No
             
             for band in bands:
                     
-                df = nonzero_sample(df, 'Fcsc_'+band, 'Fcsc_'+band,random_state=random_state)
+                df = nonzero_sample(df, 'Fcsc_'+band, 'Fcsc_'+band,random_state=random_state,factor=factor)
             
             df['Fcsc_b'] = df['Fcsc_s'] + df['Fcsc_m'] + df['Fcsc_h']
 
@@ -318,7 +318,7 @@ def sample_data(df,Xray='CSC',distance='nodist',Uncer_flag=False,random_state=No
 
         for cat in MW_cats:
             for band in MW_names[cat]:
-                df[band] = np.random.randn(df[band].size) * df['e_'+band] + df[band]
+                df[band] = np.random.randn(df[band].size) * df['e_'+band] * factor + df[band]
 
         if distance !='nodist':
             
@@ -336,12 +336,12 @@ def sample_data(df,Xray='CSC',distance='nodist',Uncer_flag=False,random_state=No
             df = asymmetric_errors(df, dist_feature)
 
             if dist_feature == 'Plx_dist':
-                df = nonzero_sample(df, 'Plx_gaia', 'Plx_gaia',random_state=random_state)
+                df = nonzero_sample(df, 'Plx_gaia', 'Plx_gaia',random_state=random_state,factor=factor)
                 df['Plx_dist'] = 1000./df['Plx_gaia'] # Plx_gaia in units of mas
             else:
                 # set distance of sources with no parallax measurements to nan. 
                 df.loc[df['Plx_gaia'].isna(), [dist_feature, 'e_'+dist_feature]]=np.nan
-                df = nonzero_sample(df, dist_feature, dist_feature,random_state=random_state)
+                df = nonzero_sample(df, dist_feature, dist_feature,random_state=random_state,factor=factor)
 
     elif Uncer_flag == False:   
 
@@ -678,7 +678,7 @@ def scaling(scaler, X_train, unscales,verb=False):
     return X_train_scaled_df, scaleds
 
 def loo_prepare(i, df, red_switch, Xcat, distance, Uncer_flag, ran_feature, random_state_sample, random_state_smote, tbabs_ene, tbabs_cross,\
-                    maglimitcut_switch=True,mag2flux_switch=True,standard_switch=True,oversample_switch=True,scaler_switch=True,color_select=True):   
+                    maglimitcut_switch=True,mag2flux_switch=True,standard_switch=True,oversample_switch=True,scaler_switch=True,color_select=True,ran_factor=np.sqrt(2.) ):   
     
     df_test = df[df.name == df.name[i]]
     df_train = df[df.name != df.name[i]]
@@ -686,8 +686,8 @@ def loo_prepare(i, df, red_switch, Xcat, distance, Uncer_flag, ran_feature, rand
     field_ra = df_test['ra'].values
     field_dec = df_test['dec'].values
     
-    df_test  = sample_data(df_test,Xcat,distance,Uncer_flag,random_state_sample,rep_num=False)
-    df_train = sample_data(df_train,Xcat,distance,Uncer_flag,random_state_sample)
+    df_test  = sample_data(df_test,Xcat,distance,Uncer_flag,random_state_sample,rep_num=False,factor=ran_factor)
+    df_train = sample_data(df_train,Xcat,distance,Uncer_flag,random_state_sample,factor=ran_factor)
 
     if Xcat == 'XMM':
         df_test = convert2csc(df_test, method = 'simple', Gamma =2.)
@@ -727,10 +727,10 @@ def loo_prepare(i, df, red_switch, Xcat, distance, Uncer_flag, ran_feature, rand
     return [i, X_train, y_train, X_test, y_test, test_name]
 
 def class_prepare(TD, field, red_switch, field_ra, field_dec, Xcat, distance, Uncer_flag, random_state_sample, random_state_smote, tbabs_ene, tbabs_cross,\
-                    maglimitcut_switch=True,mag2flux_switch=True,standard_switch=True,oversample_switch=True,scaler_switch=True,color_select=True): 
+                    maglimitcut_switch=True,mag2flux_switch=True,standard_switch=True,oversample_switch=True,scaler_switch=True,color_select=True,ran_factor=np.sqrt(2.) ): 
     
-    TD = sample_data(TD,Xcat,distance,Uncer_flag,random_state_sample)
-    field = sample_data(field,Xcat,distance,Uncer_flag,random_state_sample)
+    TD = sample_data(TD,Xcat,distance,Uncer_flag,random_state_sample,factor=ran_factor)
+    field = sample_data(field,Xcat,distance,Uncer_flag,random_state_sample,factor=ran_factor)
 
     if red_switch:
 
@@ -759,12 +759,12 @@ def class_prepare(TD, field, red_switch, field_ra, field_dec, Xcat, distance, Un
     return [X_train, y_train, X_test, test_name]
 
 def class_prepare_CSCv2(TD, field, red_switch, ebv, Xcat, distance, Uncer_flag, random_state_sample, random_state_smote, tbabs_ene, tbabs_cross,\
-                    maglimitcut_switch=True,mag2flux_switch=True,standard_switch=True,oversample_switch=True,scaler_switch=True,color_select=True): 
+                    maglimitcut_switch=True,mag2flux_switch=True,standard_switch=True,oversample_switch=True,scaler_switch=True,color_select=True,ran_factor=np.sqrt(2.) ): 
     
     field = prepare_cols(field, cp_thres=0, vphas=False,gaiadata=False)
 
-    TD = sample_data(TD,Xcat,distance,Uncer_flag,random_state_sample)
-    field = sample_data(field,Xcat,distance,Uncer_flag,random_state_sample)
+    TD = sample_data(TD,Xcat,distance,Uncer_flag,random_state_sample,factor=ran_factor)
+    field = sample_data(field,Xcat,distance,Uncer_flag,random_state_sample,factor=ran_factor)
 
     if red_switch:
 

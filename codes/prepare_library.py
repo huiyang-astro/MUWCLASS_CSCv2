@@ -506,18 +506,19 @@ def combine_master(df_ave, bands=['s','m','h']):
         stats(df_ave[df_ave['remove_code']==0], flx='flux_aper90_ave_', end='')
     return df_ave
 
-def nan_flux(df_ave, flux_name):
-    #print("Run nan_flux......")
-
-    df_ave['flux_flag'] = 0
+def nan_flux(df_ave, flux_name, flux_flag='flux_flag',end=''):
+    print("Run nan_flux......")
+    
+    df_ave[flux_flag] = 0
 
     for band, code, flux_hilim in zip(['s', 'm', 'h'], [1, 2, 4], [1e-17, 1e-17, 1e-17]):
-        col = flux_name+band
+        col = flux_name+band+end
         idx = np.where( (df_ave[col].isna()) | (df_ave['e_'+col].isna()) )[0]
         
         df_ave.loc[idx, col] = np.sqrt(2/np.pi) * flux_hilim
         df_ave.loc[idx, 'e_'+col] = np.sqrt((1.- 2./np.pi))* flux_hilim
-        df_ave.loc[idx, 'flux_flag'] = df_ave.loc[idx, 'flux_flag'] + code
+        
+        df_ave.loc[idx, flux_flag] = df_ave.loc[idx, flux_flag] + code
 
     return df_ave
 
@@ -548,6 +549,7 @@ def cal_ave(df, data_dir, dtype='TD', Chandratype='CSC',PU=False,cnt=False,plot=
     
     # convert asymmetric fluxes to symmetric fluxes
     df = flux2symmetric(df, end='.1')
+
     
     if Chandratype == 'CSC' or  Chandratype=='CSC-CXO':
         df = flux2symmetric(df, end='')
@@ -558,6 +560,10 @@ def cal_ave(df, data_dir, dtype='TD', Chandratype='CSC',PU=False,cnt=False,plot=
         # Adding new data
         df = add_newdata(df, data_dir)
     
+    # a mode of 0 and an upper limit of 1E-17 are used to replace the Null values of per-obs flux
+    #df = nan_flux(df, flux_name='flux_aper90_mean_',flux_flag='per_flux_flag',end='.1')
+    #print(df['per_flux_flag'].value_counts())
+
     df = cal_bflux(df, flx='flux_aper90_mean_',end='.1')
     
     # Apply with some filters on sat_src_flag and pile_warning at per-obs level
