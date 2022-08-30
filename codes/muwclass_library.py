@@ -1637,7 +1637,8 @@ def plot_classifier_matrix_withSTD(probs, stds, pred, yaxis, classes, normalize=
     if length ==2:
         fig, ax = plt.subplots(figsize=(21, length*1.5+3))
     '''
-    fig, ax = plt.subplots(figsize=(12, length+2))
+    #fig, ax = plt.subplots(figsize=(12, length+2))
+    fig, ax = plt.subplots(figsize=(21, length*1.5+3))
     im = ax.imshow(probs, interpolation='nearest', cmap=cmap)
     if nocmap ==False:
         ax.figure.colorbar(im, ax=ax)
