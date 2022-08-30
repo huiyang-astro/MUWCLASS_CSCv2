@@ -1148,6 +1148,13 @@ def confident_flag(df, method = 'sigma-mean', thres=2., class_cols=['AGN','CV','
 
     return df 
 
+def confident_sigma(df, class_cols=['AGN','CV','HM-STAR','LM-STAR','HMXB','LMXB','NS','YSO']):
+ 
+    df['conf_sigma'] = np.nan
+    df['conf_sigma'] = df.apply(lambda row: sorted([(row.Class_prob - row['P_'+clas])/(row.Class_prob_e+row['e_P_'+clas] if row.Class_prob_e+row['e_P_'+clas]!=0 else 1e-5) for clas in class_cols])[1], axis=1) 
+    
+    return df 
+
 def mw_counterpart_flag(df, mw_cols=['Gmag','BPmag','RPmag','Jmag','Hmag','Kmag','W1mag_comb','W2mag_comb','W3mag_allwise']):
 
     df['mw_cp_flag'] = 0

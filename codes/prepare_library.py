@@ -69,7 +69,7 @@ def atnf_pos(coord, e_coord, coord_format='hms', out='pos'):
         elif coord_format == 'dms':
             return float(e_deg)
 
-def create_perobs_data(data, query_dir, data_dir,  name_type='CSCview', name_col='name', ra_col='ra',dec_col='dec',coord_format='hms',csc_version='2.0'):
+def create_perobs_data(data, query_dir, data_dir,  name_type='CSCview', name_col='name', ra_col='ra',dec_col='dec',coord_format='hms',engine='curl',csc_version='2.0'):
     '''
     description:
         extract the per-observation CSC 2.0 data using ADQL from http://cda.cfa.harvard.edu/csccli/getProperties URL  
@@ -88,7 +88,7 @@ def create_perobs_data(data, query_dir, data_dir,  name_type='CSCview', name_col
         the combined per-obs data is saved as a csv file
 
     '''
-
+    print(f'engine:{engine},csc_version:{csc_version}')
     Path(query_dir).mkdir(parents=True, exist_ok=True)
     
     data['_q'] = data.index + 1
@@ -129,15 +129,25 @@ def create_perobs_data(data, query_dir, data_dir,  name_type='CSCview', name_col
             for [str1, str2] in [[rad_cone, rad_cone_temp], [ra, ra_temp], [dec, dec_temp], [ra_low, ra_low_temp], [ra_upp, ra_upp_temp], [dec_low, dec_low_temp], [dec_upp, dec_upp_temp]]:
                 adql = adql.replace(str2, str(str1))
             
-            text_file = open(f'{query_dir}/{src}.adql', "w")
-            text_file.write(adql)
-            text_file.close()
+            if engine == 'curl':
+                text_file = open(f'{query_dir}/{src}.adql', "w")
+                text_file.write(adql)
+                text_file.close()
+            elif engine == 'wget':
+                text_file = open(f'{query_dir}/{src}_wget.adql', "w")
+                text_file.write('http://cda.cfa.harvard.edu/csccli/getProperties?query='+adql)
+                text_file.close()
+            
+            if engine == 'curl':
 
-            os.system("curl -o "+query_dir+'/'+src+".txt \
-                --form version="+csc_version+"  \
-                --form query=@"+query_dir+'/'+src+".adql \
-                http://cda.cfa.harvard.edu/csccli/getProperties")
-    
+                os.system("curl -o "+query_dir+'/'+src+".txt \
+                    --form version="+csc_version+"  \
+                    --form query=@"+query_dir+'/'+src+".adql \
+                    http://cda.cfa.harvard.edu/csccli/getProperties")
+            elif engine == 'wget':
+
+                os.system("wget -O "+query_dir+'/'+src+".txt -i "+query_dir+'/'+src+"_wget.adql")
+        
     df_pers = pd.DataFrame()
     for source, usrid in zip(data[name_col], range(len(ras))):
         #print(usrid,source)
@@ -145,7 +155,7 @@ def create_perobs_data(data, query_dir, data_dir,  name_type='CSCview', name_col
             src = source[5:].strip()
         elif name_type == 'VizierCSC':
             src = source[2:-1]#.decode('utf-8') 
-        
+        print(src)
         df = pd.read_csv(f'{query_dir}/{src}.txt', header=154, sep='\t')
         df['usrid'] = usrid+1
         #df_pers = df_pers.append(df, ignore_index=True)

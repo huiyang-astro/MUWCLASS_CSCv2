@@ -214,10 +214,10 @@ def find_obs(df_per, ra, dec,filter=True):
     return obsids
 
 
-def prepare_field(df, data_dir, query_dir, field_name, name_col='name',search_mode='cone_search'):
+def prepare_field(df, data_dir, query_dir, field_name, name_col='name',search_mode='cone_search',engine='curl',csc_version='2.0'):
     
     #'''
-    df_pers = create_perobs_data(df, query_dir, data_dir, name_type='CSCview', name_col=name_col, ra_col='ra',dec_col='dec',coord_format='deg')
+    df_pers = create_perobs_data(df, query_dir, data_dir, name_type='CSCview', name_col=name_col, ra_col='ra',dec_col='dec',coord_format='deg',engine=engine,csc_version=csc_version)
     
     Path(data_dir).mkdir(parents=True, exist_ok=True)
     

@@ -209,7 +209,7 @@ def prepare_cols(df, cp_thres=0, vphas=False,gaiadata=False,cp_conf_flag=False, 
     #'''
     df_save = df_save.rename(columns = {
         'flux_aper90_ave_s':'Fcsc_s','e_flux_aper90_ave_s':'e_Fcsc_s','flux_aper90_ave_m':'Fcsc_m','e_flux_aper90_ave_m':'e_Fcsc_m',
-        'flux_aper90_ave_h':'Fcsc_h','e_flux_aper90_ave_h':'e_Fcsc_h',#'Plx_gaia':'Plx','e_Plx_gaia':'e_Plx','PM_gaia':'PM',
+        'flux_aper90_ave_h':'Fcsc_h','e_flux_aper90_ave_h':'e_Fcsc_h','Plx_gaia':'Plx','e_Plx_gaia':'e_Plx','PM_gaia':'PM',
         'rgeo_gaiadist':'rgeo','b_rgeo_gaiadist':'b_rgeo','B_rgeo_gaiadist':'B_rgeo','rpgeo_gaiadist':'rpgeo','b_rpgeo_gaiadist':'b_rpgeo','B_rpgeo_gaiadist':'B_rpgeo',
         'Jmag_2mass':'Jmag','e_Jmag_2mass':'e_Jmag','Hmag_2mass':'Hmag','e_Hmag_2mass':'e_Hmag','Kmag_2mass':'Kmag','e_Kmag_2mass':'e_Kmag',
         'W1mag_wise12':'W1mag','W2mag_wise12':'W2mag','W3mag_allwise':'W3mag','W4mag_allwise':'W4mag',
