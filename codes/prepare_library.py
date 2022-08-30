@@ -69,6 +69,41 @@ def atnf_pos(coord, e_coord, coord_format='hms', out='pos'):
         elif coord_format == 'dms':
             return float(e_deg)
 
+def CSCview_conesearch(field_name, ra, dec, radius,query_dir,csc_version='2.0'):
+    
+    ra_low  = ra - radius/60
+    ra_upp  = ra + radius/60
+    dec_low = dec - radius/60
+    dec_upp = dec + radius/60
+    rad_cone = radius
+    
+    f = open(f'{query_dir}/template/cscview_conesearch.adql', "r")
+    adql = f.readline()
+    ra_temp = '196.61458333333334'
+    dec_temp = '-60.73169444444444'
+    ra_low_temp = '196.2055016983212'
+    ra_upp_temp = '197.02366496834549'
+    dec_low_temp = '-60.931694444444446'
+    dec_upp_temp = '-60.53169444444444'
+    rad_cone_temp = '12.05789'
+    
+    for [str1, str2] in [[rad_cone, rad_cone_temp], [ra, ra_temp], [dec, dec_temp], [ra_low, ra_low_temp], [ra_upp, ra_upp_temp], [dec_low, dec_low_temp], [dec_upp, dec_upp_temp]]:
+        adql = adql.replace(str2, str(str1))
+    
+
+    text_file = open(f'{query_dir}/{field_name}.adql', "w")
+    text_file.write(adql)
+    text_file.close()
+
+    os.system("curl -o "+query_dir+'/'+field_name+".txt \
+        --form version="+csc_version+"  \
+        --form query=@"+query_dir+'/'+field_name+".adql \
+        http://cda.cfa.harvard.edu/csccli/getProperties")
+
+    df = pd.read_csv(f'{query_dir}/{field_name}.txt', header=15, sep='\t')
+
+    return df
+
 def create_perobs_data(data, query_dir, data_dir,  name_type='CSCview', name_col='name', ra_col='ra',dec_col='dec',coord_format='hms',engine='curl',csc_version='2.0'):
     '''
     description:
@@ -88,7 +123,7 @@ def create_perobs_data(data, query_dir, data_dir,  name_type='CSCview', name_col
         the combined per-obs data is saved as a csv file
 
     '''
-    print(f'engine:{engine},csc_version:{csc_version}')
+    #print(f'engine:{engine},csc_version:{csc_version}')
     Path(query_dir).mkdir(parents=True, exist_ok=True)
     
     data['_q'] = data.index + 1
@@ -116,7 +151,7 @@ def create_perobs_data(data, query_dir, data_dir,  name_type='CSCview', name_col
             dec_upp = dec + pu/3600
             rad_cone = pu/60
             
-            f = open(f'{query_dir}/csc_query_cnt_template.adql', "r")
+            f = open(f'{query_dir}/template/csc_query_cnt_template.adql', "r")
             adql = f.readline()
             ra_temp = '266.599396'
             dec_temp = '-28.87594'
@@ -155,7 +190,7 @@ def create_perobs_data(data, query_dir, data_dir,  name_type='CSCview', name_col
             src = source[5:].strip()
         elif name_type == 'VizierCSC':
             src = source[2:-1]#.decode('utf-8') 
-        print(src)
+        #print(src)
         df = pd.read_csv(f'{query_dir}/{src}.txt', header=154, sep='\t')
         df['usrid'] = usrid+1
         #df_pers = df_pers.append(df, ignore_index=True)
