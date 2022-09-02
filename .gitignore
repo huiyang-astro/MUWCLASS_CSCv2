@@ -8,4 +8,6 @@ codes/Evaluation/*
 codes/HESS/*
 codes/CSCv2_classification/*
 codes/demo/data/query/old/*
+files_v1/*
+files/CSCv2_all_MW_classprob_XCLASS.csv
 #codes/NGC3532/data/NGC3532_02182022/Astrometry/*

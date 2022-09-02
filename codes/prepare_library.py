@@ -69,14 +69,15 @@ def atnf_pos(coord, e_coord, coord_format='hms', out='pos'):
         elif coord_format == 'dms':
             return float(e_deg)
 
-def CSCview_conesearch(field_name, ra, dec, radius,query_dir,csc_version='2.0'):
+def CSCview_conesearch(field_name, ra, dec, radius,query_dir,engine='curl',csc_version='2.0'):
     
-    ra_low  = ra - radius/60
-    ra_upp  = ra + radius/60
+    ra_low  = ra - radius/(60.*np.cos(dec*np.pi/180.))
+    ra_upp  = ra + radius/(60.*np.cos(dec*np.pi/180.))
     dec_low = dec - radius/60
     dec_upp = dec + radius/60
     rad_cone = radius
     
+    '''
     f = open(f'{query_dir}/template/cscview_conesearch.adql', "r")
     adql = f.readline()
     ra_temp = '196.61458333333334'
@@ -86,21 +87,52 @@ def CSCview_conesearch(field_name, ra, dec, radius,query_dir,csc_version='2.0'):
     dec_low_temp = '-60.931694444444446'
     dec_upp_temp = '-60.53169444444444'
     rad_cone_temp = '12.05789'
+    '''
     
+    f = open(f'{query_dir}/template/csc_query_cnt_template.adql', "r")
+    adql = f.readline()
+    ra_temp = '266.599396'
+    dec_temp = '-28.87594'
+    ra_low_temp = '266.5898794490786'
+    ra_upp_temp = '266.60891255092145'
+    dec_low_temp = '-28.884273333333333'
+    dec_upp_temp = '-28.867606666666667'
+    rad_cone_temp = '0.543215'
+    #'''
     for [str1, str2] in [[rad_cone, rad_cone_temp], [ra, ra_temp], [dec, dec_temp], [ra_low, ra_low_temp], [ra_upp, ra_upp_temp], [dec_low, dec_low_temp], [dec_upp, dec_upp_temp]]:
         adql = adql.replace(str2, str(str1))
     
 
-    text_file = open(f'{query_dir}/{field_name}.adql', "w")
-    text_file.write(adql)
-    text_file.close()
+    #text_file = open(f'{query_dir}/{field_name}.adql', "w")
+    #text_file.write(adql)
+    #text_file.close()
 
-    os.system("curl -o "+query_dir+'/'+field_name+".txt \
-        --form version="+csc_version+"  \
-        --form query=@"+query_dir+'/'+field_name+".adql \
-        http://cda.cfa.harvard.edu/csccli/getProperties")
+    if engine == 'curl':
+        text_file = open(f'{query_dir}/{field_name}.adql', "w")
+        text_file.write(adql)
+        text_file.close()
+    elif engine == 'wget':
+        text_file = open(f'{query_dir}/{field_name}_wget.adql', "w")
+        text_file.write('http://cda.cfa.harvard.edu/csccli/getProperties?query='+adql)
+        text_file.close()
+    
+    if engine == 'curl':
 
-    df = pd.read_csv(f'{query_dir}/{field_name}.txt', header=15, sep='\t')
+        os.system("curl -o "+query_dir+'/'+field_name+".txt \
+            --form version="+csc_version+"  \
+            --form query=@"+query_dir+'/'+field_name+".adql \
+            http://cda.cfa.harvard.edu/csccli/getProperties")
+    elif engine == 'wget':
+
+        os.system("wget -O "+query_dir+'/'+field_name+".txt -i "+query_dir+'/'+field_name+"_wget.adql")
+
+    #os.system("curl -o "+query_dir+'/'+field_name+".txt \
+    #    --form version="+csc_version+"  \
+    #    --form query=@"+query_dir+'/'+field_name+".adql \
+    #    http://cda.cfa.harvard.edu/csccli/getProperties")
+
+    #df = pd.read_csv(f'{query_dir}/{field_name}.txt', header=15, sep='\t')
+    df = pd.read_csv(f'{query_dir}/{field_name}.txt', header=154, sep='\t')
 
     return df
 
@@ -145,10 +177,10 @@ def create_perobs_data(data, query_dir, data_dir,  name_type='CSCview', name_col
         if not (path.exists(f'{query_dir}/{src}.txt')):
             print(src)
         
-            ra_low  = ra - pu/3600
-            ra_upp  = ra + pu/3600
-            dec_low = dec - pu/3600
-            dec_upp = dec + pu/3600
+            ra_low  = ra - pu/(3600.*np.cos(dec*np.pi/180.))
+            ra_upp  = ra + pu/(3600.*np.cos(dec*np.pi/180.))
+            dec_low = dec - pu/3600.
+            dec_upp = dec + pu/3600.
             rad_cone = pu/60
             
             f = open(f'{query_dir}/template/csc_query_cnt_template.adql', "r")

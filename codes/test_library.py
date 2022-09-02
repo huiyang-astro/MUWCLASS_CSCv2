@@ -1064,6 +1064,111 @@ def plot_confusion_matrix(df,
         
     return(p)
 
+def plot_confusion_matrix_2fractions(df,
+                          title='Normalized confusion matrix (%)',
+                          cm_type='recall',
+                          classes = ['AGN','CV','HM-STAR','LM-STAR','HMXB','LMXB','NS','YSO'],
+                          normalize=True,  
+                          count_fraction=False,
+                          df_all1 = None, 
+                          df_all2 = None,                           
+                          pallete=cc.fire[::-1],
+                          fill_alpha=0.6,
+                          width=600, 
+                          height=600,
+                          plot_zeroes=True
+                         ):
+
+    #classes = np.sort(df.true_Class.unique())
+
+    if cm_type=='recall':
+        xlabel, x_class='Predicted Class', 'Class'
+        ylabel, y_class='True Class', 'true_Class'
+    elif cm_type=='precision':
+        xlabel, x_class='True Class', 'true_Class'
+        ylabel, y_class='Predicted Class', 'Class'
+    else:
+        raise ValueError("Type must be recall or precision!")
+    
+    cm = confusion_matrix(df[y_class], df[x_class], labels=classes)
+    
+    if normalize:
+        cm = 100 * cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+
+    _ = []
+    for i in range(len(cm)):
+        for j in range(len(cm[0])):        
+            f = format(np.round(cm[i, j]).astype(int), 'd')  
+            if not plot_zeroes and f == '0': continue # f = ''
+            _.append([classes[i], classes[j], f])        
+    _ =  pd.DataFrame(dict(zip([ylabel, xlabel, 'counts'], np.transpose(_))))         
+    source = ColumnDataSource(_)
+
+    p = figure(width=width, 
+               height=height, 
+               title=title,
+               x_range=classes, 
+               match_aspect=True,
+               # aspect_scale=2,
+               y_range=classes[::-1], 
+               toolbar_location=None, 
+               # tools='hover'
+              )
+
+    p.rect(xlabel, 
+           ylabel, 
+           1, 
+           1, 
+           source=source, 
+           fill_alpha=fill_alpha, 
+           line_color=None,
+           color=linear_cmap('counts', pallete, 0, 2 * cm.max())
+          )
+
+    text_props = {'source': source, 'text_align': 'center', 'text_baseline': 'middle'}
+    x = dodge(xlabel, 0, range=p.x_range)
+    r = p.text(x=x, y=ylabel, text='counts', **text_props)
+    r.glyph.text_font_style='bold'
+
+    p.outline_line_color = None
+    p.grid.grid_line_color = None
+    p.axis.axis_line_color = None
+    p.axis.major_label_text_font_size = '10pt'
+    p.xaxis.major_label_orientation = np.pi/4
+
+    p.yaxis.axis_label = ylabel 
+    p.xaxis.axis_label = xlabel
+
+    p.axis.axis_label_text_font_size = '18pt'
+    p.axis.axis_label_text_font_style = 'normal'
+
+    p.title.text_font_size = '18pt'
+    p.title.text_font_style = 'normal'
+
+    p.axis.major_label_standoff = 5
+        
+    class_abun = df[y_class].value_counts().to_dict()        
+    y_labels = {_: f'{_}\n{class_abun[_]}' for _ in p.y_range.factors}    
+
+    if count_fraction == True:
+        if cm_type == 'recall':
+            class_abun_all1 = df_all1.true_Class.value_counts().to_dict()
+            #class_abun_all2 = df_all2.true_Class.value_counts().to_dict()   
+        elif cm_type=='precision':
+            class_abun_all1 = df_all1.Class.value_counts().to_dict() 
+        class_abun_all2 = df_all1.true_Class.value_counts().to_dict()
+        class_abun_all3 = df_all2.true_Class.value_counts().to_dict()
+            #class_abun_all2 = df_all2.Class.value_counts().to_dict() 
+    
+        y_labels = {_: f'{_}/{class_abun[_]}\n{class_abun[_]/class_abun_all1[_] if _ in class_abun else 0:.2f}/{class_abun_all2[_]/class_abun_all3[_] if _ in class_abun else 0:.2f}' for _ in p.y_range.factors}    
+        
+    p.yaxis.formatter = FuncTickFormatter(code=f'''
+            var labels = {y_labels}
+            return labels[tick]
+        ''') 
+        
+    return(p)
+
 def plot_CM_withSTD(cm, tds, classes,
                     normalize=False,
                     type='recall',

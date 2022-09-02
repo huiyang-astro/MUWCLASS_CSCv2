@@ -1,0 +1,327 @@
+<?xml version="1.0"?>
+<VOTABLE version="1.2"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://www.ivoa.net/xml/VOTable/v1.2"
+  xsi:schemaLocation="http://www.ivoa.net/xml/VOTable/v1.2 http://www.ivoa.net/xml/VOTable/v1.2"
+  xmlns:stc="http://www.ivoa.net/xml/STC/v1.30">
+<RESOURCE name="CSC">
+<TABLE name="null">
+<FIELD ID="col0" arraysize="*" datatype="char" name="name" width="22">
+<DESCRIPTION>Source name in the format '2CXO Jhhmmss.s{+|-}ddmmss[X]'</DESCRIPTION>
+</FIELD>
+<FIELD ID="col1" datatype="double" name="significance" precision="F2">
+<DESCRIPTION>Highest flux significance (S/N) across all stacked observations and energy bands</DESCRIPTION>
+</FIELD>
+<FIELD ID="col2" datatype="double" name="flux_aper_b" precision="E3" unit="erg/s/cm^2">
+<DESCRIPTION>Aperture-corrected net energy flux inferred from the source region aperture, best estimate derived from the longest block of a multi-band, flux-ordered Bayesian Block analysis of the contributing observations, and calculated by counting X-ray events; ACIS broad (0.5-7.0 keV) energy band</DESCRIPTION>
+</FIELD>
+<FIELD ID="col3" datatype="double" name="powlaw_gamma" precision="F3">
+<DESCRIPTION>Photon index, defined as F_E ~ E^(-Gamma), of the best fitting  absorbed power-law model spectrum to the source region aperture PI spectrum</DESCRIPTION>
+</FIELD>
+<DATA>
+<TABLEDATA>
+  <TR>
+    <TD>2CXO J010151.8-724109</TD>
+    <TD>10.853259718011067</TD>
+    <TD>1.2408550943663E-13</TD>
+    <TD>2.3187</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J165111.6-440238</TD>
+    <TD>10.480013478052753</TD>
+    <TD>1.1325964331561E-12</TD>
+    <TD></TD>
+  </TR>
+  <TR>
+    <TD>2CXO J171107.6-395029</TD>
+    <TD>11.008497781509783</TD>
+    <TD>1.4779882300642E-13</TD>
+    <TD>0.928174</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J171428.6-383601</TD>
+    <TD>11.544484791383647</TD>
+    <TD>2.4207416309888E-13</TD>
+    <TD>0.176537</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J171440.7-400235</TD>
+    <TD>16.37952829242013</TD>
+    <TD>1.6931167007144E-13</TD>
+    <TD>2.25173</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J171531.5-394308</TD>
+    <TD>13.973083861131002</TD>
+    <TD>3.21113454553E-13</TD>
+    <TD>0.427512</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J171557.6-402047</TD>
+    <TD>16.652667901692674</TD>
+    <TD>5.6151006536797E-13</TD>
+    <TD>0.662245</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J172035.9-354200</TD>
+    <TD>12.517661783150794</TD>
+    <TD>7.9527089884643E-14</TD>
+    <TD>2.51679</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J172303.9-341147</TD>
+    <TD>17.28658348274664</TD>
+    <TD>2.8172069327917E-13</TD>
+    <TD>1.3642</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J172433.0-341654</TD>
+    <TD>10.033025499510645</TD>
+    <TD>4.4056668420794E-14</TD>
+    <TD></TD>
+  </TR>
+  <TR>
+    <TD>2CXO J172516.8-341211</TD>
+    <TD>10.617165045800093</TD>
+    <TD>5.8206501668261E-14</TD>
+    <TD>2.32743</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J172522.3-342445</TD>
+    <TD>11.057496307097683</TD>
+    <TD>5.5144629630318E-14</TD>
+    <TD>3.05869</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J172526.7-342337</TD>
+    <TD>14.983252930071743</TD>
+    <TD>1.0930519997899E-13</TD>
+    <TD>2.08264</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J172529.6-342557</TD>
+    <TD>13.81994301299774</TD>
+    <TD>1.5931844137274E-13</TD>
+    <TD>1.10104</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J172534.0-342334</TD>
+    <TD>13.557778246304276</TD>
+    <TD>8.9598861481327E-14</TD>
+    <TD>1.92317</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J172544.7-342719</TD>
+    <TD>13.896408525139599</TD>
+    <TD>1.028933841541E-13</TD>
+    <TD>1.92883</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J172552.1-342723</TD>
+    <TD>10.073203176937168</TD>
+    <TD>4.4825033015354E-14</TD>
+    <TD></TD>
+  </TR>
+  <TR>
+    <TD>2CXO J172751.2-352000</TD>
+    <TD>10.475249084184563</TD>
+    <TD>2.6127538828987E-13</TD>
+    <TD>0.0680728</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J173124.8-343904</TD>
+    <TD>12.19516703101863</TD>
+    <TD>2.2001022907502E-13</TD>
+    <TD>0.897678</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J173204.0-311556</TD>
+    <TD>10.251680229383815</TD>
+    <TD>2.9191690413834E-13</TD>
+    <TD></TD>
+  </TR>
+  <TR>
+    <TD>2CXO J174245.4-281324</TD>
+    <TD>10.192911718753823</TD>
+    <TD>2.8036282098013E-13</TD>
+    <TD></TD>
+  </TR>
+  <TR>
+    <TD>2CXO J175721.0-304404</TD>
+    <TD>39.99249182485345</TD>
+    <TD>1.2806950603351E-12</TD>
+    <TD>0.496673</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J175721.1-304406</TD>
+    <TD>46.67520772023789</TD>
+    <TD>1.9595017645203E-12</TD>
+    <TD>0.107331</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J175731.9-304301</TD>
+    <TD>24.044208377154042</TD>
+    <TD>3.4995268372161E-13</TD>
+    <TD>0.763978</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J180011.6-232634</TD>
+    <TD>12.229629206726264</TD>
+    <TD>4.5006746554423E-14</TD>
+    <TD>2.45516</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J180028.4-233336</TD>
+    <TD>13.82962441163329</TD>
+    <TD>5.8531152580222E-14</TD>
+    <TD>1.80729</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J180100.0-245127</TD>
+    <TD>17.230655096807258</TD>
+    <TD>3.8247462543823E-13</TD>
+    <TD>1.32696</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J180230.9-230043</TD>
+    <TD>10.116671282827399</TD>
+    <TD>3.8174221952126E-14</TD>
+    <TD></TD>
+  </TR>
+  <TR>
+    <TD>2CXO J180428.3-242111</TD>
+    <TD>11.231008081913943</TD>
+    <TD>3.604110349822E-14</TD>
+    <TD></TD>
+  </TR>
+  <TR>
+    <TD>2CXO J180733.7-245924</TD>
+    <TD>15.16114357177841</TD>
+    <TD>3.2077110820297E-13</TD>
+    <TD>1.98797</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J004820.2-733152</TD>
+    <TD>12.507718251021059</TD>
+    <TD>1.96589819992E-14</TD>
+    <TD></TD>
+  </TR>
+  <TR>
+    <TD>2CXO J123719.3+114915</TD>
+    <TD>10.02616483908181</TD>
+    <TD>3.4352015351611E-14</TD>
+    <TD></TD>
+  </TR>
+  <TR>
+    <TD>2CXO J123725.2+115810</TD>
+    <TD>12.064839980796394</TD>
+    <TD>1.0600744979806E-13</TD>
+    <TD>1.59249</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J173817.0-265939</TD>
+    <TD>23.769756390611256</TD>
+    <TD>6.7709598327462E-12</TD>
+    <TD>1.48026</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J175605.0-215723</TD>
+    <TD>10.2341122970048</TD>
+    <TD>5.2887376234005E-14</TD>
+    <TD></TD>
+  </TR>
+  <TR>
+    <TD>2CXO J175632.2-215943</TD>
+    <TD>12.411265735676201</TD>
+    <TD>8.2678261004097E-14</TD>
+    <TD>1.95559</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J180401.2-213153</TD>
+    <TD>15.127362291396604</TD>
+    <TD>1.4901836183428E-13</TD>
+    <TD>2.11034</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J180917.7-242252</TD>
+    <TD>12.134407733578804</TD>
+    <TD>2.0586719599458E-13</TD>
+    <TD>1.26504</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J181209.7-190226</TD>
+    <TD>13.581826095773827</TD>
+    <TD>1.1758507972855E-13</TD>
+    <TD>0.587376</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J181314.2-175343</TD>
+    <TD>14.213736499809508</TD>
+    <TD>1.9186806925165E-13</TD>
+    <TD>2.57318</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J181323.7-175040</TD>
+    <TD>12.360480716248368</TD>
+    <TD>1.1634753988791E-13</TD>
+    <TD>1.76327</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J181330.1-175110</TD>
+    <TD>12.129873795032108</TD>
+    <TD>2.0673366573481E-13</TD>
+    <TD>1.72549</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J181333.3-175855</TD>
+    <TD>14.742419128885114</TD>
+    <TD>3.2430651623069E-13</TD>
+    <TD>-0.222042</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J181335.1-174957</TD>
+    <TD>24.680497131970903</TD>
+    <TD>7.4339994351823E-13</TD>
+    <TD>1.90477</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J181638.2-161843</TD>
+    <TD>10.484796927216225</TD>
+    <TD>2.6251015662761E-13</TD>
+    <TD></TD>
+  </TR>
+  <TR>
+    <TD>2CXO J181642.7-161322</TD>
+    <TD>27.486647408297394</TD>
+    <TD>2.0366662602158E-12</TD>
+    <TD>1.03741</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J181933.5-165656</TD>
+    <TD>10.447215113474176</TD>
+    <TD>2.0075221245966E-13</TD>
+    <TD>1.13899</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J182539.9-133129</TD>
+    <TD>12.602774487356154</TD>
+    <TD>1.6013453506025E-13</TD>
+    <TD>0.294821</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J182558.7-145205</TD>
+    <TD>14.703368815514924</TD>
+    <TD>1.5033153759472E-13</TD>
+    <TD>2.24641</TD>
+  </TR>
+  <TR>
+    <TD>2CXO J182613.1-133446</TD>
+    <TD>15.458852680568782</TD>
+    <TD>1.1146659108611E-13</TD>
+    <TD>0.946663</TD>
+  </TR>
+</TABLEDATA>
+</DATA>
+</TABLE>
+</RESOURCE>
+</VOTABLE>

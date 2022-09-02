@@ -16,7 +16,7 @@ import pyds9 as ds9
 from scipy.ndimage import gaussian_filter
 from astropy.coordinates import SkyCoord, Angle
 from astropy import units as u
-from prepare_library import create_perobs_data, cal_ave, add_MW, confusion_clean, CSC_clean_keepcols
+from prepare_library import create_perobs_data, cal_ave, add_MW, confusion_clean, CSC_clean_keepcols, CSCview_conesearch
 from muwclass_library import class_prepare, class_train_and_classify, class_save_res, col_rename, confident_flag, confident_sigma, find_confident, plot_classifier_matrix_withSTD, prepare_cols
 from pathlib import Path
 import time
@@ -214,11 +214,14 @@ def find_obs(df_per, ra, dec,filter=True):
     return obsids
 
 
-def prepare_field(df, data_dir, query_dir, field_name, name_col='name',search_mode='cone_search',engine='curl',csc_version='2.0'):
+def prepare_field(df, data_dir, query_dir, field_name, name_col='name',search_mode='cone_search',engine='curl',csc_version='2.0',create_perobs=True):
     
     #'''
-    df_pers = create_perobs_data(df, query_dir, data_dir, name_type='CSCview', name_col=name_col, ra_col='ra',dec_col='dec',coord_format='deg',engine=engine,csc_version=csc_version)
-    
+    if create_perobs == True:
+        df_pers = create_perobs_data(df, query_dir, data_dir, name_type='CSCview', name_col=name_col, ra_col='ra',dec_col='dec',coord_format='deg',engine=engine,csc_version=csc_version)
+    else:
+        df_pers = df
+        
     Path(data_dir).mkdir(parents=True, exist_ok=True)
     
     df_pers.to_csv(f'{data_dir}/{field_name}_per.csv', index=False)
