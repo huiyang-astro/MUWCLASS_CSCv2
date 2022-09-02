@@ -28,6 +28,7 @@ from astroML.crossmatch import crossmatch_angular
 from astroquery.gaia import Gaia
 from uncertainties import unumpy
 from astropy.time import Time
+import requests
 
 exnum = 975318642
 
@@ -124,6 +125,7 @@ def create_perobs_data(data, query_dir, data_dir,  name_type='CSCview', name_col
 
     '''
     #print(f'engine:{engine},csc_version:{csc_version}')
+    print('Operating system is: '+os.name)
     Path(query_dir).mkdir(parents=True, exist_ok=True)
     
     data['_q'] = data.index + 1
@@ -163,7 +165,7 @@ def create_perobs_data(data, query_dir, data_dir,  name_type='CSCview', name_col
             
             for [str1, str2] in [[rad_cone, rad_cone_temp], [ra, ra_temp], [dec, dec_temp], [ra_low, ra_low_temp], [ra_upp, ra_upp_temp], [dec_low, dec_low_temp], [dec_upp, dec_upp_temp]]:
                 adql = adql.replace(str2, str(str1))
-            
+
             if engine == 'curl':
                 text_file = open(f'{query_dir}/{src}.adql', "w")
                 text_file.write(adql)
@@ -180,8 +182,16 @@ def create_perobs_data(data, query_dir, data_dir,  name_type='CSCview', name_col
                     --form query=@"+query_dir+'/'+src+".adql \
                     http://cda.cfa.harvard.edu/csccli/getProperties")
             elif engine == 'wget':
-
-                os.system("wget -O "+query_dir+'/'+src+".txt -i "+query_dir+'/'+src+"_wget.adql")
+                # if operatin system is linux
+                if os.name == 'posix':
+                    os.system("wget -O "+query_dir+'/'+src+".txt -i "+query_dir+'/'+src+"_wget.adql")
+                elif os.name == 'nt':
+                    # read uri from the first line of the file, strip the newline character
+                    uri = open(query_dir+'/'+src+"_wget.adql", "r").readline().strip()
+                    # use requests to get the data
+                    r = requests.get(uri)
+                    # write the data to the file
+                    open(query_dir+'/'+src+".txt", "w").write(r.text)
         
     df_pers = pd.DataFrame()
     for source, usrid in zip(data[name_col], range(len(ras))):
