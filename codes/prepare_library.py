@@ -609,7 +609,7 @@ def nan_flux(df_ave, flux_name, flux_flag='flux_flag',end=''):
 
     return df_ave
 
-def cal_ave(df, data_dir, dtype='TD', Chandratype='CSC',PU=False,cnt=False,plot=False, verb=False):
+def cal_ave(df, data_dir, dtype='TD', Chandratype='CSC',PU=False,cnt=False,plot=False, verb=False, convert_hms_to_deg=True):
     '''
     description:
         calculate the averaged data from per-observation CSC data
@@ -712,7 +712,7 @@ def cal_ave(df, data_dir, dtype='TD', Chandratype='CSC',PU=False,cnt=False,plot=
     df, df_ave = cal_var(df, df_ave, 'flux_aper90_ave2_b','flux_aper90_mean_b.1')
     df_ave = df_ave.drop(['flux_aper90_ave2_b','e_flux_aper90_ave2_b'],axis=1)
 
-    if Chandratype=='CSC' or  Chandratype=='CSC-CXO':
+    if (Chandratype=='CSC' or  Chandratype=='CSC-CXO') and  convert_hms_to_deg==True:
         # combine additional useful master flux
         #df_ave = combine_master(df_ave)
         df_ave['ra']= Angle(df_ave['ra'], 'hourangle').degree

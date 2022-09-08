@@ -758,6 +758,40 @@ def class_prepare(TD, field, red_switch, field_ra, field_dec, Xcat, distance, Un
     
     return [X_train, y_train, X_test, test_name]
 
+
+def class_prepare_oversample(TD, field, red_switch, field_ra, field_dec, Xcat, distance, Uncer_flag, random_state_sample, random_state_smote, tbabs_ene, tbabs_cross,oversample_algo,\
+                    maglimitcut_switch=True,mag2flux_switch=True,standard_switch=True,oversample_switch=True,scaler_switch=True,color_select=True,ran_factor=np.sqrt(2.) ): 
+    
+    TD = sample_data(TD,Xcat,distance,Uncer_flag,random_state_sample,factor=ran_factor)
+    field = sample_data(field,Xcat,distance,Uncer_flag,random_state_sample,factor=ran_factor)
+
+    if red_switch:
+
+        # Extract reddening parameters from SFD dustmap & DL HI map
+        ebv, nh = get_red_par(field_ra, field_dec)
+
+        # Applying reddening to AGNs     
+        TD_red2csc = apply_red2csc(TD.copy(), nh, tbabs_ene, tbabs_cross, 'AGN', self_unred=False, Gamma=2)
+        TD  = apply_red2mw(TD_red2csc, ebv, 'AGN', self_unred=False)
+
+    TD = postprocessing(TD, Xcat, distance, add_cols=['Class','name'],maglimitcut_switch=maglimitcut_switch,mag2flux_switch=mag2flux_switch,standard_switch=standard_switch,color_select=color_select)
+    field = postprocessing(field, Xcat, distance, add_cols=['name'],maglimitcut_switch=maglimitcut_switch,mag2flux_switch=mag2flux_switch,standard_switch=standard_switch,color_select=color_select)
+
+    X_train, y_train = TD.drop(['Class', 'name'], axis=1), TD.Class
+    X_test, test_name = field.drop('name', axis=1), field.name
+
+    if scaler_switch==True:
+        X_train, [X_test] = scaling(ML_scaler, X_train, [X_test])
+    if oversample_switch ==True:
+        #ML_oversampler = oversample_algo(random_state=random_state_smote) 
+        oversample_algo.random_state = random_state_smote
+        X_train, y_train = oversampling(oversample_algo, X_train, y_train)
+    
+    X_train = X_train.fillna(-100)
+    X_test  = X_test.fillna(-100)
+    
+    return [X_train, y_train, X_test, test_name]
+
 def class_prepare_CSCv2(TD, field, red_switch, ebv, Xcat, distance, Uncer_flag, random_state_sample, random_state_smote, tbabs_ene, tbabs_cross,\
                     maglimitcut_switch=True,mag2flux_switch=True,standard_switch=True,oversample_switch=True,scaler_switch=True,color_select=True,ran_factor=np.sqrt(2.) ): 
     

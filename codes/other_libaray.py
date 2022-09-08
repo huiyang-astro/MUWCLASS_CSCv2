@@ -214,7 +214,7 @@ def find_obs(df_per, ra, dec,filter=True):
     return obsids
 
 
-def prepare_field(df, data_dir, query_dir, field_name, name_col='name',search_mode='cone_search',engine='curl',csc_version='2.0',create_perobs=True):
+def prepare_field(df, data_dir, query_dir, field_name, name_col='name',search_mode='cone_search',engine='curl',csc_version='2.0',create_perobs=True,convert_hms_to_deg=True):
     
     #'''
     if create_perobs == True:
@@ -231,7 +231,7 @@ def prepare_field(df, data_dir, query_dir, field_name, name_col='name',search_mo
     df_pers['name'] = df_pers['name'].str.lstrip()
     df_pers['per_remove_code'] = 0
 
-    df_ave, df_obs = cal_ave(df_pers, data_dir, dtype='field',Chandratype='CSC',verb=0)
+    df_ave, df_obs = cal_ave(df_pers, data_dir, dtype='field',Chandratype='CSC',verb=0, convert_hms_to_deg=True)
 
     df_ave.to_csv(f'{data_dir}/{field_name}_ave.csv', index=False)
 
