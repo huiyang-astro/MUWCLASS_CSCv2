@@ -9,3 +9,4 @@ codes/HESS/*
 codes/CSCv2_classification/*
 codes/demo/data/query/*
 #codes/NGC3532/data/NGC3532_02182022/Astrometry/*
+*.pyc
