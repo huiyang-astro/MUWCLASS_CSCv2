@@ -125,7 +125,16 @@ def CSCview_conesearch(field_name, ra, dec, radius,query_dir,engine='curl',csc_v
             http://cda.cfa.harvard.edu/csccli/getProperties")
     elif engine == 'wget':
 
-        os.system("wget -O "+query_dir+'/'+field_name+".txt -i "+query_dir+'/'+field_name+"_wget.adql")
+        # if operatin system is linux
+        if os.name == 'posix':
+            os.system("wget -O "+query_dir+'/'+field_name+".txt -i "+query_dir+'/'+field_name+"_wget.adql")
+        elif os.name == 'nt':
+            # read uri from the first line of the file, strip the newline character
+            uri = open(query_dir+'/'+field_name+"_wget.adql", "r").readline().strip()
+            # use requests to get the data
+            r = requests.get(uri)
+            # write the data to the file
+            open(query_dir+'/'+field_name+".txt", "w").write(r.text)
 
     #os.system("curl -o "+query_dir+'/'+field_name+".txt \
     #    --form version="+csc_version+"  \
