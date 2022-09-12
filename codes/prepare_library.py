@@ -222,7 +222,7 @@ def create_perobs_data(data, query_dir, data_dir,  name_type='CSCview', name_col
             src = source[5:].strip()
         elif name_type == 'VizierCSC':
             src = source[2:-1]#.decode('utf-8') 
-        #print(src)
+        print(src)
         df = pd.read_csv(f'{query_dir}/{src}.txt', header=154, sep='\t')
         df['usrid'] = usrid+1
         #df_pers = df_pers.append(df, ignore_index=True)
