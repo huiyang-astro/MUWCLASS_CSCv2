@@ -21,6 +21,9 @@ codes/builtTD
 files/HESS_results
 - This includes the classification results of X-ray sources within the extent of unidentified HESS sources with detection significance S/N>6 (files/HESS_results/signif_6) and S/N>3 (files/HESS_results/signif_3)
 
+codes/Evaluation
+- This is a notebook that evaluate the performance of the pipeline (calculating performance metrics, confusion matrices) for all the sources from the training dataset, or a subset of the sources that are missing optical/NIR/MIR counterparts. The users can adjust the filters to evaluate the performance any subset of the training dataset. 
+
 -- 
 
 * This notebook was run in CIAO 4.14 with Python 3.9 
