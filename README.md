@@ -12,6 +12,9 @@ This github repo provides the MUltiWavelength Machine Learning CLASSification Pi
 
 The main components of this github repo are
 
+files/{GCS.csv, GCS_MRT.dat, TD.csv, TD_MRT.dat, HESS.csv, HESS_MRT.dat}
+- These include the CSV (comma-separated values) files of the good CSCv2 sample (GCS.csv), the training dataset (TD.csv) and the HESS field sources (HESS.csv) which are the full tables of Table 8, 9, and 10 in https://arxiv.org/abs/2206.13656, and their corresponding machine readable tables for the AAS Journals (GCS_MRT.dat, TD_MRT.dat, and HESS_MER.dat). 
+
 codes/demo
 - This is a notebook of a demonstration of classifying CSCv2 sources using MUWCLASS with CSCv2 and multiwavelength data
 
@@ -23,6 +26,9 @@ files/HESS_results
 
 codes/Evaluation
 - This is a notebook that evaluate the performance of the pipeline (calculating performance metrics, confusion matrices) for all the sources from the training dataset, or a subset of the sources that are missing optical/NIR/MIR counterparts. The users can adjust the filters to evaluate the performance any subset of the training dataset. 
+
+files/{CSC_TD_MW_remove.csv, feature_importance.csv, tbabs.data}
+- Some other CSV files including the raw training dataset with more properties (CSC_TD_MW_remove.csv), feature importance values and their uncertainties (feature_importance.csv), the photoelectric absorption cross-section file (tbabs.data).
 
 -- 
 
