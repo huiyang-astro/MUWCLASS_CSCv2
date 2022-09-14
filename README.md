@@ -30,9 +30,14 @@ codes/Evaluation
 files/{CSC_TD_MW_remove.csv, feature_importance.csv, tbabs.data}
 - Some other CSV files including the raw training dataset with more properties (CSC_TD_MW_remove.csv), feature importance values and their uncertainties (feature_importance.csv), the photoelectric absorption cross-section file (tbabs.data).
 
--- 
+-- Required Package Installation Instructions
 
-* This notebook was run in CIAO 4.14 with Python 3.9 
+* The notebooks were run in CIAO 4.14 with Python 3.9 
+
+* If you are using macOS 11 (Big Sur) and macOS 12 (Monterey) on the new Apple M1 chip, you will need to use the Intel x86_64 edition of conda and Python for conda installation (see https://cxc.cfa.harvard.edu/ciao/download/platforms.html)
+
+* XQuartz is required to install on macOS to run DS9.
+
 * run the follow code to create a new conda environment ciao-4.14-muwclass; if you already have ciao-4.14 installed with Python 3.9, you can use your own conda environment with additional Python packages installed from below
 * conda create -n ciao-4.14-muwclass -c https://cxc.cfa.harvard.edu/conda/ciao -c conda-forge ciao sherpa ds9 ciao-contrib caldb_main marx python=3.9
 
