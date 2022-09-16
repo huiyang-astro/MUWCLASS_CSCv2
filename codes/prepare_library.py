@@ -10,6 +10,7 @@ Created on Tue Oct 12 2021
 version 1.0 the minimum version of library for preparation of TD
 '''
 
+from operator import index
 import numpy as np, pandas as pd, astropy.units as u, pickle
 from os import path
 from pathlib import Path
@@ -737,7 +738,7 @@ def cal_ave(df, data_dir, dtype='TD', Chandratype='CSC',PU=False,cnt=False,plot=
     #'''
     return df_ave, df
 
-def MW_counterpart_confusion(ras, decs, R, Es=[], N=10, catalog='wise',ref_mjd=5.e4, pm_cor=False, confusion=True, second_nearest=False):
+def MW_counterpart_confusion(ras, decs, R, Es=[], N=10, catalog='wise',ref_mjd=5.e4, pm_cor=False, confusion=True, second_nearest=False, gaia_precomputed=True):
     '''
         input:
         
@@ -966,7 +967,7 @@ def MW_counterpart_confusion(ras, decs, R, Es=[], N=10, catalog='wise',ref_mjd=5
     
     return df_MWs
 
-def add_MW(df, file_dir, field_name, Chandratype='CSC',ref_mjd=5.e4,pm_cor=False,confusion=False):
+def add_MW(df, file_dir, field_name, Chandratype='CSC',ref_mjd=5.e4,pm_cor=False,confusion=False, gaia_precomputed=True):
 
     #data = data[0:3]
     if path.exists(f'{file_dir}/{field_name}_MW.csv') == True:
@@ -1017,7 +1018,7 @@ def add_MW(df, file_dir, field_name, Chandratype='CSC',ref_mjd=5.e4,pm_cor=False
             #print(cat, confusion)
             
             df_MW = MW_counterpart_confusion(ras, decs, search_radius, Es=Es, N=sig_nr, catalog=cat,ref_mjd=ref_mjd,pm_cor=pm_cor,confusion=conf)
-            
+
             if path.exists(f'{file_dir}/{field_name}_{cat}.csv') == False:
                 #df_MW = MW_counterpart_confusion(ras, decs, search_radius, Es=Es, N=sig_nr, catalog=cat,ref_mjd=ref_mjd,pm_cor=pm_cor,confusion=confusion)
                 df_MW.to_csv(file_dir+'/'+field_name+'_'+cat+'.csv', index=False) 
@@ -1034,6 +1035,17 @@ def add_MW(df, file_dir, field_name, Chandratype='CSC',ref_mjd=5.e4,pm_cor=False
                 df_MW_all.to_csv(f'{file_dir}/{field_name}_{cat}.csv', index=False)   
             
             data = pd.merge(data, df_MW, how='outer', on=['_q', '_q'])
+
+            if cat == 'gaia' and gaia_precomputed == True:
+                print('gaia_precomputed')
+                df_gaia = Gaia_counterparts_new(data['name', 'ra', 'dec'], file_dir, field_name, 3)
+                data = data.merge(df_gaia, how='left', on='name')
+                df_nogaia = data.loc[data['EDR3Name_gaia'].isna()]
+                for cat in ['2mass','allwise']:
+                    df_MW = MW_counterpart_confusion(df_nogaia['ra'].values, df_nogaia['dec'].values, search_radius, Es=df_nogaia['err_ellipse_r0'].values, N=sig_nr, catalog=cat,ref_mjd=ref_mjd,pm_cor=pm_cor,confusion=confusion)
+                    df_MW.to_csv(file_dir+'/'+field_name+'_'+cat+'.csv', index=False) 
+                    data = pd.merge(data, df_MW, how='outer', on=['_q', '_q'])
+
         
         if path.exists(f'{file_dir}/{field_name}_MW.csv') == True:
             #data.to_csv(file_dir+'/'+field_name+'_MW_new.csv', index=False)
@@ -1638,6 +1650,83 @@ def CSC_clean(data, remove_codes = [1, 32], withvphas=False):
     print(len(CSC[CSC['remove_code']==0]))
 
     return CSC
+
+
+def Gaia_counterparts_new(df, file_dir, field_name, radius):
+    '''
+    upload file with CXO sources to Gaia archive, crossmatch to Gaia DR3, upload results to Gaia archive again and crossmatch to Gaia DR3 astrophysical parameters, Gaia eDR3 distances, and Gaia precomputed 2MASS and AllWISE counterparts
+    radius: crossmatching radius of CXO sources to Gaia DR3 in arcsec
+    '''
+
+
+
+    upload_resource = f'{file_dir}/{field_name}_upload.xml'
+
+    # currently table cannot be csv file, see https://github.com/astropy/astroquery/issues/2529
+    table = Table.from_pandas(df)
+    # from astropy.io.votable import from_table, writeto
+    # votable = from_table(table)
+    # writeto(votable, upload_resource)
+
+    # notes: need to separate the Gaia query into two parts, one part for crossmatching to Gaia based on coordinate cone search, the other part for crossmatching to Gaia distance, Gaia DR3 astrophysical parameters, Gaia precomputed 2MASS and ALLWISE sources based on Gaia source ID.
+    # this is because the job takes very long to finish if crossmatching based on coordinates and source ID are combined for some reason, see https://www.cosmos.esa.int/web/gaia-users/archive/combine-with-other-data#preXmatch_S3_2 section 3.2
+    # also must have decimal point on crossmatching radius to make it a float
+    # j = Gaia.launch_job(query=
+    #     f'''SELECT {field_name}.name, gaia.*, DISTANCE(POINT({field_name}.ra, {field_name}.dec), POINT(gaia.ra, gaia.dec)) AS separation
+    #         FROM tap_upload.{field_name} AS {field_name}
+    #         LEFT JOIN gaiadr3.gaia_source AS gaia
+    #             ON 1 = CONTAINS(
+    #                 POINT({field_name}.ra, {field_name}.dec),
+    #                 CIRCLE(gaia.ra, gaia.dec, {radius}./3600)
+    #             )
+    #     '''
+    # , upload_resource=table, upload_table_name=field_name, verbose=True, dump_to_file=False)
+    # r = j.get_results()
+
+    # print(type(r))
+
+    j = Gaia.launch_job(query=
+        f'''SELECT {field_name}.*, gaiaap.*, dist.*, tmass.*, allwise.*
+            FROM tap_upload.{field_name} AS {field_name}
+            LEFT JOIN gaiadr3.astrophysical_parameters AS gaiaap USING (source_id)
+            LEFT JOIN external.gaiaedr3_distance AS dist USING (source_id)
+            LEFT JOIN gaiadr3.tmass_psc_xsc_best_neighbour AS xmatch_tmass USING (source_id)
+            LEFT JOIN gaiadr3.tmass_psc_xsc_join AS xjoin_tmass
+            ON xmatch_tmass.original_ext_source_id = xjoin_tmass.original_psc_source_id
+            LEFT JOIN gaiadr1.tmass_original_valid AS tmass
+            ON xjoin_tmass.original_psc_source_id = tmass.designation
+            LEFT JOIN gaiadr3.allwise_best_neighbour AS xmatch_allwise USING (source_id)
+            LEFT JOIN gaiadr1.allwise_original_valid AS allwise
+            ON xmatch_allwise.allwise_oid = allwise.allwise_oid
+        '''
+    , upload_resource=table, upload_table_name=field_name, verbose=True, dump_to_file=False)
+
+    r = j.get_results()
+
+    df = r.to_pandas()
+    df = df.rename(columns={
+    'tmass_oid': '_2MASS',
+    'ra':'RAJ2000',
+    'dec':'DEJ2000',
+    'j_m':'Jmag',
+    'h_m':'Hmag',
+    'ks_m':'Kmag',
+    'j_msigcom':'e_Jmag',
+    'h_msigcom':'e_Hmag',
+    'ks_msigcom':'e_Kmag',
+    'allwise_oid':'AllWISE',
+    'ra':'RAJ2000',
+    'dec':'DEJ2000',
+    'w1mpro':'W1mag',
+    'w2mpro':'W2mag',
+    'w3mpro':'W3mag',
+    'w4mpro':'W4mag',
+    'w1mpro_error':'e_W1mag',
+    'w2mpro_error':'e_W2mag',
+    'w3mpro_error':'e_W3mag',
+    'w4mpro_error':'e_W4mag'})
+
+    return df
 
 
 def Gaia_counterparts(df_gaia, file_dir, field_name):

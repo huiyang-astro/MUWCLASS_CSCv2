@@ -214,7 +214,7 @@ def find_obs(df_per, ra, dec,filter=True):
     return obsids
 
 
-def prepare_field(df, data_dir, query_dir, field_name, name_col='name',search_mode='cone_search',engine='curl',csc_version='2.0',create_perobs=True,convert_hms_to_deg=True):
+def prepare_field(df, data_dir, query_dir, field_name, name_col='name',search_mode='cone_search',engine='curl',csc_version='2.0',create_perobs=True,convert_hms_to_deg=True, gaia_precomputed=True):
     
     #'''
     if create_perobs == True:
@@ -240,7 +240,7 @@ def prepare_field(df, data_dir, query_dir, field_name, name_col='name',search_mo
     # cross-match with MW catalogs
     start = time.time()
     confusion = False if search_mode == 'cone_search' else True
-    add_MW(df_ave, data_dir, field_name, Chandratype='CSC',confusion =confusion)
+    add_MW(df_ave, data_dir, field_name, Chandratype='CSC',confusion =confusion, gaia_precomputed=True)
     end = time.time() 
     #print(end - start)
     #'''
