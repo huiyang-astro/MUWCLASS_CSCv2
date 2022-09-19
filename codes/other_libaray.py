@@ -16,7 +16,7 @@ from astropy.visualization import make_lupton_rgb
 from scipy.ndimage import gaussian_filter
 from astropy.coordinates import SkyCoord, Angle
 from astropy import units as u
-from prepare_library import create_perobs_data, cal_ave, add_MW, confusion_clean, CSC_clean_keepcols, CSCview_conesearch
+from prepare_library import create_perobs_data, cal_ave, add_MW, confusion_clean, CSC_clean_keepcols, CSCview_conesearch, Gaia_counterparts_new
 from muwclass_library import class_prepare, class_train_and_classify, class_save_res, col_rename, confident_flag, confident_sigma, find_confident, plot_classifier_matrix_withSTD, prepare_cols
 from pathlib import Path
 import time
@@ -250,6 +250,11 @@ def prepare_field(df, data_dir, query_dir, field_name, name_col='name',search_mo
 
     df_MW_cf = pd.read_csv(f'{data_dir}/{field_name}_MW_clean.csv')
     #df_ave = TD_clean_vizier(df_MW_cf, remove_codes = [1, 32, 64]) # previousl no remove_codes =2?!
+
+    print(df_MW_cf.columns.tolist())
+
+    if gaia_precomputed == True:
+        df_MW_cf = Gaia_counterparts_new(df_MW_cf, data_dir, field_name.lower(), radius=3)
 
     df_MW_clean = CSC_clean_keepcols(df_MW_cf, withvphas=False)
     #df_MW_clean = vphasp_to_gaia_mags(df_MW_clean)

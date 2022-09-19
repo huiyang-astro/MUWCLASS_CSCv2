@@ -761,9 +761,9 @@ def MW_counterpart_confusion(ras, decs, R, Es=[], N=10, catalog='wise',ref_mjd=5
         '''
     
     cats = {
-        'gaia':     'I/350/gaiaedr3',
-        #'gaia':  'I/355/gaiadr3',
-        'gaiadist': 'I/352/gedr3dis',
+        # 'gaia':     'I/350/gaiaedr3',
+        'gaia':  'I/355/gaiadr3',
+        # 'gaiadist': 'I/352/gedr3dis',
         '2mass':    'II/246/out',
         'catwise':  'II/365/catwise',
         'unwise':   'II/363/unwise',
@@ -773,7 +773,7 @@ def MW_counterpart_confusion(ras, decs, R, Es=[], N=10, catalog='wise',ref_mjd=5
     
     cols = {
         'gaia': ['RAJ2000', 'DEJ2000', 'Gmag', 'e_Gmag', 'BPmag', 'e_BPmag', 'RPmag', 'e_RPmag','Plx', 'e_Plx', 'PM', 'pmRA', 'e_pmRA', 'pmDE'],#, 'e_pmDE'],
-        'gaiadist': ['RAJ2000', 'DEJ2000', 'rgeo', 'rpgeo'],
+        # 'gaiadist': ['RAJ2000', 'DEJ2000', 'rgeo', 'rpgeo'],
         '2mass': ['RAJ2000', 'DEJ2000', 'Jmag', 'e_Jmag', 'Hmag', 'e_Hmag', 'Kmag', 'e_Kmag'],
         'catwise': ['RAJ2000', 'DEJ2000','W1mproPM','e_W1mproPM','W2mproPM','e_W2mproPM','pmRA','e_pmRA','pmDE','e_pmDE'],
         'unwise': ['RAJ2000', 'DEJ2000','FW1','e_FW1','FW2','e_FW2'],
@@ -824,17 +824,17 @@ def MW_counterpart_confusion(ras, decs, R, Es=[], N=10, catalog='wise',ref_mjd=5
         df['ra_X'] = df.apply(lambda row: ras[row._q-1],axis=1)
         df['dec_X'] = df.apply(lambda row: decs[row._q-1],axis=1)
 
-        print('cross-matching to gaiadist')
-        viz = Vizier(row_limit=-1,  timeout=5000, columns=["**", "+_r"], catalog=cats['gaiadist'])
-        query_radius = 10.
-        query = viz.query_region(rd, radius=query_radius*u.arcsec)
-        while len(query)==0:
-            query_radius +=10
-            print('updating query radius to',query_radius)
-            query = viz.query_region(rd, radius=query_radius*u.arcsec)
-        query_res = query[0]
+        # print('cross-matching to gaiadist')
+        # viz = Vizier(row_limit=-1,  timeout=5000, columns=["**", "+_r"], catalog=cats['gaiadist'])
+        # query_radius = 10.
+        # query = viz.query_region(rd, radius=query_radius*u.arcsec)
+        # while len(query)==0:
+        #     query_radius +=10
+        #     print('updating query radius to',query_radius)
+        #     query = viz.query_region(rd, radius=query_radius*u.arcsec)
+        # query_res = query[0]
 
-        df_gaiadist = query_res.to_pandas()
+        # df_gaiadist = query_res.to_pandas()
     
     #'''
     if pm_cor == True and catalog == 'gaia':
@@ -954,14 +954,15 @@ def MW_counterpart_confusion(ras, decs, R, Es=[], N=10, catalog='wise',ref_mjd=5
     df_MWs = df_MWs.rename(columns= {'_q_'+catalog: '_q'} )
 
     if catalog == 'gaia':
-        df_gaiadist = df_gaiadist.add_suffix('_gaiadist')
-        df_gaiadist = df_gaiadist.rename(columns= {'Source_gaiadist':'Source_gaia','_q_gaiadist':'_q'})
+        # df_gaiadist = df_gaiadist.add_suffix('_gaiadist')
+        # df_gaiadist = df_gaiadist.rename(columns= {'Source_gaiadist':'Source_gaia','_q_gaiadist':'_q'})
 
         # df_MWs = df_MWs.rename(columns={'DR3Name_gaia':'EDR3Name_gaia'})
-        df_MWs = df_MWs[df_MWs['EDR3Name_gaia'].notna()]
-        df_MWs['Source_gaia'] = df_MWs.apply(lambda row: np.int64(row.EDR3Name_gaia[10:]), axis=1)
+        # df_MWs = df_MWs[df_MWs['DR3Name_gaia'].notna()]
+        # apparently Vizier doesn't load the source id correctly, so we need to use the DR3Name instead
+        df_MWs['Source_gaia'] = df_MWs['DR3Name_gaia'].str.replace('Gaia DR3 ','').astype(np.int64)
         #print(df_MWs[['Source_gaia','_q']], df_gaiadist[['Source_gaia','_q']])
-        df_MWs = pd.merge(df_MWs, df_gaiadist, how="left", on=["Source_gaia","_q"])
+        # df_MWs = pd.merge(df_MWs, df_gaiadist, how="left", on=["Source_gaia","_q"])
     #print(df_MWs)
     #df_MWs = df_MWs.rename(columns= {'RAJ2000':'RAJ2000_'+catalog, 'DEJ2000':'DEJ2000_'+catalog, '_r': '_r_'+catalog} )
     
@@ -1035,16 +1036,6 @@ def add_MW(df, file_dir, field_name, Chandratype='CSC',ref_mjd=5.e4,pm_cor=False
                 df_MW_all.to_csv(f'{file_dir}/{field_name}_{cat}.csv', index=False)   
             
             data = pd.merge(data, df_MW, how='outer', on=['_q', '_q'])
-
-            if cat == 'gaia' and gaia_precomputed == True:
-                print('gaia_precomputed')
-                df_gaia = Gaia_counterparts_new(data['name', 'ra', 'dec'], file_dir, field_name, 3)
-                data = data.merge(df_gaia, how='left', on='name')
-                df_nogaia = data.loc[data['EDR3Name_gaia'].isna()]
-                for cat in ['2mass','allwise']:
-                    df_MW = MW_counterpart_confusion(df_nogaia['ra'].values, df_nogaia['dec'].values, search_radius, Es=df_nogaia['err_ellipse_r0'].values, N=sig_nr, catalog=cat,ref_mjd=ref_mjd,pm_cor=pm_cor,confusion=confusion)
-                    df_MW.to_csv(file_dir+'/'+field_name+'_'+cat+'.csv', index=False) 
-                    data = pd.merge(data, df_MW, how='outer', on=['_q', '_q'])
 
         
         if path.exists(f'{file_dir}/{field_name}_MW.csv') == True:
@@ -1357,7 +1348,7 @@ def TD_clean_vizier(TD, NS_clean=True, remove_codes = [1, 32, 64]):
     'extent_flag', 'pileup_flag','sat_src_flag', 'streak_src_flag','conf_flag',
     fn+'b',fn+'h',fn+'m',fn+'s','e_'+fn+'b','e_'+fn+'h','e_'+fn+'m','e_'+fn+'s','flux_flag',
     'ks_intra_prob_b','kp_intra_prob_b','var_inter_prob_b','kp_prob_b_max','var_inter_prob','dof','chisqr',
-    'EDR3Name_gaia','Plx_gaia','e_Plx_gaia','X_PU_gaia','Gmag_gaia','e_Gmag_gaia','BPmag_gaia','e_BPmag_gaia','RPmag_gaia','e_RPmag_gaia','PM_gaia','pmRA_gaia',
+    'DR3Name_gaia','Plx_gaia','e_Plx_gaia','X_PU_gaia','Gmag_gaia','e_Gmag_gaia','BPmag_gaia','e_BPmag_gaia','RPmag_gaia','e_RPmag_gaia','PM_gaia','pmRA_gaia',
     'e_pmRA_gaia','pmDE_gaia','e_pmDE_gaia','_r_gaia','prob_log_gaia',
     'X_PU_2mass','Jmag_2mass','Hmag_2mass','Kmag_2mass','e_Jmag_2mass','e_Hmag_2mass','e_Kmag_2mass','_r_2mass','prob_log_2mass',
     'X_PU_catwise','W1mproPM_catwise','e_W1mproPM_catwise','W2mproPM_catwise','e_W2mproPM_catwise','pmRA_catwise','pmDE_catwise','_r_catwise','prob_log_catwise',
@@ -1393,7 +1384,7 @@ def TD_clean_vizier(TD, NS_clean=True, remove_codes = [1, 32, 64]):
 
     # Removing unreliable MW features from large PUs
 
-    for MW_feature, sep in zip([['EDR3Name_gaia','Plx_gaia','e_Plx_gaia','Gmag', 'BPmag', 'RPmag','e_Gmag', 'e_BPmag', 'e_RPmag','pm_gaia','pmRA_gaia','pmDE_gaia'], ['rgeo','rpgeo','b_rgeo','B_rgeo','b_rpgeo','B_rpgeo','Flag_gaiadist'], ['Jmag', 'Hmag', 'Kmag','e_Jmag', 'e_Hmag', 'e_Kmag'],['W1mag_catwise','W2mag_catwise','e_W1mag_catwise','e_W2mag_catwise','pmRA_catwise','pmDE_catwise'],['W1mag_unwise', 'W2mag_unwise','e_W1mag_unwise', 'e_W2mag_unwise'], ['W1mag_allwise','W2mag_allwise','W3mag_allwise','W4mag_allwise','e_W1mag_allwise','e_W2mag_allwise','e_W3mag_allwise','e_W4mag_allwise'],['main_id','main_type']], ['_gaia','_gaiadist', '_2mass','_catwise','_unwise','_allwise','_simbad']):
+    for MW_feature, sep in zip([['DR3Name_gaia','Plx_gaia','e_Plx_gaia','Gmag', 'BPmag', 'RPmag','e_Gmag', 'e_BPmag', 'e_RPmag','pm_gaia','pmRA_gaia','pmDE_gaia'], ['rgeo','rpgeo','b_rgeo','B_rgeo','b_rpgeo','B_rpgeo','Flag_gaiadist'], ['Jmag', 'Hmag', 'Kmag','e_Jmag', 'e_Hmag', 'e_Kmag'],['W1mag_catwise','W2mag_catwise','e_W1mag_catwise','e_W2mag_catwise','pmRA_catwise','pmDE_catwise'],['W1mag_unwise', 'W2mag_unwise','e_W1mag_unwise', 'e_W2mag_unwise'], ['W1mag_allwise','W2mag_allwise','W3mag_allwise','W4mag_allwise','e_W1mag_allwise','e_W2mag_allwise','e_W3mag_allwise','e_W4mag_allwise'],['main_id','main_type']], ['_gaia','_gaiadist', '_2mass','_catwise','_unwise','_allwise','_simbad']):
         print('angDist'+sep)
         if sep != '_simbad':
             s = np.where(CSC['_r'+sep]>CSC['X_PU'+sep])[0]
@@ -1427,7 +1418,7 @@ def TD_clean_vizier(TD, NS_clean=True, remove_codes = [1, 32, 64]):
 
     # clean PSR MW
     #'''
-    counterpart_features = ['EDR3Name_gaia','Plx_gaia','e_Plx_gaia','Gmag','BPmag','RPmag','e_Gmag','e_BPmag','e_RPmag','pm_gaia','pmRA_gaia','pmDE_gaia','_r_gaia','Jmag','Hmag','Kmag','e_Jmag','e_Hmag','e_Kmag','_r_2mass','W1mag_catwise','W2mag_catwise','e_W1mag_catwise','e_W2mag_catwise','pmRA_catwise','pmDE_catwise','_r_catwise','W1mag_unwise','W2mag_unwise','e_W1mag_unwise','e_W2mag_unwise','_r_unwise','W1mag_comb','W2mag_comb','e_W1mag_comb','e_W2mag_comb','W1mag_allwise','W2mag_allwise','W3mag_allwise','W4mag_allwise','e_W1mag_allwise','e_W2mag_allwise','e_W3mag_allwise','e_W4mag_allwise','_r_allwise','rgeo','rpgeo','_r_gaiadist','b_rgeo','B_rgeo','b_rpgeo','B_rpgeo','Flag_gaiadist']
+    counterpart_features = ['DR3Name_gaia','Plx_gaia','e_Plx_gaia','Gmag','BPmag','RPmag','e_Gmag','e_BPmag','e_RPmag','pm_gaia','pmRA_gaia','pmDE_gaia','_r_gaia','Jmag','Hmag','Kmag','e_Jmag','e_Hmag','e_Kmag','_r_2mass','W1mag_catwise','W2mag_catwise','e_W1mag_catwise','e_W2mag_catwise','pmRA_catwise','pmDE_catwise','_r_catwise','W1mag_unwise','W2mag_unwise','e_W1mag_unwise','e_W2mag_unwise','_r_unwise','W1mag_comb','W2mag_comb','e_W1mag_comb','e_W2mag_comb','W1mag_allwise','W2mag_allwise','W3mag_allwise','W4mag_allwise','e_W1mag_allwise','e_W2mag_allwise','e_W3mag_allwise','e_W4mag_allwise','_r_allwise','rgeo','rpgeo','_r_gaiadist','b_rgeo','B_rgeo','b_rpgeo','B_rpgeo','Flag_gaiadist']
     
     print("NS confusion:")
     for col in counterpart_features:
@@ -1576,7 +1567,7 @@ def CSC_clean(data, remove_codes = [1, 32], withvphas=False):
     'extent_flag', 'pileup_flag','sat_src_flag', 'streak_src_flag','conf_flag',
     fn+'b',fn+'h',fn+'m',fn+'s','e_'+fn+'b','e_'+fn+'h','e_'+fn+'m','e_'+fn+'s','flux_flag',
     'ks_intra_prob_b','kp_intra_prob_b','var_inter_prob_b','kp_prob_b_max','var_inter_prob','dof','chisqr',
-    'X_PU_gaia','EDR3Name_gaia','Plx_gaia','e_Plx_gaia','Gmag_gaia','e_Gmag_gaia','BPmag_gaia','e_BPmag_gaia','RPmag_gaia','e_RPmag_gaia','PM_gaia','pmRA_gaia',
+    'X_PU_gaia','DR3Name_gaia','Plx_gaia','e_Plx_gaia','Gmag_gaia','e_Gmag_gaia','BPmag_gaia','e_BPmag_gaia','RPmag_gaia','e_RPmag_gaia','PM_gaia','pmRA_gaia',
     'e_pmRA_gaia','pmDE_gaia','e_pmDE_gaia','_r_gaia','prob_log_gaia',
     'X_PU_2mass','Jmag_2mass','Hmag_2mass','Kmag_2mass','e_Jmag_2mass','e_Hmag_2mass','e_Kmag_2mass','_r_2mass','prob_log_2mass',
     'X_PU_catwise','RA_ICRS_catwise','DE_ICRS_catwise','W1mproPM_catwise','e_W1mproPM_catwise','W2mproPM_catwise','e_W2mproPM_catwise','pmRA_catwise','pmDE_catwise','_r_catwise','prob_log_catwise',
@@ -1610,7 +1601,7 @@ def CSC_clean(data, remove_codes = [1, 32], withvphas=False):
 
     # Removing unreliable MW features from large PUs
 
-    for MW_feature, sep in zip([['EDR3Name_gaia','Source_gaia','Plx_gaia','e_Plx_gaia','Gmag', 'BPmag', 'RPmag','e_Gmag', 'e_BPmag', 'e_RPmag','pm_gaia','pmRA_gaia','pmDE_gaia'], ['rgeo','rpgeo','b_rgeo','B_rgeo','b_rpgeo','B_rpgeo','Flag_gaiadist','Source_gaiadist'], ['Jmag', 'Hmag', 'Kmag','e_Jmag', 'e_Hmag', 'e_Kmag','_2MASS_2mass'],['W1mag_catwise','W2mag_catwise','e_W1mag_catwise','e_W2mag_catwise','pmRA_catwise','pmDE_catwise','objID_catwise'],['W1mag_unwise', 'W2mag_unwise','e_W1mag_unwise', 'e_W2mag_unwise','objID_unwise'], ['W1mag_allwise','W2mag_allwise','W3mag_allwise','W4mag_allwise','e_W1mag_allwise','e_W2mag_allwise','e_W3mag_allwise','e_W4mag_allwise','AllWISE_allwise']], ['_gaia','_gaiadist', '_2mass','_catwise','_unwise','_allwise']):
+    for MW_feature, sep in zip([['DR3Name_gaia','Source_gaia','Plx_gaia','e_Plx_gaia','Gmag', 'BPmag', 'RPmag','e_Gmag', 'e_BPmag', 'e_RPmag','pm_gaia','pmRA_gaia','pmDE_gaia'], ['rgeo','rpgeo','b_rgeo','B_rgeo','b_rpgeo','B_rpgeo','Flag_gaiadist','Source_gaiadist'], ['Jmag', 'Hmag', 'Kmag','e_Jmag', 'e_Hmag', 'e_Kmag','_2MASS_2mass'],['W1mag_catwise','W2mag_catwise','e_W1mag_catwise','e_W2mag_catwise','pmRA_catwise','pmDE_catwise','objID_catwise'],['W1mag_unwise', 'W2mag_unwise','e_W1mag_unwise', 'e_W2mag_unwise','objID_unwise'], ['W1mag_allwise','W2mag_allwise','W3mag_allwise','W4mag_allwise','e_W1mag_allwise','e_W2mag_allwise','e_W3mag_allwise','e_W4mag_allwise','AllWISE_allwise']], ['_gaia','_gaiadist', '_2mass','_catwise','_unwise','_allwise']):
         print('angDist'+sep)
         s = np.where(CSC['_r'+sep]>CSC['X_PU'+sep])[0]
         #print(CSC.loc[s, ['err_ellipse_r0','_r'+sep]])
@@ -1652,18 +1643,21 @@ def CSC_clean(data, remove_codes = [1, 32], withvphas=False):
     return CSC
 
 
-def Gaia_counterparts_new(df, file_dir, field_name, radius):
+def Gaia_counterparts_new(df_mw, file_dir, field_name, radius):
     '''
     upload file with CXO sources to Gaia archive, crossmatch to Gaia DR3, upload results to Gaia archive again and crossmatch to Gaia DR3 astrophysical parameters, Gaia eDR3 distances, and Gaia precomputed 2MASS and AllWISE counterparts
     radius: crossmatching radius of CXO sources to Gaia DR3 in arcsec
     '''
 
-
-
     upload_resource = f'{file_dir}/{field_name}_upload.xml'
 
+    # df_mw = df_mw.rename(columns={'Source_gaia': 'source_id'})
+
+    df_mw_gaia = df_mw.loc[(df_mw['DR3Name_gaia'].notna()) & (df_mw['cp_flag_gaia']>=-4)]
+    df_mw_gaia['Source_gaia'] = df_mw_gaia['Source_gaia'].astype(np.int64)
+
     # currently table cannot be csv file, see https://github.com/astropy/astroquery/issues/2529
-    table = Table.from_pandas(df)
+    table = Table.from_pandas(df_mw_gaia.rename(columns={'Source_gaia': 'source_id'})[['name', 'ra', 'dec', 'source_id']])
     # from astropy.io.votable import from_table, writeto
     # votable = from_table(table)
     # writeto(votable, upload_resource)
@@ -1685,7 +1679,7 @@ def Gaia_counterparts_new(df, file_dir, field_name, radius):
 
     # print(type(r))
 
-    j = Gaia.launch_job(query=
+    j = Gaia.launch_job_async(query=
         f'''SELECT {field_name}.*, gaiaap.*, dist.*, tmass.*, allwise.*
             FROM tap_upload.{field_name} AS {field_name}
             LEFT JOIN gaiadr3.astrophysical_parameters AS gaiaap USING (source_id)
@@ -1703,30 +1697,45 @@ def Gaia_counterparts_new(df, file_dir, field_name, radius):
 
     r = j.get_results()
 
-    df = r.to_pandas()
-    df = df.rename(columns={
-    'tmass_oid': '_2MASS',
-    'ra':'RAJ2000',
-    'dec':'DEJ2000',
-    'j_m':'Jmag',
-    'h_m':'Hmag',
-    'ks_m':'Kmag',
-    'j_msigcom':'e_Jmag',
-    'h_msigcom':'e_Hmag',
-    'ks_msigcom':'e_Kmag',
-    'allwise_oid':'AllWISE',
-    'ra':'RAJ2000',
-    'dec':'DEJ2000',
-    'w1mpro':'W1mag',
-    'w2mpro':'W2mag',
-    'w3mpro':'W3mag',
-    'w4mpro':'W4mag',
-    'w1mpro_error':'e_W1mag',
-    'w2mpro_error':'e_W2mag',
-    'w3mpro_error':'e_W3mag',
-    'w4mpro_error':'e_W4mag'})
+    df_gaia = r.to_pandas()
 
-    return df
+    df_gaia = df_gaia.rename(columns={
+        'r_med_geo':'rgeo',
+        'r_med_photogeo':'rpgeo', 
+        'r_lo_geo':'b_rgeo',
+        'r_hi_geo':'B_rgeo',
+        'r_lo_photogeo':'b_rpgeo',
+        'r_hi_photogeo':'B_rpgeo',
+        'DESIGNATION': '_2MASS_2mass',
+        'ra':'RAJ2000',
+        'dec':'DEJ2000',
+        'j_m':'Jmag',
+        'h_m':'Hmag',
+        'ks_m':'Kmag',
+        'j_msigcom':'e_Jmag',
+        'h_msigcom':'e_Hmag',
+        'ks_msigcom':'e_Kmag',
+        'designation':'AllWISE_allwise',
+        'ra':'RAJ2000',
+        'dec':'DEJ2000',
+        'w1mpro':'W1mag',
+        'w2mpro':'W2mag',
+        'w3mpro':'W3mag',
+        'w4mpro':'W4mag',
+        'w1mpro_error':'e_W1mag',
+        'w2mpro_error':'e_W2mag',
+        'w3mpro_error':'e_W3mag',
+        'w4mpro_error':'e_W4mag'})
+
+    gaia_precomputed_cols = ['rgeo', 'rpgeo', 'b_rgeo', 'B_rgeo', 'b_rpgeo', 'B_rpgeo', '_2MASS_2mass', 'Jmag', 'Hmag', 'Kmag','e_Jmag', 'e_Hmag', 'e_Kmag', 'AllWISE_allwise' ,'W1mag','W2mag','W3mag','W4mag','e_W1mag','e_W2mag','e_W3mag','e_W4mag']
+
+    df_gaia.to_csv(f'{file_dir}/{field_name}_gaia_precomputed.csv', index=False)
+
+    df_mw.loc[(df_mw['DR3Name_gaia'].notna()) & (df_mw['cp_flag_gaia']>=-4), gaia_precomputed_cols] = df_gaia[gaia_precomputed_cols].values
+    df_mw.loc[(df_mw['DR3Name_gaia'].notna()) & (df_mw['cp_flag_gaia']>=-4), 'gaia_test'] = 1
+
+    
+    return df_mw
 
 
 def Gaia_counterparts(df_gaia, file_dir, field_name):
@@ -1822,11 +1831,11 @@ def Gaia_counterparts(df_gaia, file_dir, field_name):
         #print(df_gaia.dtypes)
         #print(df_gaia['Source_gaia'][:3])
         print(len(df_gaia))
-        df_gaia = df_gaia[df_gaia['EDR3Name_gaia'].notna()]
+        df_gaia = df_gaia[df_gaia['DR3Name_gaia'].notna()]
         print(len(df_gaia))
-        df_gaia['Source_gaia'] = df_gaia.apply(lambda row: np.int64(row.EDR3Name_gaia[10:]), axis=1)
+        df_gaia['Source_gaia'] = df_gaia.apply(lambda row: np.int64(row.DR3Name_gaia[10:]), axis=1)
         df_MW = df_MW.add_suffix('_'+cat)
-        #df_gaia['Source_gaia'] = df_gaia.apply(lambda row: np.nan if pd.isnull(row.EDR3Name_gaia) else np.int64(row.EDR3Name_gaia[10:]), axis=1)
+        #df_gaia['Source_gaia'] = df_gaia.apply(lambda row: np.nan if pd.isnull(row.DR3Name_gaia) else np.int64(row.DR3Name_gaia[10:]), axis=1)
         df_MW = df_MW.merge(df_gaia[['Source_gaia', '_q','cp_flag_gaia']], how="inner", left_on="source_id_"+cat, right_on="Source_gaia")
         #print(df_MW)
         print(df_MW.shape)

@@ -88,7 +88,7 @@ class_colors = ['blue','orange','red','c','g','purple','magenta','olive', 'Aqua'
 
 MW_cols = {'xray':['name','ra','dec','PU','significance','flux_aper90_ave_s','e_flux_aper90_ave_s','flux_aper90_ave_m','e_flux_aper90_ave_m','flux_aper90_ave_h','e_flux_aper90_ave_h', \
                   'flux_aper90_ave_b','e_flux_aper90_ave_b','kp_prob_b_max','var_inter_prob','CSC_flags' ],
-           'gaia':['EDR3Name_gaia','RA_pmcor_gaia','DEC_pmcor_gaia','Gmag_gaia','e_Gmag_gaia','BPmag_gaia','e_BPmag_gaia','RPmag_gaia','e_RPmag_gaia','Plx_gaia','e_Plx_gaia','PM_gaia','rgeo_gaiadist','b_rgeo_gaiadist','B_rgeo_gaiadist','rpgeo_gaiadist','b_rpgeo_gaiadist','B_rpgeo_gaiadist'], 
+           'gaia':['DR3Name_gaia','RA_pmcor_gaia','DEC_pmcor_gaia','Gmag_gaia','e_Gmag_gaia','BPmag_gaia','e_BPmag_gaia','RPmag_gaia','e_RPmag_gaia','Plx_gaia','e_Plx_gaia','PM_gaia','rgeo_gaiadist','b_rgeo_gaiadist','B_rgeo_gaiadist','rpgeo_gaiadist','b_rpgeo_gaiadist','B_rpgeo_gaiadist'], 
            '2mass':['_2MASS_2mass','Jmag_2mass','e_Jmag_2mass','Hmag_2mass','e_Hmag_2mass','Kmag_2mass','e_Kmag_2mass'], 
            'catwise':['Name_catwise','W1mag_catwise','e_W1mag_catwise','W2mag_catwise','e_W2mag_catwise'],
            'unwise':['objID_unwise','W1mag_unwise','e_W1mag_unwise','W2mag_unwise','e_W2mag_unwise'],
@@ -324,9 +324,9 @@ def sample_data(df,Xray='CSC',distance='nodist',Uncer_flag=False,random_state=No
             
             dist_feature = dist_features_dict[distance][0] 
 
-            # set distances to zero for sources without EDR3Name_gaia 
+            # set distances to zero for sources without DR3Name_gaia 
 
-            df.loc[df['EDR3Name_gaia'].isna(), [dist_feature, 'e_'+dist_feature]]=np.nan
+            df.loc[df['DR3Name_gaia'].isna(), [dist_feature, 'e_'+dist_feature]]=np.nan
             
             # set distance of sources with negative parallaxes and parallaxes with large errors (fpu<2) to nan, already done in making of TD?
             # the cleaning of features should be done when creating the test data
@@ -360,7 +360,7 @@ def sample_data(df,Xray='CSC',distance='nodist',Uncer_flag=False,random_state=No
             
             dist_feature = dist_features_dict[distance][0] 
 
-            df.loc[df['EDR3Name_gaia'].isna(), [dist_feature, 'e_'+dist_feature]]=np.nan 
+            df.loc[df['DR3Name_gaia'].isna(), [dist_feature, 'e_'+dist_feature]]=np.nan 
 
             # set distance of sources with negative parallaxes and parallaxes with large errors (fpu<2) to nan, already done in making of TD?
             df.loc[df['Plx_gaia']<0, [dist_feature, 'e_'+dist_feature]]=np.nan
