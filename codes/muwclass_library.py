@@ -207,6 +207,7 @@ def prepare_cols(df, cp_thres=0, vphas=False,gaiadata=False,cp_conf_flag=False, 
             df_save.loc[(df_save['cp_flag_gaia']<cp_thres) & (df_save['cp_flag_vphas']>=cp_thres), 'e_'+mag+'_comb'] = df_save.loc[(df_save['cp_flag_gaia']<cp_thres) & (df_save['cp_flag_vphas']>=cp_thres), 'e_'+mag+'_vphas'] 
     
     #'''
+
     df_save = df_save.rename(columns = {
         'flux_aper90_ave_s':'Fcsc_s','e_flux_aper90_ave_s':'e_Fcsc_s','flux_aper90_ave_m':'Fcsc_m','e_flux_aper90_ave_m':'e_Fcsc_m',
         'flux_aper90_ave_h':'Fcsc_h','e_flux_aper90_ave_h':'e_Fcsc_h','Plx_gaia':'Plx','e_Plx_gaia':'e_Plx','PM_gaia':'PM',

@@ -240,7 +240,8 @@ def prepare_field(df, data_dir, query_dir, field_name, name_col='name',search_mo
     # cross-match with MW catalogs
     start = time.time()
     confusion = False if search_mode == 'cone_search' else True
-    add_MW(df_ave, data_dir, field_name, Chandratype='CSC',confusion =confusion, gaia_precomputed=True)
+    add_MW(df_ave, data_dir, field_name, Chandratype='CSC',confusion =confusion, gaia_precomputed=gaia_precomputed)
+
     end = time.time() 
     #print(end - start)
     #'''
@@ -250,8 +251,6 @@ def prepare_field(df, data_dir, query_dir, field_name, name_col='name',search_mo
 
     df_MW_cf = pd.read_csv(f'{data_dir}/{field_name}_MW_clean.csv')
     #df_ave = TD_clean_vizier(df_MW_cf, remove_codes = [1, 32, 64]) # previousl no remove_codes =2?!
-
-    print(df_MW_cf.columns.tolist())
 
     if gaia_precomputed == True:
         df_MW_cf = Gaia_counterparts_new(df_MW_cf, data_dir, field_name.lower(), radius=3)
@@ -404,7 +403,7 @@ import holoviews as hv
 import hvplot
 import hvplot.pandas
 import bokeh
-from test_library import prepare_cols
+# from test_library import prepare_cols
 import param
 from holoviews.element.chart import Chart
 from holoviews.plotting.bokeh import PointPlot

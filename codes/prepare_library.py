@@ -763,7 +763,7 @@ def MW_counterpart_confusion(ras, decs, R, Es=[], N=10, catalog='wise',ref_mjd=5
     cats = {
         # 'gaia':     'I/350/gaiaedr3',
         'gaia':  'I/355/gaiadr3',
-        # 'gaiadist': 'I/352/gedr3dis',
+        'gaiadist': 'I/352/gedr3dis',
         '2mass':    'II/246/out',
         'catwise':  'II/365/catwise',
         'unwise':   'II/363/unwise',
@@ -772,8 +772,8 @@ def MW_counterpart_confusion(ras, decs, R, Es=[], N=10, catalog='wise',ref_mjd=5
     }
     
     cols = {
-        'gaia': ['RAJ2000', 'DEJ2000', 'Gmag', 'e_Gmag', 'BPmag', 'e_BPmag', 'RPmag', 'e_RPmag','Plx', 'e_Plx', 'PM', 'pmRA', 'e_pmRA', 'pmDE'],#, 'e_pmDE'],
-        # 'gaiadist': ['RAJ2000', 'DEJ2000', 'rgeo', 'rpgeo'],
+        'gaia': ['RAJ2000', 'DEJ2000', 'Gmag', 'e_Gmag', 'BPmag', 'e_BPmag', 'RPmag', 'e_RPmag','Plx', 'e_Plx', 'PM', 'pmRA', 'e_pmRA', 'pmDE', 'e_pmDE'],
+        'gaiadist': ['RAJ2000', 'DEJ2000', 'rgeo', 'rpgeo'],
         '2mass': ['RAJ2000', 'DEJ2000', 'Jmag', 'e_Jmag', 'Hmag', 'e_Hmag', 'Kmag', 'e_Kmag'],
         'catwise': ['RAJ2000', 'DEJ2000','W1mproPM','e_W1mproPM','W2mproPM','e_W2mproPM','pmRA','e_pmRA','pmDE','e_pmDE'],
         'unwise': ['RAJ2000', 'DEJ2000','FW1','e_FW1','FW2','e_FW2'],
@@ -824,17 +824,18 @@ def MW_counterpart_confusion(ras, decs, R, Es=[], N=10, catalog='wise',ref_mjd=5
         df['ra_X'] = df.apply(lambda row: ras[row._q-1],axis=1)
         df['dec_X'] = df.apply(lambda row: decs[row._q-1],axis=1)
 
-        # print('cross-matching to gaiadist')
-        # viz = Vizier(row_limit=-1,  timeout=5000, columns=["**", "+_r"], catalog=cats['gaiadist'])
-        # query_radius = 10.
-        # query = viz.query_region(rd, radius=query_radius*u.arcsec)
-        # while len(query)==0:
-        #     query_radius +=10
-        #     print('updating query radius to',query_radius)
-        #     query = viz.query_region(rd, radius=query_radius*u.arcsec)
-        # query_res = query[0]
+        if gaia_precomputed==False:
+            print('cross-matching to gaiadist')
+            viz = Vizier(row_limit=-1,  timeout=5000, columns=["**", "+_r"], catalog=cats['gaiadist'])
+            query_radius = 10.
+            query = viz.query_region(rd, radius=query_radius*u.arcsec)
+            while len(query)==0:
+                query_radius +=10
+                print('updating query radius to',query_radius)
+                query = viz.query_region(rd, radius=query_radius*u.arcsec)
+            query_res = query[0]
 
-        # df_gaiadist = query_res.to_pandas()
+            df_gaiadist = query_res.to_pandas()
     
     #'''
     if pm_cor == True and catalog == 'gaia':
@@ -954,15 +955,15 @@ def MW_counterpart_confusion(ras, decs, R, Es=[], N=10, catalog='wise',ref_mjd=5
     df_MWs = df_MWs.rename(columns= {'_q_'+catalog: '_q'} )
 
     if catalog == 'gaia':
-        # df_gaiadist = df_gaiadist.add_suffix('_gaiadist')
-        # df_gaiadist = df_gaiadist.rename(columns= {'Source_gaiadist':'Source_gaia','_q_gaiadist':'_q'})
 
         # df_MWs = df_MWs.rename(columns={'DR3Name_gaia':'EDR3Name_gaia'})
         # df_MWs = df_MWs[df_MWs['DR3Name_gaia'].notna()]
         # apparently Vizier doesn't load the source id correctly, so we need to use the DR3Name instead
         df_MWs['Source_gaia'] = df_MWs['DR3Name_gaia'].str.replace('Gaia DR3 ','').astype(np.int64)
-        #print(df_MWs[['Source_gaia','_q']], df_gaiadist[['Source_gaia','_q']])
-        # df_MWs = pd.merge(df_MWs, df_gaiadist, how="left", on=["Source_gaia","_q"])
+        if gaia_precomputed==False:
+            df_gaiadist = df_gaiadist.add_suffix('_gaiadist')
+            df_gaiadist = df_gaiadist.rename(columns= {'Source_gaiadist':'Source_gaia','_q_gaiadist':'_q'})
+            df_MWs = pd.merge(df_MWs, df_gaiadist, how="left", on=["Source_gaia","_q"])
     #print(df_MWs)
     #df_MWs = df_MWs.rename(columns= {'RAJ2000':'RAJ2000_'+catalog, 'DEJ2000':'DEJ2000_'+catalog, '_r': '_r_'+catalog} )
     
@@ -1018,7 +1019,7 @@ def add_MW(df, file_dir, field_name, Chandratype='CSC',ref_mjd=5.e4,pm_cor=False
             # For field data NGC 3532, we should not match to gaiadist so that we don't have to remove those match to gaiadist but no gaia matched later.
             #print(cat, confusion)
             
-            df_MW = MW_counterpart_confusion(ras, decs, search_radius, Es=Es, N=sig_nr, catalog=cat,ref_mjd=ref_mjd,pm_cor=pm_cor,confusion=conf)
+            df_MW = MW_counterpart_confusion(ras, decs, search_radius, Es=Es, N=sig_nr, catalog=cat,ref_mjd=ref_mjd,pm_cor=pm_cor,confusion=conf, gaia_precomputed=gaia_precomputed)
 
             if path.exists(f'{file_dir}/{field_name}_{cat}.csv') == False:
                 #df_MW = MW_counterpart_confusion(ras, decs, search_radius, Es=Es, N=sig_nr, catalog=cat,ref_mjd=ref_mjd,pm_cor=pm_cor,confusion=confusion)
@@ -1700,34 +1701,34 @@ def Gaia_counterparts_new(df_mw, file_dir, field_name, radius):
     df_gaia = r.to_pandas()
 
     df_gaia = df_gaia.rename(columns={
-        'r_med_geo':'rgeo',
-        'r_med_photogeo':'rpgeo', 
-        'r_lo_geo':'b_rgeo',
-        'r_hi_geo':'B_rgeo',
-        'r_lo_photogeo':'b_rpgeo',
-        'r_hi_photogeo':'B_rpgeo',
+        'r_med_geo':'rgeo_gaiadist',
+        'r_med_photogeo':'rpgeo_gaiadist', 
+        'r_lo_geo':'b_rgeo_gaiadist',
+        'r_hi_geo':'B_rgeo_gaiadist',
+        'r_lo_photogeo':'b_rpgeo_gaiadist',
+        'r_hi_photogeo':'B_rpgeo_gaiadist',
         'DESIGNATION': '_2MASS_2mass',
-        'ra':'RAJ2000',
-        'dec':'DEJ2000',
-        'j_m':'Jmag',
-        'h_m':'Hmag',
-        'ks_m':'Kmag',
-        'j_msigcom':'e_Jmag',
-        'h_msigcom':'e_Hmag',
-        'ks_msigcom':'e_Kmag',
+        'ra_2':'RAJ2000_2mass',
+        'dec_2':'DEJ2000_2mass',
+        'j_m':'Jmag_2mass',
+        'h_m':'Hmag_2mass',
+        'ks_m':'Kmag_2mass',
+        'j_msigcom':'e_Jmag_2mass',
+        'h_msigcom':'e_Hmag_2mass',
+        'ks_msigcom':'e_Kmag_2mass',
         'designation':'AllWISE_allwise',
-        'ra':'RAJ2000',
-        'dec':'DEJ2000',
-        'w1mpro':'W1mag',
-        'w2mpro':'W2mag',
-        'w3mpro':'W3mag',
-        'w4mpro':'W4mag',
-        'w1mpro_error':'e_W1mag',
-        'w2mpro_error':'e_W2mag',
-        'w3mpro_error':'e_W3mag',
-        'w4mpro_error':'e_W4mag'})
+        'ra_3':'RAJ2000_allwise',
+        'dec_3':'DEJ2000_allwise',
+        'w1mpro':'W1mag_allwise',
+        'w2mpro':'W2mag_allwise',
+        'w3mpro':'W3mag_allwise',
+        'w4mpro':'W4mag_allwise',
+        'w1mpro_error':'e_W1mag_allwise',
+        'w2mpro_error':'e_W2mag_allwise',
+        'w3mpro_error':'e_W3mag_allwise',
+        'w4mpro_error':'e_W4mag_allwise'})
 
-    gaia_precomputed_cols = ['rgeo', 'rpgeo', 'b_rgeo', 'B_rgeo', 'b_rpgeo', 'B_rpgeo', '_2MASS_2mass', 'Jmag', 'Hmag', 'Kmag','e_Jmag', 'e_Hmag', 'e_Kmag', 'AllWISE_allwise' ,'W1mag','W2mag','W3mag','W4mag','e_W1mag','e_W2mag','e_W3mag','e_W4mag']
+    gaia_precomputed_cols = ['rgeo_gaiadist','rpgeo_gaiadist','b_rgeo_gaiadist','B_rgeo_gaiadist','b_rpgeo_gaiadist','B_rpgeo_gaiadist','_2MASS_2mass','RAJ2000_2mass','DEJ2000_2mass','Jmag_2mass','Hmag_2mass','Kmag_2mass','e_Jmag_2mass','e_Hmag_2mass','e_Kmag_2mass','AllWISE_allwise','RAJ2000_allwise','DEJ2000_allwise','W1mag_allwise','W2mag_allwise','W3mag_allwise','W4mag_allwise','e_W1mag_allwise','e_W2mag_allwise','e_W3mag_allwise','e_W4mag_allwise']
 
     df_gaia.to_csv(f'{file_dir}/{field_name}_gaia_precomputed.csv', index=False)
 
