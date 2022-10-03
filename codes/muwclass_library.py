@@ -88,14 +88,14 @@ class_colors = ['blue','orange','red','c','g','purple','magenta','olive', 'Aqua'
 
 MW_cols = {'xray':['name','ra','dec','PU','significance','flux_aper90_ave_s','e_flux_aper90_ave_s','flux_aper90_ave_m','e_flux_aper90_ave_m','flux_aper90_ave_h','e_flux_aper90_ave_h', \
                   'flux_aper90_ave_b','e_flux_aper90_ave_b','kp_prob_b_max','var_inter_prob','CSC_flags' ],
-           'gaia':['EDR3Name_gaia','RA_pmcor_gaia','DEC_pmcor_gaia','Gmag_gaia','e_Gmag_gaia','BPmag_gaia','e_BPmag_gaia','RPmag_gaia','e_RPmag_gaia','Plx_gaia','e_Plx_gaia','PM_gaia','rgeo_gaiadist','b_rgeo_gaiadist','B_rgeo_gaiadist','rpgeo_gaiadist','b_rpgeo_gaiadist','B_rpgeo_gaiadist'], 
-           '2mass':['_2MASS_2mass','Jmag_2mass','e_Jmag_2mass','Hmag_2mass','e_Hmag_2mass','Kmag_2mass','e_Kmag_2mass'], 
-           'catwise':['Name_catwise','W1mag_catwise','e_W1mag_catwise','W2mag_catwise','e_W2mag_catwise'],
-           'unwise':['objID_unwise','W1mag_unwise','e_W1mag_unwise','W2mag_unwise','e_W2mag_unwise'],
-           'allwise':['AllWISE_allwise','W1mag_allwise','e_W1mag_allwise','W2mag_allwise','e_W2mag_allwise','W3mag_allwise','e_W3mag_allwise','W4mag_allwise','e_W4mag_allwise'],
-           'vphas':['VPHASDR2_vphas','Gmag_vphas','RPmag_vphas','BPmag_vphas','e_Gmag_vphas','e_RPmag_vphas','e_BPmag_vphas'],
-           '2mass_gaia':['_2MASS_2mass_gaia','Jmag_2mass_gaia','e_Jmag_2mass_gaia','Hmag_2mass_gaia','e_Hmag_2mass_gaia','Kmag_2mass_gaia','e_Kmag_2mass_gaia'],
-           'allwise_gaia':['AllWISE_allwise_gaia','W1mag_allwise_gaia','e_W1mag_allwise_gaia','W2mag_allwise_gaia','e_W2mag_allwise_gaia','W3mag_allwise_gaia','e_W3mag_allwise_gaia','W4mag_allwise_gaia','e_W4mag_allwise_gaia']
+           'gaia':['EDR3Name_gaia','_r_gaia','PU_gaia','RA_ICRS_gaia','DE_ICRS_gaia','Gmag_gaia','e_Gmag_gaia','BPmag_gaia','e_BPmag_gaia','RPmag_gaia','e_RPmag_gaia','Plx_gaia','e_Plx_gaia','PM_gaia','rgeo_gaiadist','b_rgeo_gaiadist','B_rgeo_gaiadist','rpgeo_gaiadist','b_rpgeo_gaiadist','B_rpgeo_gaiadist'], 
+           '2mass':['_2MASS_2mass','_r_2mass','PU_2mass','RAJ2000_2mass','DEJ2000_2mass','Jmag_2mass','e_Jmag_2mass','Hmag_2mass','e_Hmag_2mass','Kmag_2mass','e_Kmag_2mass'], 
+           'catwise':['Name_catwise','_r_catwise','PU_catwise','RA_ICRS_catwise','DE_ICRS_catwise','W1mag_catwise','e_W1mag_catwise','W2mag_catwise','e_W2mag_catwise'],
+           'unwise':['objID_unwise','_r_unwise','PU_unwise','RAJ2000_unwise','DEJ2000_unwise','W1mag_unwise','e_W1mag_unwise','W2mag_unwise','e_W2mag_unwise'],
+           'allwise':['AllWISE_allwise','_r_allwise','PU_allwise','RAJ2000_allwise','DEJ2000_allwise','W1mag_allwise','e_W1mag_allwise','W2mag_allwise','e_W2mag_allwise','W3mag_allwise','e_W3mag_allwise','W4mag_allwise','e_W4mag_allwise'],
+           'vphas':['VPHASDR2_vphas','RAJ2000_vphas','DEJ2000_vphas','Gmag_vphas','RPmag_vphas','BPmag_vphas','e_Gmag_vphas','e_RPmag_vphas','e_BPmag_vphas'],
+           '2mass_gaia':['_2MASS_2mass_gaia','RAJ2000_2mass_gaia', 'DEJ2000_2mass_gaia','Jmag_2mass_gaia','e_Jmag_2mass_gaia','Hmag_2mass_gaia','e_Hmag_2mass_gaia','Kmag_2mass_gaia','e_Kmag_2mass_gaia'],
+           'allwise_gaia':['AllWISE_allwise_gaia','RAJ2000_allwise_gaia','DEJ2000_allwise_gaia','W1mag_allwise_gaia','e_W1mag_allwise_gaia','W2mag_allwise_gaia','e_W2mag_allwise_gaia','W3mag_allwise_gaia','e_W3mag_allwise_gaia','W4mag_allwise_gaia','e_W4mag_allwise_gaia']
            }
 
 ########################### Default Scaler  ####################################
@@ -175,10 +175,16 @@ def prepare_cols(df, cp_thres=0, vphas=False,gaiadata=False,cp_conf_flag=False, 
         #df_save.loc[df_save['cp_flag_2mass_gaia']>=cp_thres, [MW_cols['2mass']+['cp_flag_2mass']]] = df_save.loc[df_save['cp_flag_2mass_gaia']>=cp_thres, MW_cols['2mass_gaia']+['cp_flag_2mass_gaia']]
         #df_save.loc[df_save['cp_flag_allwise_gaia']>=cp_thres, [MW_cols['allwise']+['cp_flag_allwise']]] = df_save.loc[df_save['cp_flag_allwise_gaia']>=cp_thres, MW_cols['allwise_gaia']+['cp_flag_allwise_gaia']]
         #'''
-        for col in MW_cols['2mass']+['cp_flag_2mass']:
+        for col in list((Counter(MW_cols['2mass']+['cp_flag_2mass']) - Counter(['_r_2mass','PU_2mass'])).elements()):
+            #print(col)
+            df_save['tmassfromgaia'] = 'no'
             df_save.loc[df_save['cp_flag_2mass_gaia']>=cp_thres, col] = df_save.loc[df_save['cp_flag_2mass_gaia']>=cp_thres, col+'_gaia']
-        for col in MW_cols['allwise']+['cp_flag_allwise']:
+            df_save.loc[df_save['cp_flag_2mass_gaia']>=cp_thres, 'tmassfromgaia'] = 'yes'
+        for col in list((Counter(MW_cols['allwise']+['cp_flag_allwise']) - Counter(['_r_allwise','PU_allwise'])).elements()):
+            #print(col)
+            df_save['allwisefromgaia'] = 'no'
             df_save.loc[df_save['cp_flag_allwise_gaia']>=cp_thres, col] = df_save.loc[df_save['cp_flag_allwise_gaia']>=cp_thres, col+'_gaia']
+            df_save.loc[df_save['cp_flag_allwise_gaia']>=cp_thres, 'allwisefromgaia'] = 'yes'
         #'''
 
     # combine ALLWISE, CatWISE and UnWISE

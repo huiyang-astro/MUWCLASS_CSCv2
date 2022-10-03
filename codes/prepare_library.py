@@ -652,7 +652,7 @@ def cal_ave(df, data_dir, dtype='TD', Chandratype='CSC',PU=False,cnt=False,plot=
     #df.to_csv('TD_test.csv',index=False)
 
     if Chandratype=='CSC':
-        cols_copy = ['name', 'usrid', 'ra', 'dec', 'err_ellipse_r0', 'err_ellipse_r1', 'err_ellipse_ang', 'significance',
+        cols_copy = ['name', 'usrid','ra_pnt','dec_pnt', 'ra', 'dec', 'err_ellipse_r0', 'err_ellipse_r1', 'err_ellipse_ang', 'significance',
                   'extent_flag', 'pileup_flag','sat_src_flag', 'streak_src_flag','conf_flag',
                   'flux_aper90_mean_b', 'e_flux_aper90_mean_b', 'flux_aper90_mean_h', 'e_flux_aper90_mean_h', 
                   'flux_aper90_mean_m', 'e_flux_aper90_mean_m', 'flux_aper90_mean_s', 'e_flux_aper90_mean_s', 
@@ -674,7 +674,7 @@ def cal_ave(df, data_dir, dtype='TD', Chandratype='CSC',PU=False,cnt=False,plot=
     df = df[df['per_remove_code']==0].reset_index(drop=True)
     #df.to_csv('TD_test.csv',index=False)
     if PU:
-        df_ave = df[cols_copy+[PU]].copy()
+        df_ave = df[cols_copy+PU].copy()
     else:
         df_ave = df[cols_copy].copy()
     
@@ -1850,7 +1850,7 @@ def cal_PU(df, theta, N_counts, PU_name, ver='kim95', sigma=2.):
 
     return df
 
-def refsrc_gaia(field_name, field_dir, ref_mjd, ra=167.8665, dec=-60.66655, R=12., exclude_center=False, Plx_limits=[-2.,2.], e_Plx_limit=1., e_PM_limit=1., PU_limits=1., PM_limit=False, RUWE_limit=False):
+def refsrc_gaia(field_name, field_dir, ref_mjd, ra=167.8665, dec=-60.66655, R=12., exclude_center=False, Plx_limits=[-2.,2.], e_Plx_limit=1., e_PM_limit=1., PU_limits=1., PM_limit=False, RUWE_limit=False,PM_cor=True,refname='_Gaia_DR3_clean.txt'):
     '''
     description:
         prepare the Gaia astrometric reference catalog
@@ -1871,14 +1871,14 @@ def refsrc_gaia(field_name, field_dir, ref_mjd, ra=167.8665, dec=-60.66655, R=12
     #os.chdir(field_dir)
     Path(f'{field_dir}/Astrometry/').mkdir(parents=True, exist_ok=True)
     #os.chdir(field_dir+'/Astrometry/')
-    if path.exists(field_name+'_Gaia_eDR3_clean.txt') == False:
-        gaia_cat = 'I/350/gaiaedr3'
+    if path.exists(field_name+'_Gaia_DR3_clean.txt') == False:
+        gaia_cat = 'I/355/gaiadr3'
         viz = Vizier(row_limit=-1,  timeout=1000, columns=["**", "+_r"], column_filters={'Gmag':'<23.', 'e_RA_ICRS':'<1.', 'e_DE_ICRS':'<1.'}, catalog=gaia_cat)
         c = coordinates.SkyCoord(ra, dec, unit=('deg', 'deg'), frame='icrs')
         res = viz.query_region(c, radius=R*u.arcmin)[0]
         df = res.to_pandas()
         df['e_PM'] = np.sqrt(df['e_pmRA']**2+df['e_pmDE']**2)
-        df.to_csv(f'{field_dir}/Astrometry/{field_name}_Gaia_eDR3.csv', index=False)
+        df.to_csv(f'{field_dir}/Astrometry/{field_name}_Gaia_DR3.csv', index=False)
         epsi_90 = df['epsi'].quantile(0.9)
         print('The 90% percentile of epsi for', field_name,' field is ', epsi_90,'.')
         df_sub = df.loc[(df.Plx>Plx_limits[0]) & (df.Plx<Plx_limits[1]) & (df.e_Plx<e_Plx_limit) & (df.e_PM < e_PM_limit) & (df.epsi<epsi_90)]
@@ -1891,14 +1891,18 @@ def refsrc_gaia(field_name, field_dir, ref_mjd, ra=167.8665, dec=-60.66655, R=12
             df_sub = df_sub.loc[df._r > exclude_center]
         df_sub['RA_ERR'] = df_sub['e_RA_ICRS']/3.6e6
         df_sub['DEC_ERR'] = df_sub['e_DE_ICRS']/3.6e6
-        df_sub['RA'] = df_sub.apply(lambda row:row.RA_ICRS+delta_yr*row.pmRA/(np.cos(row.DE_ICRS*np.pi/180.)*3.6e6),axis=1)
-        df_sub['DEC'] = df_sub.apply(lambda row:row.DE_ICRS+delta_yr*row.pmDE/3.6e6,axis=1)
+        if PM_cor:
+            df_sub['RA'] = df_sub.apply(lambda row:row.RA_ICRS+delta_yr*row.pmRA/(np.cos(row.DE_ICRS*np.pi/180.)*3.6e6),axis=1)
+            df_sub['DEC'] = df_sub.apply(lambda row:row.DE_ICRS+delta_yr*row.pmDE/3.6e6,axis=1)
+        else:
+            df_sub['RA'] = df_sub['RA_ICRS']
+            df_sub['DEC'] = df_sub['DE_ICRS']
         df_sub.loc[df_sub['RA'].isnull(),'RA'] = df_sub['RA_ICRS']
         df_sub.loc[df_sub['DEC'].isnull(),'DEC'] = df_sub['DE_ICRS']
         df_save = df_sub[['RA','RA_ERR','DEC','DEC_ERR']]
         df_save = df_save.rename(columns={'RA':'#RA'})
         #df_save = df_save.rename(columns={'RA_ICRS':'#RA','e_RA_ICRS':'RA_ERR','DE_ICRS':'DEC','e_DE_ICRS':'DEC_ERR'})
-        df_save.to_csv(f'{field_dir}/Astrometry/{field_name}_Gaia_eDR3_clean.txt',header=True,index=None, sep='\t')
+        df_save.to_csv(f'{field_dir}/Astrometry/{field_name}{refname}',header=True,index=None, sep='\t')
 
     return df_save
 
@@ -1942,13 +1946,13 @@ def alignment_uncertainty(coords, df_X, df_ref):
 
     ra_astro_pu = np.sum(1./(df_X['RA_ERR']*3600)**2+(df_ref['RA_ERR']*3600)**2)**(-0.5)
     dec_astro_pu = np.sum(1./(df_X['DEC_ERR']*3600)**2+(df_ref['DEC_ERR']*3600)**2)**(-0.5)
-    print(ra_astro_pu, dec_astro_pu)
+    #print(ra_astro_pu, dec_astro_pu)
     astro_pu = (ra_astro_pu +dec_astro_pu)/2.
     
     return astro_pu
 
 
-def cal_astro_pu(field_name,data_dir,residlim,sig_astro,count_astro):
+def cal_astro_pu(field_name,data_dir,residlim,sig_astro,count_astro,refsecfile='_Gaia_DR3_clean.txt'):
 
     #os.chdir(field_dir)
     lines = open(f'{data_dir}/Astrometry/{field_name}_{residlim}_{sig_astro}_{count_astro}_wcs_Xmatch.log').readlines()
@@ -1980,7 +1984,7 @@ def cal_astro_pu(field_name,data_dir,residlim,sig_astro,count_astro):
 
     df_X = pd.read_csv(f'{data_dir}/Astrometry/{field_name}_bright.txt', header=0,sep="\s+")
     
-    df_ref = pd.read_csv(f'{data_dir}/Astrometry/{field_name}_Gaia_eDR3_clean.txt', header=0,sep="\s+")
+    df_ref = pd.read_csv(f'{data_dir}/Astrometry/{field_name}{refsecfile}', header=0,sep="\s+")
 
 
     astro_pu = alignment_uncertainty(df_src, df_X, df_ref)
