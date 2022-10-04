@@ -3,8 +3,8 @@
 
 # version 1.0
 
-from sklearnex import patch_sklearn
-patch_sklearn()
+# from sklearnex import patch_sklearn
+# patch_sklearn()
 
 import pandas as pd
 import numpy as np
@@ -213,6 +213,7 @@ def prepare_cols(df, cp_thres=0, vphas=False,gaiadata=False,cp_conf_flag=False, 
             df_save.loc[(df_save['cp_flag_gaia']<cp_thres) & (df_save['cp_flag_vphas']>=cp_thres), 'e_'+mag+'_comb'] = df_save.loc[(df_save['cp_flag_gaia']<cp_thres) & (df_save['cp_flag_vphas']>=cp_thres), 'e_'+mag+'_vphas'] 
     
     #'''
+
     df_save = df_save.rename(columns = {
         'flux_aper90_ave_s':'Fcsc_s','e_flux_aper90_ave_s':'e_Fcsc_s','flux_aper90_ave_m':'Fcsc_m','e_flux_aper90_ave_m':'e_Fcsc_m',
         'flux_aper90_ave_h':'Fcsc_h','e_flux_aper90_ave_h':'e_Fcsc_h','Plx_gaia':'Plx','e_Plx_gaia':'e_Plx','PM_gaia':'PM',
@@ -330,9 +331,9 @@ def sample_data(df,Xray='CSC',distance='nodist',Uncer_flag=False,random_state=No
             
             dist_feature = dist_features_dict[distance][0] 
 
-            # set distances to zero for sources without EDR3Name_gaia 
+            # set distances to zero for sources without DR3Name_gaia 
 
-            df.loc[df['EDR3Name_gaia'].isna(), [dist_feature, 'e_'+dist_feature]]=np.nan
+            df.loc[df['DR3Name_gaia'].isna(), [dist_feature, 'e_'+dist_feature]]=np.nan
             
             # set distance of sources with negative parallaxes and parallaxes with large errors (fpu<2) to nan, already done in making of TD?
             # the cleaning of features should be done when creating the test data
@@ -366,7 +367,7 @@ def sample_data(df,Xray='CSC',distance='nodist',Uncer_flag=False,random_state=No
             
             dist_feature = dist_features_dict[distance][0] 
 
-            df.loc[df['EDR3Name_gaia'].isna(), [dist_feature, 'e_'+dist_feature]]=np.nan 
+            df.loc[df['DR3Name_gaia'].isna(), [dist_feature, 'e_'+dist_feature]]=np.nan 
 
             # set distance of sources with negative parallaxes and parallaxes with large errors (fpu<2) to nan, already done in making of TD?
             df.loc[df['Plx_gaia']<0, [dist_feature, 'e_'+dist_feature]]=np.nan

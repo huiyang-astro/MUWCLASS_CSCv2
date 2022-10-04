@@ -3,8 +3,8 @@
 
 # version 1.0
 
-from sklearnex import patch_sklearn
-patch_sklearn()
+# from sklearnex import patch_sklearn
+# patch_sklearn()
 
 import pandas as pd
 import numpy as np

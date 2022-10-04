@@ -12,11 +12,11 @@ from astropy.io import fits
 from astropy.table import Table
 import astropy.wcs as wcs
 from astropy.visualization import make_lupton_rgb
-import pyds9 as ds9
+# import pyds9 as ds9
 from scipy.ndimage import gaussian_filter
 from astropy.coordinates import SkyCoord, Angle
 from astropy import units as u
-from prepare_library import create_perobs_data, cal_ave, add_MW, confusion_clean, CSC_clean_keepcols, CSCview_conesearch, create_CXO_ave
+from prepare_library import create_perobs_data, cal_ave, add_MW, confusion_clean, CSC_clean_keepcols, CSCview_conesearch, create_CXO_ave, Gaia_counterparts_new
 from muwclass_library import class_prepare, class_train_and_classify, class_save_res, col_rename, confident_flag, confident_sigma, find_confident, plot_classifier_matrix_withSTD, prepare_cols
 from pathlib import Path
 import time
@@ -214,7 +214,7 @@ def find_obs(df_per, ra, dec,filter=True):
     return obsids
 
 
-def prepare_field(df, data_dir, query_dir, field_name, name_col='name',Chandratype='CSC',pu_astro=0., search_mode='cone_search',engine='curl',csc_version='2.0',create_perobs='query',convert_hms_to_deg=True):
+def prepare_field(df, data_dir, query_dir, field_name, name_col='name',Chandratype='CSC',pu_astro=0., search_mode='cone_search',engine='curl',csc_version='2.0',create_perobs='query',convert_hms_to_deg=True, gaia_precomputed=True):
     
     #'''
     if Chandratype=='CSC':
@@ -247,7 +247,8 @@ def prepare_field(df, data_dir, query_dir, field_name, name_col='name',Chandraty
     # cross-match with MW catalogs
     start = time.time()
     confusion = False if search_mode == 'cone_search' else True
-    add_MW(df_ave, data_dir, field_name, Chandratype='CSC',confusion =confusion)
+    add_MW(df_ave, data_dir, field_name, Chandratype='CSC',confusion =confusion, gaia_precomputed=gaia_precomputed)
+
     end = time.time() 
     #print(end - start)
     #'''
@@ -263,6 +264,10 @@ def prepare_field(df, data_dir, query_dir, field_name, name_col='name',Chandraty
         df_MW_clean = CSC_clean_keepcols(df_MW_cf, remove_codes = [32], withvphas=False)
         df_MW_clean['CSC_flags'] = ''
 
+    if gaia_precomputed == True:
+        df_MW_cf = Gaia_counterparts_new(df_MW_cf, data_dir, field_name.lower(), radius=3)
+
+    df_MW_clean = CSC_clean_keepcols(df_MW_cf, withvphas=False)
     #df_MW_clean = vphasp_to_gaia_mags(df_MW_clean)
 
     df_remove = df_MW_clean[df_MW_clean['remove_code']==0].reset_index(drop=True)
@@ -410,7 +415,7 @@ import holoviews as hv
 import hvplot
 import hvplot.pandas
 import bokeh
-from test_library import prepare_cols
+# from test_library import prepare_cols
 import param
 from holoviews.element.chart import Chart
 from holoviews.plotting.bokeh import PointPlot

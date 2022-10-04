@@ -15,3 +15,5 @@ files/CSCv2_all_MW_classprob_XCLASS.csv
 codes/MRT/*
 codes/buildTD/old_files/*
 #codes/NGC3532/data/NGC3532_02182022/Astrometry/*
+*.pyc
+codes/demo/data/*.csv
