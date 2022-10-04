@@ -28,3 +28,4 @@ pip install seaborn
 pip install ipyaladin
 pip install holoviews
 pip install hvplot
+pip install git+https://github.com/cgobat/asymmetric_uncertainty.git
