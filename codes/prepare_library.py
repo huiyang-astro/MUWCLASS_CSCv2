@@ -994,8 +994,6 @@ def MW_counterpart_confusion(ras, decs, R, Es=[], N=10, catalog='wise',ref_mjd=5
         # df_MWs = df_MWs.rename(columns={'DR3Name_gaia':'EDR3Name_gaia'})
         # df_MWs = df_MWs[df_MWs['DR3Name_gaia'].notna()]
         # apparently Vizier doesn't load the source id correctly, so we need to use the DR3Name instead
-        print(df_MWs.loc[df_MWs['Source_gaia'].notna()].shape)
-        print(df_MWs.loc[df_MWs['DR3Name_gaia'].notna(), 'DR3Name_gaia'].shape)
         df_MWs.loc[df_MWs['Source_gaia'].notna(), 'Source_gaia'] = df_MWs.loc[df_MWs['DR3Name_gaia'].notna(), 'DR3Name_gaia'].str.replace('Gaia DR3 ','').astype(np.int64)
         if gaia_precomputed==False:
             df_gaiadist = df_gaiadist.add_suffix('_gaiadist')
@@ -1865,12 +1863,9 @@ def Gaia_counterparts(df_gaia, file_dir, field_name):
                 'w4mpro_error':'e_W4mag'})
 
         #df_gaia = pd.read_csv(f'{file_dir}/{field_name}_gaia.csv')
-        print(df_MW.shape)
         #print(df_gaia.dtypes)
         #print(df_gaia['Source_gaia'][:3])
-        print(len(df_gaia))
         df_gaia = df_gaia[df_gaia['DR3Name_gaia'].notna()]
-        print(len(df_gaia))
         df_gaia['Source_gaia'] = df_gaia.apply(lambda row: np.int64(row.DR3Name_gaia[10:]), axis=1)
         df_MW = df_MW.add_suffix('_'+cat)
         #df_gaia['Source_gaia'] = df_gaia.apply(lambda row: np.nan if pd.isnull(row.DR3Name_gaia) else np.int64(row.DR3Name_gaia[10:]), axis=1)
