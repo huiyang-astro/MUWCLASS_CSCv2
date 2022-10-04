@@ -1,4 +1,5 @@
 old_files/*
+**.pyc
 codes/ciao_library.py
 codes/NGC3532/*
 codes/4FGL/*
@@ -7,6 +8,7 @@ codes/Review_report/*
 codes/Evaluation/private/*
 codes/HESS/*
 codes/CSCv2_classification/*
+codes/demo/data/query/*
 codes/demo/data/query/old/*
 files_v1/*
 files/CSCv2_all_MW_classprob_XCLASS.csv
