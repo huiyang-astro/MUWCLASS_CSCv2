@@ -994,7 +994,9 @@ def MW_counterpart_confusion(ras, decs, R, Es=[], N=10, catalog='wise',ref_mjd=5
         # df_MWs = df_MWs.rename(columns={'DR3Name_gaia':'EDR3Name_gaia'})
         # df_MWs = df_MWs[df_MWs['DR3Name_gaia'].notna()]
         # apparently Vizier doesn't load the source id correctly, so we need to use the DR3Name instead
-        df_MWs['Source_gaia'] = df_MWs['DR3Name_gaia'].str.replace('Gaia DR3 ','').astype(np.int64)
+        print(df_MWs.loc[df_MWs['Source_gaia'].notna()].shape)
+        print(df_MWs.loc[df_MWs['DR3Name_gaia'].notna(), 'DR3Name_gaia'].shape)
+        df_MWs.loc[df_MWs['Source_gaia'].notna(), 'Source_gaia'] = df_MWs.loc[df_MWs['DR3Name_gaia'].notna(), 'DR3Name_gaia'].str.replace('Gaia DR3 ','').astype(np.int64)
         if gaia_precomputed==False:
             df_gaiadist = df_gaiadist.add_suffix('_gaiadist')
             df_gaiadist = df_gaiadist.rename(columns= {'Source_gaiadist':'Source_gaia','_q_gaiadist':'_q'})
