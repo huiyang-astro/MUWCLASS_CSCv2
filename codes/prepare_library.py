@@ -1768,8 +1768,7 @@ def Gaia_counterparts_new(df_mw, file_dir, field_name, radius):
     df_gaia.to_csv(f'{file_dir}/{field_name}_gaia_precomputed.csv', index=False)
 
     df_mw.loc[(df_mw['DR3Name_gaia'].notna()) & (df_mw['cp_flag_gaia']>=-4), gaia_precomputed_cols] = df_gaia[gaia_precomputed_cols].values
-    df_mw.loc[(df_mw['DR3Name_gaia'].notna()) & (df_mw['cp_flag_gaia']>=-4), 'gaia_test'] = 1
-
+    df_mw.loc[(df_mw['DR3Name_gaia'].notna()) & (df_mw['cp_flag_gaia']>=-4), 'gaia_precomputed'] = True
     
     return df_mw
 

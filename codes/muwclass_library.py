@@ -120,7 +120,7 @@ def col_rename(df):
 
     return df
 
-def prepare_cols(df, cp_thres=0, vphas=False,gaiadata=False,cp_conf_flag=False, TD=False, NS_MWdrop=False, STAR_classremove=['HM-STAR','LM-STAR','YSO']):
+def prepare_cols(df, cp_thres=0, vphas=False,gaiadata=False,cp_conf_flag=False, TD=False, NS_MWdrop=False, STAR_classremove=['HM-STAR','LM-STAR','YSO'], gaia_precomputed=True):
 
     # clean X-ray sources
     #df = df[df.remove_code==0].reset_index(drop=True)
@@ -163,6 +163,9 @@ def prepare_cols(df, cp_thres=0, vphas=False,gaiadata=False,cp_conf_flag=False, 
         else:
             #print(MW_cols[cat]+['cp_flag_'+cat])
             df_save = df_save.join(df[MW_cols[cat]+['cp_flag_'+cat]])
+    
+    if TD == False and gaia_precomputed == True:
+        df_save['gaia_precomputed'] = df['gaia_precomputed']
     
     if cp_conf_flag == True:
         df_save = df_save.join(df['cp_conf_flag'])

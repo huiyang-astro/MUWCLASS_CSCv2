@@ -265,9 +265,8 @@ def prepare_field(df, data_dir, query_dir, field_name, name_col='name',Chandraty
         df_MW_clean['CSC_flags'] = ''
 
     if gaia_precomputed == True:
-        df_MW_cf = Gaia_counterparts_new(df_MW_cf, data_dir, field_name.lower(), radius=3)
+        df_MW_clean = Gaia_counterparts_new(df_MW_clean, data_dir, field_name.lower(), radius=3)
 
-    df_MW_clean = CSC_clean_keepcols(df_MW_cf, withvphas=False)
     #df_MW_clean = vphasp_to_gaia_mags(df_MW_clean)
 
     df_remove = df_MW_clean[df_MW_clean['remove_code']==0].reset_index(drop=True)
