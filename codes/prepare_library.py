@@ -1650,7 +1650,7 @@ def Gaia_counterparts_new(df_mw, file_dir, field_name, radius):
     radius: crossmatching radius of CXO sources to Gaia DR3 in arcsec
     '''
 
-    upload_resource = f'{file_dir}/{field_name}_upload.xml'
+    # upload_resource = f'{file_dir}/{field_name}_upload.xml'
 
     # df_mw = df_mw.rename(columns={'Source_gaia': 'source_id'})
 
