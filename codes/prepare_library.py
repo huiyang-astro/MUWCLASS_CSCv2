@@ -28,6 +28,9 @@ from astroML.crossmatch import crossmatch_angular
 from astroquery.gaia import Gaia
 from uncertainties import unumpy
 from astropy.time import Time
+from muwclass_library import bandshift
+from asymmetric_uncertainty import AsymmetricUncertainty
+
 
 exnum = 975318642
 
@@ -443,6 +446,35 @@ def cal_theta_counts(df, df_ave, theta, net_count, err_count):
 
     return df, df_ave
 
+def cal_ave_pos(df, df_ave, ra_col, dec_col, pu_col, add2df=False):
+
+    for uid in df.usrid.unique():
+        
+        idx = np.where( (df.usrid ==uid))[0] # & (df.per_remove_code==0) )[0]
+        idx2 = np.where(df_ave.usrid == uid)[0]
+        
+        if len(idx) ==1:
+            ra_ave      = df.loc[idx, ra_col].values
+            dec_ave      = df.loc[idx, dec_col].values
+            pu_ave = df.loc[idx, pu_col].values
+            #df_ave.loc[idx2, col]      = ave
+            #df_ave.loc[idx2, 'e_'+col] = err
+        
+        else:
+            ra_ave = np.average(df.loc[idx, ra_col].values, weights=1./(df.loc[idx, pu_col].values)**2)
+            dec_ave = np.average(df.loc[idx, dec_col].values, weights=1./(df.loc[idx, pu_col].values)**2)
+            pu_ave =  np.sqrt(1./sum(1./(df.loc[idx, pu_col].values)**2))
+            
+        df_ave.loc[idx2, 'ra_ave']  = ra_ave
+        df_ave.loc[idx2, 'dec_ave']  = dec_ave
+        df_ave.loc[idx2, 'PU_ave'] = pu_ave
+        if add2df:
+            df.loc[idx, 'ra_ave']      = ra_ave
+            df.loc[idx, 'dec_ave']      = dec_ave
+            df.loc[idx, 'PU_ave'] = pu_ave
+
+    return df, df_ave
+
 
 def cal_sig(df, df_ave, sig):
     #print("Run cal_sig......")
@@ -599,7 +631,7 @@ def nan_flux(df_ave, flux_name, flux_flag='flux_flag',end=''):
 
     return df_ave
 
-def cal_ave(df, data_dir, dtype='TD', Chandratype='CSC',PU=False,cnt=False,plot=False, verb=False, convert_hms_to_deg=True):
+def cal_ave(df, data_dir, dtype='TD', Chandratype='CSC',PU=False,cnt=False,plot=False, verb=False, convert_hms_to_deg=True,cal_ave_coordinate=False):
     '''
     description:
         calculate the averaged data from per-observation CSC data
@@ -647,8 +679,9 @@ def cal_ave(df, data_dir, dtype='TD', Chandratype='CSC',PU=False,cnt=False,plot=
     if Chandratype=='CSC' or  Chandratype=='CSC-CXO':
         df = apply_flags_filter(df, verb=verb)# theta_flag=True,dup=True,sat_flag=True,pileup_warning=True,streak_flag=True
     elif Chandratype=='CXO':
-        df = apply_flags_filter(df,theta_flag=True,dup=False,sat_flag=False,pileup_warning=False,streak_flag=False,pu_signa_fil=False,verb=verb)
+        df = apply_flags_filter(df,instrument=False,sig=False,theta_flag=True,dup=False,sat_flag=False,pileup_warning=False,streak_flag=False,pu_signa_fil=False,verb=verb)
     #'''
+    
     #df.to_csv('TD_test.csv',index=False)
 
     if Chandratype=='CSC':
@@ -661,7 +694,7 @@ def cal_ave(df, data_dir, dtype='TD', Chandratype='CSC',PU=False,cnt=False,plot=
                   'powlaw_nh_mean','e_powlaw_nh_mean','powlaw_ampl_mean','e_powlaw_ampl_mean','powlaw_stat']
    
     elif Chandratype=='CXO':
-          cols_copy = ['usrid']
+          cols_copy = ['name','usrid','ra', 'dec', 'significance', 'net_counts']
     elif Chandratype=='CSC-CXO':
         cols_copy = ['COMPONENT','name', 'usrid', 'ra', 'dec', 'err_ellipse_r0', 'err_ellipse_r1', 'err_ellipse_ang', 'significance',
                   'extent_flag', 'pileup_flag','sat_src_flag', 'streak_src_flag','conf_flag',
@@ -711,6 +744,9 @@ def cal_ave(df, data_dir, dtype='TD', Chandratype='CSC',PU=False,cnt=False,plot=
     df_ave = nan_flux(df_ave, 'flux_aper90_ave_')
     
     df_ave = cal_bflux(df_ave, 'flux_aper90_ave_',end='')
+
+    if Chandratype=='CXO' and cal_ave_coordinate == True:
+        df, df_ave = cal_ave_pos(df, df_ave, ra_col='ra.1', dec_col='dec.1', pu_col='PU.1')
 
     if cnt:
         df, df_ave = cal_cnt(df, df_ave, 'src_cnts_aper90_b','src_cnts_aper90_hilim_b','src_cnts_aper90_lolim_b')
@@ -1307,7 +1343,7 @@ def TD_clean(CSC, remove_codes = [1, 32]):
     CSC = CSC.apply(pd.to_numeric, errors='ignore')
     CSC = CSC.replace(np.nan, exnum)
 
-    CSC = remove_sources(CSC, remove_codes) 
+    CSC = remove_sources(CSC, remove_codes=remove_sources) 
 
     CSC = CSC.replace(exnum, np.nan)
     #print(len(CSC))
@@ -1525,7 +1561,7 @@ def CSC_clean_keepcols(CSC, remove_codes = [1, 32], withvphas=False):
     # obtain combined WISE magnitudes from CatWISE2020 and unWISE
 
     #'''
-    CSC = remove_sources(CSC, [1, 32], dtype='CSC')
+    CSC = remove_sources(CSC, remove_codes, dtype='CSC')
 
     CSC = CSC.replace(exnum, np.nan)
     #CSC = CSC.drop(columns=['FW1_unwise','FW2_unwise','_r_gaia','_r_gaiadist', '_r_2mass','_r_catwise','_r_unwise','_r_allwise'])
@@ -1951,6 +1987,25 @@ def alignment_uncertainty(coords, df_X, df_ref):
     
     return astro_pu
 
+def get_rms_res(field_name,data_dir,wcs_log_file):
+
+    lines = open(wcs_log_file).readlines()
+    num_line = len(lines)
+    #line = lines[8]
+    #num_src = [int(s) for s in line.split() if s.isdigit()][0]
+
+    outF = open(f'{data_dir}/{field_name}_astro_wcs_residual.csv', "w")
+    outF.write('before after percentage ')
+    outF.write('\n')
+    for li in lines[num_line-8:num_line-6]:
+            outF.write(li[30:])
+            #outF.write('\n')
+    outF.close()
+
+    res = pd.read_csv(f'{data_dir}/{field_name}_astro_wcs_residual.csv', header=0,sep="\s+")
+    rms_res = res.loc[0, 'after']
+
+    return rms_res
 
 def cal_astro_pu(field_name,data_dir,residlim,sig_astro,count_astro,refsecfile='_Gaia_DR3_clean.txt'):
 
@@ -2048,6 +2103,75 @@ def apply_astro_correct(field_name,data_dir,del_ra, del_dec, residlim,sig_astro,
     dist1, ind1 = crossmatch_angular(Xcat1, Xcat2, max_radius)
 
     #print(dist1*3600,np.sqrt(np.mean(dist1**2))*3600)
+
+def create_CXO_ave(data_dir, field_name,df, pu_astro=0):
+
+    '''
+    convert the dataframe created from CSC pipeline to the format used by MUWCLASS, 
+    and calculate the average properties
+
+    '''
+
+    print('run create_CXO_ave...')
+
+    df['name'] = df.apply(lambda r: field_name + '-' + str(r['COMPONENT']), axis=1) 
+    df['usrid'] = np.nan
+    for i, name in enumerate(df['name'].unique()):
+        df.loc[df['name']==name, 'usrid'] = i+1
+
+    df = cal_PU(df, theta='THETA_broad', N_counts='NET_COUNTS_broad', PU_name='PU', ver='kim95', sigma=2.)
+
+    df['PU'] = np.sqrt(df['PU']**2+(2*pu_astro)**2)
+
+    df = df.drop(columns='src')
+    
+    CXO_names = ['RA_x', 'DEC_x', 'SRC_SIGNIFICANCE', 'NET_COUNTS_x', 'obsid', 'THETA_broad', 'RA_y',  'DEC_y', 'PU','SRC_SIGNIFICANCE_broad']
+    CSC_names = ['ra',    'dec',  'significance',    'net_counts',   'obsid',  'theta',   'ra.1',    'dec.1', 'PU.1', 'flux_significance_b']
+    
+    #df = df_CXO[CXO_names]
+    for CXOn, CSCn in zip(CXO_names, CSC_names):
+        df = df.rename(columns={CXOn:CSCn})
+    #df = df.rename(columns={'RA':'ra','RA_ERR':'e_ra','DEC': 'dec','DEC_ERR': 'e_dec','SRC_SIGNIFICANCE': 'significance', 'THETA_broad': 'theta'})#
+    #, 'NET_FLUX_APER_0.7-7.0': 'flux_aper_b.1', 'NET_FLUX_APER_LO_0.7-7.0': 'flux_aper_lolim_b.1', 'NET_FLUX_APER_HI_0.7-7.0': 'flux_aper_hilim_b.1', 'NET_FLUX_APER_hard': 'flux_aper_h.1', 'Hard_LO': 'flux_aper90_lolim_h.1', 'Hard_HI': 'flux_aper90_hilim_h.1', 'Medium': 'flux_aper90_m.1', 'Medium_LO': 'flux_aper90_lolim_m.1', 'Medium_HI': 'flux_aper90_hilim_m.1', 'Soft': 'flux_aper90_s.1', 'Soft_LO': 'flux_aper90_lolim_s.1', 'Soft_HI': 'flux_aper90_hilim_s.1'})
+    
+    CXO_var_cols = ['KP', 'KS']
+    CSC_var_cols = ['kp_prob_b', 'ks_prob_b']
+    
+    for CXOv, CSCv in zip(CXO_var_cols, CSC_var_cols):
+        
+        df = df.replace({CXOv: {-1: np.nan}})
+        
+        df[CSCv] = 1.- df[CXOv]
+    
+    origbands_name, origbands, convertedbands_name, convertedbands = ['0.7-1.2', '0.7-7.0'], [(0.7,1.2), (0.7,7.0)], ['0.5-1.2', '0.5-7.0'], [(0.5,1.2), (0.5,7.0)]
+    for i_band,iband, c_band, cband in zip(origbands_name, origbands, convertedbands_name, convertedbands):
+        
+        #df[['NET_FLUX_APER_'+c_band,'NET_FLUX_APER_LO_'+c_band, 'NET_FLUX_APER_HI_'+c_band]] = np.nan
+        df['NET_FLUX_APER_'+c_band],df['NET_FLUX_APER_LO_'+c_band],df['NET_FLUX_APER_HI_'+c_band]  = np.nan, np.nan, np.nan
+        df['NET_FLUX_APER_'+c_band]    = df.apply(lambda r: bandshift(AsymmetricUncertainty(r['NET_FLUX_APER_'+i_band],abs(r['NET_FLUX_APER_HI_'+i_band]-r['NET_FLUX_APER_'+i_band]),abs(r['NET_FLUX_APER_'+i_band]-r['NET_FLUX_APER_LO_'+i_band])), iband,cband,2).value , axis=1)
+        df['NET_FLUX_APER_HI_'+c_band] = df.apply(lambda r: r['NET_FLUX_APER_'+c_band] + bandshift(AsymmetricUncertainty(r['NET_FLUX_APER_'+i_band],abs(r['NET_FLUX_APER_HI_'+i_band]-r['NET_FLUX_APER_'+i_band]),abs(r['NET_FLUX_APER_'+i_band]-r['NET_FLUX_APER_LO_'+i_band])),iband,cband,2).plus , axis=1)
+        df['NET_FLUX_APER_LO_'+c_band] = df.apply(lambda r: r['NET_FLUX_APER_'+c_band] - bandshift(AsymmetricUncertainty(r['NET_FLUX_APER_'+i_band],abs(r['NET_FLUX_APER_HI_'+i_band]-r['NET_FLUX_APER_'+i_band]),abs(r['NET_FLUX_APER_'+i_band]-r['NET_FLUX_APER_LO_'+i_band])),iband,cband,2).minus, axis=1)
+
+
+    CXO_bands = ['0.5-7.0', '0.5-1.2', 'medium', 'hard'] # CXO_bands = ['0.7-7.0', '0.7-1.2', 'medium', 'hard']
+    CSC_bands = ['b', 's', 'm', 'h']
+
+    for CXOb, CSCb in zip(CXO_bands, CSC_bands):
+        df = df.rename(columns={'NET_FLUX_APER_'+CXOb: 'flux_aper90_'+CSCb+'.1', 'NET_FLUX_APER_LO_'+CXOb: 'flux_aper90_lolim_'+CSCb+'.1', 'NET_FLUX_APER_HI_'+CXOb: 'flux_aper90_hilim_'+CSCb+'.1'})
+    
+    df['per_remove_code'] = 0
+    #'''
+    #ast_pu = 0
+    df_ave, df_obs = cal_ave(df, data_dir, dtype='field', Chandratype='CXO',PU=False, cnt=False,plot=False, verb=False, convert_hms_to_deg=False,cal_ave_coordinate=True)
+    
+    df_ave = df_ave.sort_values(by='flux_aper90_ave_b', ascending=False)
+    #df_ave.to_csv(f'{data_dir}/{field_name}_ave.csv',index=False)
+    #df_obs = df_obs.sort_values(by='name', ascending=True)
+    df_ave = cal_PU(df_ave, theta='theta_median', N_counts='net_counts', PU_name='PU', ver='kim95', sigma=2.) # NET_COUNTS_broad, net_counts
+
+    return df_ave, df_obs
+
+
 
 def prepare_field(arr):
     [df, data_dir, query_dir, field_name] = arr

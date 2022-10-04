@@ -383,6 +383,22 @@ def sample_data(df,Xray='CSC',distance='nodist',Uncer_flag=False,random_state=No
 
     return df
 
+def bandshift(fluxA,bandA,bandB,Gamma=1.7):
+    
+    '''
+    calculating the converted energy fluxes from bandA energy range to bandB energy range assuming a power-law spectrum with photon index Gamma
+    '''
+    
+    a1,a2 = bandA
+    b1,b2 = bandB
+    if Gamma == 2:
+        integral = lambda lower,upper : np.log(upper) - np.log(lower)
+    else:
+        integral = lambda lower,upper : (upper**(2-Gamma) - lower**(2-Gamma))/(2-Gamma)
+    scalar = fluxA/integral(a1,a2)
+    fluxB = scalar*integral(b1,b2)
+    return fluxB
+
 def convert2csc(data, method = 'simple', Gamma =2.,verb=False):
     # Convert XMM fluxes to CSC fluxes with method='simple' using simple scaling factors assuming Gamma=2
     # or method='LR' with linear regression using paramters from fitting the same sources from XMM and CSC TD

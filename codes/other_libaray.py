@@ -16,7 +16,7 @@ import pyds9 as ds9
 from scipy.ndimage import gaussian_filter
 from astropy.coordinates import SkyCoord, Angle
 from astropy import units as u
-from prepare_library import create_perobs_data, cal_ave, add_MW, confusion_clean, CSC_clean_keepcols, CSCview_conesearch
+from prepare_library import create_perobs_data, cal_ave, add_MW, confusion_clean, CSC_clean_keepcols, CSCview_conesearch, create_CXO_ave
 from muwclass_library import class_prepare, class_train_and_classify, class_save_res, col_rename, confident_flag, confident_sigma, find_confident, plot_classifier_matrix_withSTD, prepare_cols
 from pathlib import Path
 import time
@@ -214,27 +214,34 @@ def find_obs(df_per, ra, dec,filter=True):
     return obsids
 
 
-def prepare_field(df, data_dir, query_dir, field_name, name_col='name',search_mode='cone_search',engine='curl',csc_version='2.0',create_perobs=True,convert_hms_to_deg=True):
+def prepare_field(df, data_dir, query_dir, field_name, name_col='name',Chandratype='CSC',pu_astro=0., search_mode='cone_search',engine='curl',csc_version='2.0',create_perobs='query',convert_hms_to_deg=True):
     
     #'''
-    if create_perobs == True:
-        df_pers = create_perobs_data(df, query_dir, data_dir, name_type='CSCview', name_col=name_col, ra_col='ra',dec_col='dec',coord_format='deg',engine=engine,csc_version=csc_version)
-    else:
-        df_pers = df
+    if Chandratype=='CSC':
+        if create_perobs == 'query':
+            df_pers = create_perobs_data(df, query_dir, data_dir, name_type='CSCview', name_col=name_col, ra_col='ra',dec_col='dec',coord_format='deg',engine=engine,csc_version=csc_version)
+        else:
+            df_pers = df
+            
+        Path(data_dir).mkdir(parents=True, exist_ok=True)
         
-    Path(data_dir).mkdir(parents=True, exist_ok=True)
-    
-    df_pers.to_csv(f'{data_dir}/{field_name}_per.csv', index=False)
+        df_pers.to_csv(f'{data_dir}/{field_name}_per.csv', index=False)
 
-    df_pers = pd.read_csv(f'{data_dir}/{field_name}_per.csv', low_memory=False)
+        df_pers = pd.read_csv(f'{data_dir}/{field_name}_per.csv', low_memory=False)
 
-    df_pers['name'] = df_pers['name'].str.lstrip()
-    df_pers['per_remove_code'] = 0
+        df_pers['name'] = df_pers['name'].str.lstrip()
+        df_pers['per_remove_code'] = 0
 
-    df_ave, df_obs = cal_ave(df_pers, data_dir, dtype='field',Chandratype='CSC',verb=0, convert_hms_to_deg=True)
+        df_ave, df_obs = cal_ave(df_pers, data_dir, dtype='field',Chandratype='CSC',verb=0, convert_hms_to_deg=convert_hms_to_deg)
+
+    elif Chandratype=='CXO':
+        df_ave , df_obs = create_CXO_ave(data_dir, field_name, df, pu_astro=pu_astro)
+        df_obs.to_csv(f'{data_dir}/{field_name}_per.csv', index=False)
+        df_ave['err_ellipse_r0'] = df_ave['PU']
+        #df_ave['PU'] = df_ave['PU_ave']
+        
 
     df_ave.to_csv(f'{data_dir}/{field_name}_ave.csv', index=False)
-
     df_ave = pd.read_csv(f'{data_dir}/{field_name}_ave.csv')
 
     # cross-match with MW catalogs
@@ -250,8 +257,12 @@ def prepare_field(df, data_dir, query_dir, field_name, name_col='name',search_mo
 
     df_MW_cf = pd.read_csv(f'{data_dir}/{field_name}_MW_clean.csv')
     #df_ave = TD_clean_vizier(df_MW_cf, remove_codes = [1, 32, 64]) # previousl no remove_codes =2?!
+    if Chandratype=='CSC':
+        df_MW_clean = CSC_clean_keepcols(df_MW_cf, withvphas=False)
+    elif Chandratype=='CXO':
+        df_MW_clean = CSC_clean_keepcols(df_MW_cf, remove_codes = [32], withvphas=False)
+        df_MW_clean['CSC_flags'] = ''
 
-    df_MW_clean = CSC_clean_keepcols(df_MW_cf, withvphas=False)
     #df_MW_clean = vphasp_to_gaia_mags(df_MW_clean)
 
     df_remove = df_MW_clean[df_MW_clean['remove_code']==0].reset_index(drop=True)
