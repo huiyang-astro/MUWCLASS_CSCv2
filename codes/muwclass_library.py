@@ -88,7 +88,7 @@ class_colors = ['blue','orange','red','c','g','purple','magenta','olive', 'Aqua'
 
 MW_cols = {'xray':['name','ra','dec','PU','significance','flux_aper90_ave_s','e_flux_aper90_ave_s','flux_aper90_ave_m','e_flux_aper90_ave_m','flux_aper90_ave_h','e_flux_aper90_ave_h', \
                   'flux_aper90_ave_b','e_flux_aper90_ave_b','kp_prob_b_max','var_inter_prob','CSC_flags' ],
-           'gaia':['EDR3Name_gaia','_r_gaia','PU_gaia','RA_ICRS_gaia','DE_ICRS_gaia','Gmag_gaia','e_Gmag_gaia','BPmag_gaia','e_BPmag_gaia','RPmag_gaia','e_RPmag_gaia','Plx_gaia','e_Plx_gaia','PM_gaia','rgeo_gaiadist','b_rgeo_gaiadist','B_rgeo_gaiadist','rpgeo_gaiadist','b_rpgeo_gaiadist','B_rpgeo_gaiadist'], 
+           'gaia':['DR3Name_gaia','_r_gaia','PU_gaia','RA_ICRS_gaia','DE_ICRS_gaia','Gmag_gaia','e_Gmag_gaia','BPmag_gaia','e_BPmag_gaia','RPmag_gaia','e_RPmag_gaia','Plx_gaia','e_Plx_gaia','PM_gaia','rgeo_gaiadist','b_rgeo_gaiadist','B_rgeo_gaiadist','rpgeo_gaiadist','b_rpgeo_gaiadist','B_rpgeo_gaiadist'], 
            '2mass':['_2MASS_2mass','_r_2mass','PU_2mass','RAJ2000_2mass','DEJ2000_2mass','Jmag_2mass','e_Jmag_2mass','Hmag_2mass','e_Hmag_2mass','Kmag_2mass','e_Kmag_2mass'], 
            'catwise':['Name_catwise','_r_catwise','PU_catwise','RA_ICRS_catwise','DE_ICRS_catwise','W1mag_catwise','e_W1mag_catwise','W2mag_catwise','e_W2mag_catwise'],
            'unwise':['objID_unwise','_r_unwise','PU_unwise','RAJ2000_unwise','DEJ2000_unwise','W1mag_unwise','e_W1mag_unwise','W2mag_unwise','e_W2mag_unwise'],
@@ -340,17 +340,17 @@ def sample_data(df,Xray='CSC',distance='nodist',Uncer_flag=False,random_state=No
             
             # set distance of sources with negative parallaxes and parallaxes with large errors (fpu<2) to nan, already done in making of TD?
             # the cleaning of features should be done when creating the test data
-            df.loc[df['Plx_gaia']<0, [dist_feature, 'e_'+dist_feature]]=np.nan
-            df.loc[df['Plx_gaia']/df['e_Plx_gaia']<2, [dist_feature, 'e_'+dist_feature]]=np.nan
+            df.loc[df['Plx']<0, [dist_feature, 'e_'+dist_feature]]=np.nan
+            df.loc[df['Plx']/df['e_Plx']<2, [dist_feature, 'e_'+dist_feature]]=np.nan
 
             df = asymmetric_errors(df, dist_feature)
 
             if dist_feature == 'Plx_dist':
-                df = nonzero_sample(df, 'Plx_gaia', 'Plx_gaia',random_state=random_state,factor=factor)
-                df['Plx_dist'] = 1000./df['Plx_gaia'] # Plx_gaia in units of mas
+                df = nonzero_sample(df, 'Plx', 'Plx',random_state=random_state,factor=factor)
+                df['Plx_dist'] = 1000./df['Plx'] # Plx_gaia in units of mas
             else:
                 # set distance of sources with no parallax measurements to nan. 
-                df.loc[df['Plx_gaia'].isna(), [dist_feature, 'e_'+dist_feature]]=np.nan
+                df.loc[df['Plx'].isna(), [dist_feature, 'e_'+dist_feature]]=np.nan
                 df = nonzero_sample(df, dist_feature, dist_feature,random_state=random_state,factor=factor)
 
     elif Uncer_flag == False:   
@@ -373,17 +373,17 @@ def sample_data(df,Xray='CSC',distance='nodist',Uncer_flag=False,random_state=No
             df.loc[df['DR3Name_gaia'].isna(), [dist_feature, 'e_'+dist_feature]]=np.nan 
 
             # set distance of sources with negative parallaxes and parallaxes with large errors (fpu<2) to nan, already done in making of TD?
-            df.loc[df['Plx_gaia']<0, [dist_feature, 'e_'+dist_feature]]=np.nan
-            df.loc[df['Plx_gaia']/df['e_Plx_gaia']<2, [dist_feature, 'e_'+dist_feature]]=np.nan
+            df.loc[df['Plx']<0, [dist_feature, 'e_'+dist_feature]]=np.nan
+            df.loc[df['Plx']/df['e_Plx']<2, [dist_feature, 'e_'+dist_feature]]=np.nan
 
             df = asymmetric_errors(df, dist_feature)
             
             if dist_feature == 'Plx_dist':
                 # set distance of sources with no parallax measurements to nan. 
-                df['Plx_dist'] = 1000./df['Plx_gaia'] # Plx_gaia in units of mas
+                df['Plx_dist'] = 1000./df['Plx'] # Plx_gaia in units of mas
             else:
                 # set distance of sources with no parallax measurements to nan. 
-                df.loc[df['Plx_gaia'].isna(), [dist_feature, 'e_'+dist_feature]]=np.nan
+                df.loc[df['Plx'].isna(), [dist_feature, 'e_'+dist_feature]]=np.nan
 
     return df
 

@@ -994,7 +994,7 @@ def MW_counterpart_confusion(ras, decs, R, Es=[], N=10, catalog='wise',ref_mjd=5
         # df_MWs = df_MWs.rename(columns={'DR3Name_gaia':'EDR3Name_gaia'})
         # df_MWs = df_MWs[df_MWs['DR3Name_gaia'].notna()]
         # apparently Vizier doesn't load the source id correctly, so we need to use the DR3Name instead
-        df_MWs.loc[df_MWs['Source_gaia'].notna(), 'Source_gaia'] = df_MWs.loc[df_MWs['DR3Name_gaia'].notna(), 'DR3Name_gaia'].str.replace('Gaia DR3 ','').astype(np.int64)
+        df_MWs.loc[df_MWs['Source_gaia'].notna(), 'Source_gaia'] = df_MWs.loc[df_MWs['DR3Name_gaia'].notna(), 'DR3Name_gaia'].str.replace('Gaia DR3 ','').astype(str)
         if gaia_precomputed==False:
             df_gaiadist = df_gaiadist.add_suffix('_gaiadist')
             df_gaiadist = df_gaiadist.rename(columns= {'Source_gaiadist':'Source_gaia','_q_gaiadist':'_q'})
@@ -1070,9 +1070,9 @@ def add_MW(df, file_dir, field_name, Chandratype='CSC',ref_mjd=5.e4,pm_cor=False
                 df_MW_all = df_MW_old.append(df_MW, ignore_index=True)
                 #df_MW_all['_q'] = df_MW_all.index+1
                 df_MW_all.to_csv(f'{file_dir}/{field_name}_{cat}.csv', index=False)   
-            
-            data = pd.merge(data, df_MW, how='outer', on=['_q', '_q'])
 
+            data = pd.merge(data, df_MW, how='outer', on=['_q', '_q'])
+            data.loc[data['Source_gaia'].notna(), 'Source_gaia'] = data.loc[data['DR3Name_gaia'].notna(), 'DR3Name_gaia'].str.replace('Gaia DR3 ','').astype(str)
         
         if path.exists(f'{file_dir}/{field_name}_MW.csv') == True:
             #data.to_csv(file_dir+'/'+field_name+'_MW_new.csv', index=False)
@@ -1690,10 +1690,11 @@ def Gaia_counterparts_new(df_mw, file_dir, field_name, radius):
     # df_mw = df_mw.rename(columns={'Source_gaia': 'source_id'})
 
     df_mw_gaia = df_mw.loc[(df_mw['DR3Name_gaia'].notna()) & (df_mw['cp_flag_gaia']>=-4)]
-    df_mw_gaia['Source_gaia'] = df_mw_gaia['Source_gaia'].astype(np.int64)
+    df_mw_gaia['source_id'] = df_mw_gaia['DR3Name_gaia'].str.replace('Gaia DR3 ','').astype(np.int64)
+    print(df_mw_gaia['source_id'].head())
 
     # currently table cannot be csv file, see https://github.com/astropy/astroquery/issues/2529
-    table = Table.from_pandas(df_mw_gaia.rename(columns={'Source_gaia': 'source_id'})[['name', 'ra', 'dec', 'source_id']])
+    table = Table.from_pandas(df_mw_gaia)[['name', 'ra', 'dec', 'source_id']]
     # from astropy.io.votable import from_table, writeto
     # votable = from_table(table)
     # writeto(votable, upload_resource)

@@ -364,9 +364,13 @@ def combine_class_result(field_name, data_dir, dir_out, class_labels,TD_evaluati
     df_TD_src = pd.read_csv(f'{data_dir}/TD_{field_name}_MW_remove.csv')
 
     df_TD_src = df_TD_src.rename(columns={'Class':'true_Class'})
-    #print(df_TD_src)
 
-    df_save = pd.concat([df_comb, df_TD_src], ignore_index=True, sort=False)
+    # if df_TD_src is empty, then dtypes will be object, leading to all columns being object when concat
+    if df_TD_src.empty:
+        df_save = df_comb
+        df_save['true_Class'] = np.nan
+    else:
+        df_save = pd.concat([df_comb, df_TD_src], ignore_index=True, sort=False)
     
     #print(df_save.columns)
 
@@ -472,6 +476,7 @@ def prepare_sed(df_mw, name_col=False):
             df_spec.loc[band.index, 'Mag']=df_mw.iloc[:,i].to_numpy()
             #df_spec.loc[band.index, 'Flux']=zps[i]*pow(10,-df_spec.loc[band.index, 'Mag']/2.5)*widths[i]*1e-23
             df_spec.loc[band.index, 'Flux']=zps_wave[i]*pow(10,-df_spec.loc[band.index, 'Mag']/2.5)*weffs[i]#widths[i]*1e-23
+            # print(df_spec.loc[band.index, 'Mag'].dtypes)
 
         # set fluxes for Chandra bands
         if i in range(8,11):
@@ -479,6 +484,7 @@ def prepare_sed(df_mw, name_col=False):
         # print(df_spec.loc[band.index, 'Flux'])
 
         # False if nan or 0 for a source in this band
+        # print(df_spec['Flux'].dtypes)
         mask=~np.logical_or(np.isnan(df_spec['Flux']), df_spec['Flux']==0)
 
         # calculate density of source fluxes for each band, for each class
