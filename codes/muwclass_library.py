@@ -86,7 +86,7 @@ n_classes = 8#9
 
 class_colors = ['blue','orange','red','c','g','purple','magenta','olive', 'Aqua']
 
-MW_cols = {'xray':['name','ra','dec','PU','significance','flux_aper90_ave_s','e_flux_aper90_ave_s','flux_aper90_ave_m','e_flux_aper90_ave_m','flux_aper90_ave_h','e_flux_aper90_ave_h', \
+MW_cols = {'xray':['name','ra','dec','PU','significance','flux_significance_b_max','flux_aper90_ave_s','e_flux_aper90_ave_s','flux_aper90_ave_m','e_flux_aper90_ave_m','flux_aper90_ave_h','e_flux_aper90_ave_h', \
                   'flux_aper90_ave_b','e_flux_aper90_ave_b','kp_prob_b_max','var_inter_prob','CSC_flags' ],
            'gaia':['DR3Name_gaia','_r_gaia','PU_gaia','RA_ICRS_gaia','DE_ICRS_gaia','Gmag_gaia','e_Gmag_gaia','BPmag_gaia','e_BPmag_gaia','RPmag_gaia','e_RPmag_gaia','Plx_gaia','e_Plx_gaia','PM_gaia','rgeo_gaiadist','b_rgeo_gaiadist','B_rgeo_gaiadist','rpgeo_gaiadist','b_rpgeo_gaiadist','B_rpgeo_gaiadist'], 
            '2mass':['_2MASS_2mass','_r_2mass','PU_2mass','RAJ2000_2mass','DEJ2000_2mass','Jmag_2mass','e_Jmag_2mass','Hmag_2mass','e_Hmag_2mass','Kmag_2mass','e_Kmag_2mass'], 
