@@ -2,7 +2,7 @@ old_files/*
 **.pyc
 codes/ciao_library.py
 codes/NGC3532/*
-codes/4FGL/*
+codes/FGL/*
 codes/Updating/*
 codes/Review_report/*
 codes/Evaluation/private/*
@@ -17,3 +17,5 @@ codes/buildTD/old_files/*
 #codes/NGC3532/data/NGC3532_02182022/Astrometry/*
 *.pyc
 codes/demo/data/**.csv
+codes/nway_cross-matching/*
+codes/data/*

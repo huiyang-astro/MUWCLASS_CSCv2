@@ -12,7 +12,7 @@ from astropy.io import fits
 from astropy.table import Table
 import astropy.wcs as wcs
 from astropy.visualization import make_lupton_rgb
-# import pyds9 as ds9
+import pyds9 as ds9
 from scipy.ndimage import gaussian_filter
 from astropy.coordinates import SkyCoord, Angle
 from astropy import units as u
