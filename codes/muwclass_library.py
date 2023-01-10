@@ -496,7 +496,7 @@ def apply_red2csc(data, nh, tbabs_ene, tbabs_cross, red_class='AGN', self_unred=
             for idx in data.loc[data['Class'] == red_class].index.tolist():
                 data[band][idx] = data[band][idx] * red_factor(ene, nh - data['nH'][idx], Gamma, tbabs_ene, tbabs_cross)
         if self_unred == False:
-            data.loc[data.Class == red_class, band] = data[band]*red_fact
+            data.loc[data.Class == red_class, band] = data.loc[data.Class == red_class, band]*red_fact
     return data
 
 def apply_red2mw(data, ebv, red_class='AGN', self_unred = False):

@@ -73,9 +73,9 @@ def atnf_pos(coord, e_coord, coord_format='hms', out='pos'):
         elif coord_format == 'dms':
             return float(e_deg)
 
-def CSCview_conesearch(field_name, ra, dec, radius,query_dir,engine='curl',csc_version='2.0'):
+def CSCview_conesearch(field_name, ra, dec, radius,query_dir,engine='curl',csc_version='2.0',adql_version='csc_query_cnt_template.adql',num_header=154,rerun=False):
     
-    if not (path.exists(f'{query_dir}/{field_name}_{engine}.txt')): 
+    if not (path.exists(f'{query_dir}/{field_name}_{engine}.txt')) or rerun==True: 
 
        
         ra_low  = ra - radius/(60.*np.cos(dec*np.pi/180.))
@@ -96,7 +96,7 @@ def CSCview_conesearch(field_name, ra, dec, radius,query_dir,engine='curl',csc_v
         rad_cone_temp = '12.05789'
         '''
         
-        f = open(f'{query_dir}/template/csc_query_cnt_template.adql', "r")
+        f = open(f'{query_dir}/template/{adql_version}.adql', "r")
         adql = f.readline()
         ra_temp = '266.599396'
         dec_temp = '-28.87594'
@@ -149,7 +149,7 @@ def CSCview_conesearch(field_name, ra, dec, radius,query_dir,engine='curl',csc_v
 
         #df = pd.read_csv(f'{query_dir}/{field_name}.txt', header=15, sep='\t')
 
-    df = pd.read_csv(f'{query_dir}/{field_name}_{engine}.txt', header=154, sep='\t')
+    df = pd.read_csv(f'{query_dir}/{field_name}_{engine}.txt', header=num_header, sep='\t')
 
     return df
 
