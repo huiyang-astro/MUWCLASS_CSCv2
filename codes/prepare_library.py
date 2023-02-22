@@ -73,7 +73,7 @@ def atnf_pos(coord, e_coord, coord_format='hms', out='pos'):
         elif coord_format == 'dms':
             return float(e_deg)
 
-def CSCview_conesearch(field_name, ra, dec, radius,query_dir,engine='curl',csc_version='2.0',adql_version='csc_query_cnt_template.adql',num_header=154,rerun=False):
+def CSCview_conesearch(field_name, ra, dec, radius,query_dir,engine='curl',csc_version='2.0',adql_version='csc_query_cnt_template',num_header=154,rerun=False,data_dir='./'):
     
     if not (path.exists(f'{query_dir}/{field_name}_{engine}.txt')) or rerun==True: 
 
@@ -150,6 +150,9 @@ def CSCview_conesearch(field_name, ra, dec, radius,query_dir,engine='curl',csc_v
         #df = pd.read_csv(f'{query_dir}/{field_name}.txt', header=15, sep='\t')
 
     df = pd.read_csv(f'{query_dir}/{field_name}_{engine}.txt', header=num_header, sep='\t')
+    df['name'] = df['name'].str.lstrip()
+    df.to_csv(f'{data_dir}/{field_name}_conesearch.csv', index=False)
+
 
     return df
 
@@ -173,7 +176,7 @@ def create_perobs_data(data, query_dir, data_dir,  name_type='CSCview', name_col
 
     '''
     #print(f'engine:{engine},csc_version:{csc_version}')
-    print('Operating system is: '+os.name)
+    #print('Operating system is: '+os.name)
     Path(query_dir).mkdir(parents=True, exist_ok=True)
     
     data['_q'] = data.index + 1

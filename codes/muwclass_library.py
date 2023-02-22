@@ -20,6 +20,8 @@ from random import randint
 import matplotlib.pyplot as plt
 from collections import Counter
 
+from physical_oversampling import physical_oversample_csv, test_reddening_grid_csv
+
 #from cuml import RandomForestClassifier as cuRF
 
 MW_names = {'gaia':  ['Gmag', 'BPmag', 'RPmag'], \
@@ -703,8 +705,12 @@ def scaling(scaler, X_train, unscales,verb=False):
 
     return X_train_scaled_df, scaleds
 
-def loo_prepare(i, df, red_switch, Xcat, distance, Uncer_flag, ran_feature, random_state_sample, random_state_smote, tbabs_ene, tbabs_cross,\
-                    maglimitcut_switch=True,mag2flux_switch=True,standard_switch=True,oversample_switch=True,scaler_switch=True,color_select=True,ran_factor=np.sqrt(2.) ):   
+#def loo_prepare(i, df, red_switch, Xcat, distance, Uncer_flag, ran_feature, random_state_sample, random_state_smote, tbabs_ene, tbabs_cross,\
+                    #apply_limit=True,mag2flux_switch=True,stand_switch=True,oversample_switch=True,scaler_switch=True,color_select=True,ran_factor=np.sqrt(2.),physical_sample=False,df_reds=None):   
+def loo_prepare(args):    
+
+    (i, df, red_switch, Xcat, distance, Uncer_flag, ran_feature, random_state_sample, random_state_smote, tbabs_ene, tbabs_cross,\
+            apply_limit,mag2flux_switch,stand_switch,oversample_switch,scaler_switch,color_select,ran_factor,physical_sample,df_reds) = args  
     
     df_test = df[df.name == df.name[i]]
     df_train = df[df.name != df.name[i]]
@@ -715,6 +721,10 @@ def loo_prepare(i, df, red_switch, Xcat, distance, Uncer_flag, ran_feature, rand
     df_test  = sample_data(df_test,Xcat,distance,Uncer_flag,random_state_sample,rep_num=False,factor=ran_factor)
     df_train = sample_data(df_train,Xcat,distance,Uncer_flag,random_state_sample,factor=ran_factor)
 
+    if physical_sample==True:
+        df_test = test_reddening_grid_csv(df_test, df_reds, random_state=random_state_sample)
+        df_train = physical_oversample_csv(df_train, df_reds, random_state=random_state_sample, ebv_pdf = 'uniform')
+    
     if Xcat == 'XMM':
         df_test = convert2csc(df_test, method = 'simple', Gamma =2.)
         df_train = convert2csc(df_train, method = 'simple', Gamma =2.)
@@ -1692,13 +1702,14 @@ def plot_classifier_matrix_withSTD(probs, stds, pred, yaxis, classes, normalize=
         title = 'Classifier matrix'
     length = len(pred)
     '''
-    if length !=2:
-        fig, ax = plt.subplots(figsize=(21, length*1.5+3))
-    if length ==2:
-        fig, ax = plt.subplots(figsize=(21, length*1.5+3))
+    if length <=2:
+        fig, ax = plt.subplots(figsize=(21, length+3))
+    if length >2:
+        #fig, ax = plt.subplots(figsize=(21, length*1.5+3))
+        fig, ax = plt.subplots(figsize=(21, length+3))
     '''
     #fig, ax = plt.subplots(figsize=(12, length+2))
-    fig, ax = plt.subplots(figsize=(21, length*1.5+3))
+    fig, ax = plt.subplots(figsize=(21, length+3))
     im = ax.imshow(probs, interpolation='nearest', cmap=cmap)
     if nocmap ==False:
         ax.figure.colorbar(im, ax=ax)
@@ -1711,9 +1722,13 @@ def plot_classifier_matrix_withSTD(probs, stds, pred, yaxis, classes, normalize=
            title=title,
            #ylabel='True label',
            xlabel='Class')
-        
+    ax.xaxis.set_tick_params(labelsize=20)
+    ax.yaxis.set_tick_params(labelsize=20)
+    ax.xaxis.label.set_size(25)
+    ax.set_title(title,fontsize=30)
+
     # Rotate the tick labels and set their alignment.
-    plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
+    plt.setp(ax.get_xticklabels(), rotation=45, ha="right",fontsize=20, 
             rotation_mode="anchor")
            
     # Loop over data dimensions and create text annotations.
@@ -1722,7 +1737,7 @@ def plot_classifier_matrix_withSTD(probs, stds, pred, yaxis, classes, normalize=
     for i in range(probs.shape[0]):
         for j in range(probs.shape[1]):
             ax.text(j, i, "{:.2f} \n".format(probs[i,j])+r"$\pm$"+"{:.2f}".format(stds[i,j]),
-                    ha="center", va="center",
+                    ha="center", va="center",fontsize=20, 
                     color="white" if probs[i, j] > thresh else "black")
 
     fig.tight_layout()
