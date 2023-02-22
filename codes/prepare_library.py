@@ -122,10 +122,16 @@ def CSCview_conesearch(field_name, ra, dec, radius,query_dir,engine='curl',csc_v
     
     if engine == 'curl':
 
+        print("curl -o "+query_dir+'/'+field_name+".txt \
+            --form version="+csc_version+"  \
+            --form query=@"+query_dir+'/'+field_name+".adql \
+            http://cda.cfa.harvard.edu/csccli/getProperties")
+
         os.system("curl -o "+query_dir+'/'+field_name+".txt \
             --form version="+csc_version+"  \
             --form query=@"+query_dir+'/'+field_name+".adql \
             http://cda.cfa.harvard.edu/csccli/getProperties")
+
     elif engine == 'wget':
 
         # if operatin system is linux
@@ -1691,7 +1697,6 @@ def Gaia_counterparts_new(df_mw, file_dir, field_name, radius):
 
     df_mw_gaia = df_mw.loc[(df_mw['DR3Name_gaia'].notna()) & (df_mw['cp_flag_gaia']>=-4)]
     df_mw_gaia['source_id'] = df_mw_gaia['DR3Name_gaia'].str.replace('Gaia DR3 ','').astype(np.int64)
-    print(df_mw_gaia['source_id'].head())
 
     # currently table cannot be csv file, see https://github.com/astropy/astroquery/issues/2529
     table = Table.from_pandas(df_mw_gaia)[['name', 'ra', 'dec', 'source_id']]
