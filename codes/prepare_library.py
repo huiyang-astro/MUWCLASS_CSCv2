@@ -2262,7 +2262,16 @@ def create_CXO_ave(data_dir, field_name,df, pu_astro=0):
         
         df[CSCv] = 1.- df[CXOv]
     
-    origbands_name, origbands, convertedbands_name, convertedbands = ['0.7-1.2', '0.7-7.0'], [(0.7,1.2), (0.7,7.0)], ['0.5-1.2', '0.5-7.0'], [(0.5,1.2), (0.5,7.0)]
+    # origbands_name, origbands, convertedbands_name, convertedbands = ['0.7-1.2', '0.7-7.0'], [(0.7,1.2), (0.7,7.0)], ['0.5-1.2', '0.5-7.0'], [(0.5,1.2), (0.5,7.0)]
+    # for i_band,iband, c_band, cband in zip(origbands_name, origbands, convertedbands_name, convertedbands):
+        
+    #     #df[['NET_FLUX_APER_'+c_band,'NET_FLUX_APER_LO_'+c_band, 'NET_FLUX_APER_HI_'+c_band]] = np.nan
+    #     df['NET_FLUX_APER_'+c_band],df['NET_FLUX_APER_LO_'+c_band],df['NET_FLUX_APER_HI_'+c_band]  = np.nan, np.nan, np.nan
+    #     df['NET_FLUX_APER_'+c_band]    = df.apply(lambda r: bandshift(AsymmetricUncertainty(r['NET_FLUX_APER_'+i_band],abs(r['NET_FLUX_APER_HI_'+i_band]-r['NET_FLUX_APER_'+i_band]),abs(r['NET_FLUX_APER_'+i_band]-r['NET_FLUX_APER_LO_'+i_band])), iband,cband,2).value , axis=1)
+    #     df['NET_FLUX_APER_HI_'+c_band] = df.apply(lambda r: r['NET_FLUX_APER_'+c_band] + bandshift(AsymmetricUncertainty(r['NET_FLUX_APER_'+i_band],abs(r['NET_FLUX_APER_HI_'+i_band]-r['NET_FLUX_APER_'+i_band]),abs(r['NET_FLUX_APER_'+i_band]-r['NET_FLUX_APER_LO_'+i_band])),iband,cband,2).plus , axis=1)
+    #     df['NET_FLUX_APER_LO_'+c_band] = df.apply(lambda r: r['NET_FLUX_APER_'+c_band] - bandshift(AsymmetricUncertainty(r['NET_FLUX_APER_'+i_band],abs(r['NET_FLUX_APER_HI_'+i_band]-r['NET_FLUX_APER_'+i_band]),abs(r['NET_FLUX_APER_'+i_band]-r['NET_FLUX_APER_LO_'+i_band])),iband,cband,2).minus, axis=1)
+
+    origbands_name, origbands, convertedbands_name, convertedbands = ['s', 'b'], [(0.5,1.2), (0.5,7.0)], ['0.5-1.2', '0.5-7.0'], [(0.5,1.2), (0.5,7.0)]
     for i_band,iband, c_band, cband in zip(origbands_name, origbands, convertedbands_name, convertedbands):
         
         #df[['NET_FLUX_APER_'+c_band,'NET_FLUX_APER_LO_'+c_band, 'NET_FLUX_APER_HI_'+c_band]] = np.nan
