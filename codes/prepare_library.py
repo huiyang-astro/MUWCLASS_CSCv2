@@ -73,85 +73,86 @@ def atnf_pos(coord, e_coord, coord_format='hms', out='pos'):
         elif coord_format == 'dms':
             return float(e_deg)
 
-def CSCview_conesearch(field_name, ra, dec, radius,query_dir,engine='curl',csc_version='2.0'):
+def CSCview_conesearch(field_name, ra, dec, radius,query_dir,engine='curl',csc_version='2.0',adql_version='csc_query_cnt_template',num_header=154,rerun=False,data_dir='./'):
     
-    ra_low  = ra - radius/(60.*np.cos(dec*np.pi/180.))
-    ra_upp  = ra + radius/(60.*np.cos(dec*np.pi/180.))
-    dec_low = dec - radius/60
-    dec_upp = dec + radius/60
-    rad_cone = radius
-    
-    '''
-    f = open(f'{query_dir}/template/cscview_conesearch.adql', "r")
-    adql = f.readline()
-    ra_temp = '196.61458333333334'
-    dec_temp = '-60.73169444444444'
-    ra_low_temp = '196.2055016983212'
-    ra_upp_temp = '197.02366496834549'
-    dec_low_temp = '-60.931694444444446'
-    dec_upp_temp = '-60.53169444444444'
-    rad_cone_temp = '12.05789'
-    '''
-    
-    f = open(f'{query_dir}/template/csc_query_cnt_template.adql', "r")
-    adql = f.readline()
-    ra_temp = '266.599396'
-    dec_temp = '-28.87594'
-    ra_low_temp = '266.5898794490786'
-    ra_upp_temp = '266.60891255092145'
-    dec_low_temp = '-28.884273333333333'
-    dec_upp_temp = '-28.867606666666667'
-    rad_cone_temp = '0.543215'
-    #'''
-    for [str1, str2] in [[rad_cone, rad_cone_temp], [ra, ra_temp], [dec, dec_temp], [ra_low, ra_low_temp], [ra_upp, ra_upp_temp], [dec_low, dec_low_temp], [dec_upp, dec_upp_temp]]:
-        adql = adql.replace(str2, str(str1))
-    
+    if not (path.exists(f'{query_dir}/{field_name}_{engine}.txt')) or rerun==True: 
 
-    #text_file = open(f'{query_dir}/{field_name}.adql', "w")
-    #text_file.write(adql)
-    #text_file.close()
+       
+        ra_low  = ra - radius/(60.*np.cos(dec*np.pi/180.))
+        ra_upp  = ra + radius/(60.*np.cos(dec*np.pi/180.))
+        dec_low = dec - radius/60
+        dec_upp = dec + radius/60
+        rad_cone = radius
+        
+        '''
+        f = open(f'{query_dir}/template/cscview_conesearch.adql', "r")
+        adql = f.readline()
+        ra_temp = '196.61458333333334'
+        dec_temp = '-60.73169444444444'
+        ra_low_temp = '196.2055016983212'
+        ra_upp_temp = '197.02366496834549'
+        dec_low_temp = '-60.931694444444446'
+        dec_upp_temp = '-60.53169444444444'
+        rad_cone_temp = '12.05789'
+        '''
+        
+        f = open(f'{query_dir}/template/{adql_version}.adql', "r")
+        adql = f.readline()
+        ra_temp = '266.599396'
+        dec_temp = '-28.87594'
+        ra_low_temp = '266.5898794490786'
+        ra_upp_temp = '266.60891255092145'
+        dec_low_temp = '-28.884273333333333'
+        dec_upp_temp = '-28.867606666666667'
+        rad_cone_temp = '0.543215'
+        #'''
+        for [str1, str2] in [[rad_cone, rad_cone_temp], [ra, ra_temp], [dec, dec_temp], [ra_low, ra_low_temp], [ra_upp, ra_upp_temp], [dec_low, dec_low_temp], [dec_upp, dec_upp_temp]]:
+            adql = adql.replace(str2, str(str1))
+        
 
-    if engine == 'curl':
-        text_file = open(f'{query_dir}/{field_name}.adql', "w")
-        text_file.write(adql)
-        text_file.close()
-    elif engine == 'wget':
-        text_file = open(f'{query_dir}/{field_name}_wget.adql', "w")
-        text_file.write('http://cda.cfa.harvard.edu/csccli/getProperties?query='+adql)
-        text_file.close()
-    
-    if engine == 'curl':
+        #text_file = open(f'{query_dir}/{field_name}.adql', "w")
+        #text_file.write(adql)
+        #text_file.close()
 
-        print("curl -o "+query_dir+'/'+field_name+".txt \
-            --form version="+csc_version+"  \
-            --form query=@"+query_dir+'/'+field_name+".adql \
-            http://cda.cfa.harvard.edu/csccli/getProperties")
+        if engine == 'curl':
+            text_file = open(f'{query_dir}/{field_name}.adql', "w")
+            text_file.write(adql)
+            text_file.close()
+        elif engine == 'wget':
+            text_file = open(f'{query_dir}/{field_name}_wget.adql', "w")
+            text_file.write('http://cda.cfa.harvard.edu/csccli/getProperties?query='+adql)
+            text_file.close()
+        
+        if engine == 'curl':
 
-        os.system("curl -o "+query_dir+'/'+field_name+".txt \
-            --form version="+csc_version+"  \
-            --form query=@"+query_dir+'/'+field_name+".adql \
-            http://cda.cfa.harvard.edu/csccli/getProperties")
+            os.system("curl -o "+query_dir+'/'+field_name+"_"+engine+".txt \
+                --form version="+csc_version+"  \
+                --form query=@"+query_dir+'/'+field_name+".adql \
+                http://cda.cfa.harvard.edu/csccli/getProperties")
+        elif engine == 'wget':
 
-    elif engine == 'wget':
+            # if operatin system is linux
+            if os.name == 'posix':
+                os.system("wget -O "+query_dir+'/'+field_name+"_"+engine+".txt -i "+query_dir+'/'+field_name+"_wget.adql")
+            elif os.name == 'nt':
+                # read uri from the first line of the file, strip the newline character
+                uri = open(query_dir+'/'+field_name+"_wget.adql", "r").readline().strip()
+                # use requests to get the data
+                r = requests.get(uri)
+                # write the data to the file
+                open(query_dir+'/'+field_name+".txt", "w").write(r.text)
 
-        # if operatin system is linux
-        if os.name == 'posix':
-            os.system("wget -O "+query_dir+'/'+field_name+".txt -i "+query_dir+'/'+field_name+"_wget.adql")
-        elif os.name == 'nt':
-            # read uri from the first line of the file, strip the newline character
-            uri = open(query_dir+'/'+field_name+"_wget.adql", "r").readline().strip()
-            # use requests to get the data
-            r = requests.get(uri)
-            # write the data to the file
-            open(query_dir+'/'+field_name+".txt", "w").write(r.text)
+        #os.system("curl -o "+query_dir+'/'+field_name+".txt \
+        #    --form version="+csc_version+"  \
+        #    --form query=@"+query_dir+'/'+field_name+".adql \
+        #    http://cda.cfa.harvard.edu/csccli/getProperties")
 
-    #os.system("curl -o "+query_dir+'/'+field_name+".txt \
-    #    --form version="+csc_version+"  \
-    #    --form query=@"+query_dir+'/'+field_name+".adql \
-    #    http://cda.cfa.harvard.edu/csccli/getProperties")
+        #df = pd.read_csv(f'{query_dir}/{field_name}.txt', header=15, sep='\t')
 
-    #df = pd.read_csv(f'{query_dir}/{field_name}.txt', header=15, sep='\t')
-    df = pd.read_csv(f'{query_dir}/{field_name}.txt', header=154, sep='\t')
+    df = pd.read_csv(f'{query_dir}/{field_name}_{engine}.txt', header=num_header, sep='\t')
+    df['name'] = df['name'].str.lstrip()
+    df.to_csv(f'{data_dir}/{field_name}_conesearch.csv', index=False)
+
 
     return df
 
@@ -175,7 +176,7 @@ def create_perobs_data(data, query_dir, data_dir,  name_type='CSCview', name_col
 
     '''
     #print(f'engine:{engine},csc_version:{csc_version}')
-    print('Operating system is: '+os.name)
+    #print('Operating system is: '+os.name)
     Path(query_dir).mkdir(parents=True, exist_ok=True)
     
     data['_q'] = data.index + 1
@@ -250,7 +251,7 @@ def create_perobs_data(data, query_dir, data_dir,  name_type='CSCview', name_col
             src = source[5:].strip()
         elif name_type == 'VizierCSC':
             src = source[2:-1]#.decode('utf-8') 
-        print(src)
+        #print(src)
         df = pd.read_csv(f'{query_dir}/{src}.txt', header=154, sep='\t')
         df['usrid'] = usrid+1
         #df_pers = df_pers.append(df, ignore_index=True)
@@ -2280,8 +2281,19 @@ def create_CXO_ave(data_dir, field_name,df, pu_astro=0):
         df['NET_FLUX_APER_HI_'+c_band] = df.apply(lambda r: r['NET_FLUX_APER_'+c_band] + bandshift(AsymmetricUncertainty(r['NET_FLUX_APER_'+i_band],abs(r['NET_FLUX_APER_HI_'+i_band]-r['NET_FLUX_APER_'+i_band]),abs(r['NET_FLUX_APER_'+i_band]-r['NET_FLUX_APER_LO_'+i_band])),iband,cband,2).plus , axis=1)
         df['NET_FLUX_APER_LO_'+c_band] = df.apply(lambda r: r['NET_FLUX_APER_'+c_band] - bandshift(AsymmetricUncertainty(r['NET_FLUX_APER_'+i_band],abs(r['NET_FLUX_APER_HI_'+i_band]-r['NET_FLUX_APER_'+i_band]),abs(r['NET_FLUX_APER_'+i_band]-r['NET_FLUX_APER_LO_'+i_band])),iband,cband,2).minus, axis=1)
 
+    CXO_bands = ['0.7-7.0', '0.7-1.2', 'medium', 'hard']
 
-    CXO_bands = ['0.5-7.0', '0.5-1.2', 'medium', 'hard'] # CXO_bands = ['0.7-7.0', '0.7-1.2', 'medium', 'hard']
+    # origbands_name, origbands, convertedbands_name, convertedbands = ['soft', 'broad'], [(0.5,1.2), (0.5,7.0)], ['0.5-1.2', '0.5-7.0'], [(0.5,1.2), (0.5,7.0)]
+    # for i_band,iband, c_band, cband in zip(origbands_name, origbands, convertedbands_name, convertedbands):
+        
+    #     #df[['NET_FLUX_APER_'+c_band,'NET_FLUX_APER_LO_'+c_band, 'NET_FLUX_APER_HI_'+c_band]] = np.nan
+    #     df['NET_FLUX_APER_'+c_band],df['NET_FLUX_APER_LO_'+c_band],df['NET_FLUX_APER_HI_'+c_band]  = np.nan, np.nan, np.nan
+    #     df['NET_FLUX_APER_'+c_band]    = df.apply(lambda r: bandshift(AsymmetricUncertainty(r['NET_FLUX_APER_'+i_band],abs(r['NET_FLUX_APER_HI_'+i_band]-r['NET_FLUX_APER_'+i_band]),abs(r['NET_FLUX_APER_'+i_band]-r['NET_FLUX_APER_LO_'+i_band])), iband,cband,2).value , axis=1)
+    #     df['NET_FLUX_APER_HI_'+c_band] = df.apply(lambda r: r['NET_FLUX_APER_'+c_band] + bandshift(AsymmetricUncertainty(r['NET_FLUX_APER_'+i_band],abs(r['NET_FLUX_APER_HI_'+i_band]-r['NET_FLUX_APER_'+i_band]),abs(r['NET_FLUX_APER_'+i_band]-r['NET_FLUX_APER_LO_'+i_band])),iband,cband,2).plus , axis=1)
+    #     df['NET_FLUX_APER_LO_'+c_band] = df.apply(lambda r: r['NET_FLUX_APER_'+c_band] - bandshift(AsymmetricUncertainty(r['NET_FLUX_APER_'+i_band],abs(r['NET_FLUX_APER_HI_'+i_band]-r['NET_FLUX_APER_'+i_band]),abs(r['NET_FLUX_APER_'+i_band]-r['NET_FLUX_APER_LO_'+i_band])),iband,cband,2).minus, axis=1)
+
+    # CXO_bands = ['0.5-7.0', '0.5-1.2', 'medium', 'hard'] 
+
     CSC_bands = ['b', 's', 'm', 'h']
 
     for CXOb, CSCb in zip(CXO_bands, CSC_bands):

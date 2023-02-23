@@ -12,7 +12,7 @@ from astropy.io import fits
 from astropy.table import Table
 import astropy.wcs as wcs
 from astropy.visualization import make_lupton_rgb
-# import pyds9 as ds9
+import pyds9 as ds9
 from scipy.ndimage import gaussian_filter
 from astropy.coordinates import SkyCoord, Angle
 from astropy import units as u
@@ -23,6 +23,10 @@ import time
 import matplotlib.lines as mlines
 from matplotlib.colors import LogNorm
 from sklearn.metrics import confusion_matrix
+from nway_cross_matching import nway
+from astroquery.vizier import Vizier
+
+CT_thres = 2.
 
 def dict_update(a, b):
     a.update(b)
@@ -214,7 +218,7 @@ def find_obs(df_per, ra, dec,filter=True):
     return obsids
 
 
-def prepare_field(df, data_dir, query_dir, field_name, name_col='name',Chandratype='CSC',pu_astro=0., search_mode='cone_search',engine='curl',csc_version='2.0',create_perobs='query',convert_hms_to_deg=True, gaia_precomputed=True):
+def prepare_field(df, data_dir, query_dir, field_name, name_col='name',Chandratype='CSC',pu_astro=0., search_mode='cone_search',engine='curl',csc_version='2.0',create_perobs='query',convert_hms_to_deg=True, gaia_precomputed=True,cross_matching='old'):
     
     #'''
     if Chandratype=='CSC':
@@ -225,11 +229,12 @@ def prepare_field(df, data_dir, query_dir, field_name, name_col='name',Chandraty
             
         Path(data_dir).mkdir(parents=True, exist_ok=True)
         
+        df_pers['name'] = df_pers['name'].str.lstrip()
         df_pers.to_csv(f'{data_dir}/{field_name}_per.csv', index=False)
 
         df_pers = pd.read_csv(f'{data_dir}/{field_name}_per.csv', low_memory=False)
 
-        df_pers['name'] = df_pers['name'].str.lstrip()
+        
         df_pers['per_remove_code'] = 0
 
         df_ave, df_obs = cal_ave(df_pers, data_dir, dtype='field',Chandratype='CSC',verb=0, convert_hms_to_deg=convert_hms_to_deg)
@@ -244,40 +249,158 @@ def prepare_field(df, data_dir, query_dir, field_name, name_col='name',Chandraty
     df_ave.to_csv(f'{data_dir}/{field_name}_ave.csv', index=False)
     df_ave = pd.read_csv(f'{data_dir}/{field_name}_ave.csv')
 
-    # cross-match with MW catalogs
-    start = time.time()
-    confusion = False if search_mode == 'cone_search' else True
-    add_MW(df_ave, data_dir, field_name, Chandratype='CSC',confusion =confusion, gaia_precomputed=gaia_precomputed)
+    if cross_matching=='old':
+        # cross-match with MW catalogs
+        start = time.time()
+        confusion = False if search_mode == 'cone_search' else True
+        add_MW(df_ave, data_dir, field_name, Chandratype='CSC',confusion =confusion, gaia_precomputed=gaia_precomputed)
 
-    end = time.time() 
-    #print(end - start)
-    #'''
-    df_MW = pd.read_csv(f'{data_dir}/{field_name}_MW.csv')
-    df_MW_cf = confusion_clean(df_MW,X_PU='err_ellipse_r0',Chandratype='CSC')
-    df_MW_cf.to_csv(f'{data_dir}/{field_name}_MW_clean.csv',index=False)
+        end = time.time() 
+        #print(end - start)
+        #'''
+        df_MW = pd.read_csv(f'{data_dir}/{field_name}_MW.csv')
+        df_MW_cf = confusion_clean(df_MW,X_PU='err_ellipse_r0',Chandratype='CSC')
+        df_MW_cf.to_csv(f'{data_dir}/{field_name}_MW_clean.csv',index=False)
 
-    df_MW_cf = pd.read_csv(f'{data_dir}/{field_name}_MW_clean.csv')
-    #df_ave = TD_clean_vizier(df_MW_cf, remove_codes = [1, 32, 64]) # previousl no remove_codes =2?!
-    if Chandratype=='CSC':
-        df_MW_clean = CSC_clean_keepcols(df_MW_cf, withvphas=False)
-    elif Chandratype=='CXO':
-        df_MW_clean = CSC_clean_keepcols(df_MW_cf, remove_codes = [32], withvphas=False)
-        df_MW_clean['CSC_flags'] = ''
+        df_MW_cf = pd.read_csv(f'{data_dir}/{field_name}_MW_clean.csv')
+        #df_ave = TD_clean_vizier(df_MW_cf, remove_codes = [1, 32, 64]) # previousl no remove_codes =2?!
+        if Chandratype=='CSC':
+            df_MW_clean = CSC_clean_keepcols(df_MW_cf, withvphas=False)
+        elif Chandratype=='CXO':
+            df_MW_clean = CSC_clean_keepcols(df_MW_cf, remove_codes = [32], withvphas=False)
+            df_MW_clean['CSC_flags'] = ''
 
-    if gaia_precomputed == True:
-        df_MW_clean = Gaia_counterparts_new(df_MW_clean, data_dir, field_name.lower(), radius=3)
+        if gaia_precomputed == True:
+            df_MW_clean = Gaia_counterparts_new(df_MW_clean, data_dir, field_name.lower(), radius=3)
 
-    #df_MW_clean = vphasp_to_gaia_mags(df_MW_clean)
+        #df_MW_clean = vphasp_to_gaia_mags(df_MW_clean)
 
-    df_remove = df_MW_clean[df_MW_clean['remove_code']==0].reset_index(drop=True)
+        df_remove = df_MW_clean[df_MW_clean['remove_code']==0].reset_index(drop=True)
 
-    #sub_cols = ['name','ra','dec','err_ellipse_r0','err_ellipse_r1','significance','flux_aper90_ave_b','flux_aper90_ave_s','flux_aper90_ave_m','flux_aper90_ave_h', \
-    #     'kp_prob_b_max','var_inter_prob','Gmag','BPmag','RPmag','Jmag','Hmag','Kmag','W1mag_comb','W2mag_comb','W3mag_allwise','rgeo','rpgeo']
-    #ks_intra_prob_b	kp_intra_prob_b	var_inter_prob_b	Gmag	BPmag	RPmag	pm_gaia	pmRA_gaia	pmDE_gaia	Jmag	Hmag	Kmag	W1mag_catwise	W2mag_catwise	pmRA_catwise	pmDE_catwise	W1mag_allwise	W2mag_allwise	W3mag_allwise	W4mag_allwise	rgeo	rpgeo	main_id	main_type	W1mag_unwise	W2mag_unwise	W1mag_comb	W2mag_comb	CSC_flags]
-    df_remove.to_csv(f'{data_dir}/{field_name}_MW_remove.csv', index=False)
-    #df_remove[sub_cols].to_csv(f'{data_dir}/{field_name}_MW_subcols.csv', index=False)
+        #sub_cols = ['name','ra','dec','err_ellipse_r0','err_ellipse_r1','significance','flux_aper90_ave_b','flux_aper90_ave_s','flux_aper90_ave_m','flux_aper90_ave_h', \
+        #     'kp_prob_b_max','var_inter_prob','Gmag','BPmag','RPmag','Jmag','Hmag','Kmag','W1mag_comb','W2mag_comb','W3mag_allwise','rgeo','rpgeo']
+        #ks_intra_prob_b	kp_intra_prob_b	var_inter_prob_b	Gmag	BPmag	RPmag	pm_gaia	pmRA_gaia	pmDE_gaia	Jmag	Hmag	Kmag	W1mag_catwise	W2mag_catwise	pmRA_catwise	pmDE_catwise	W1mag_allwise	W2mag_allwise	W3mag_allwise	W4mag_allwise	rgeo	rpgeo	main_id	main_type	W1mag_unwise	W2mag_unwise	W1mag_comb	W2mag_comb	CSC_flags]
+        df_remove.to_csv(f'{data_dir}/{field_name}_MW_remove.csv', index=False)
+        #df_remove[sub_cols].to_csv(f'{data_dir}/{field_name}_MW_subcols.csv', index=False)
+        df_MW = df_remove
     
-    return df_remove
+    if cross_matching == 'nway':
+        radius = 0.01
+        nway_data_dir = data_dir+'/nway'
+        Path(nway_data_dir).mkdir(parents=True, exist_ok=True)
+        per_file = pd.read_csv(f'{data_dir}/{field_name}_per.csv')
+        df_MW = pd.DataFrame()
+
+        for i in range(len(df_ave)):
+            #print(len(per_file))
+            csc_name = nway.nway_cross_matching(df_ave, i, radius, query_dir,name_col='name',ra_col='ra',dec_col='dec', ra_csc_col='ra',dec_csc_col='dec',PU_col='err_ellipse_r0',r0_col='err_ellipse_r0',r1_col='err_ellipse_r1',PA_col='err_ellipse_ang',data_dir=nway_data_dir,explain=False,move=False,move_dir='check',rerun=False, sigma=2.,newcsc=True,per_file=per_file)
+
+            dat = Table.read(f'./{nway_data_dir}/{csc_name}_nway.fits', format='fits')
+            df = dat.to_pandas()
+
+
+            df_MW = pd.concat([df_MW, df[(df['match_flag']==1) | (df['match_flag']==2)]], ignore_index=True, sort=False)
+
+        print(df_MW['match_flag'].value_counts())
+
+        str_cols = ['CSC__2CXO','TMASS__2MASS','ALLWISE_AllWISE','CATWISE_Name']
+        for col in str_cols:
+            df_MW[col] = df_MW[col].str.decode("utf-8") 
+
+        
+        df_MW['Gaia'] = df_MW.apply(lambda r: 'Gaia DR3 '+ str(r['GAIA_Source']) if str(r['GAIA_Source'])!='-99' else '-99', axis=1)
+
+        df_gaia = df_MW[df_MW['GAIA_Source']!=-99].reset_index(drop=True)[['CSC__2CXO','GAIA_RA', 'GAIA_DEC','GAIA_Source']]
+        df_gaia = df_gaia.drop_duplicates(subset=['GAIA_Source']).reset_index(drop=True)
+
+        print(len(df_gaia))
+        df_gaia['_q'] = df_gaia.index+1
+
+
+        # cross-matching to Gaiadist catalog
+
+        viz = Vizier(row_limit=-1,  timeout=5000, columns=["**", "+_r"], catalog='I/352/gedr3dis')
+
+        radec = [[df_gaia.loc[i, 'GAIA_RA'], df_gaia.loc[i, 'GAIA_DEC']] for i in range(len(df_gaia))]
+        rd = Table(Angle(radec, 'deg'), names=('_RAJ2000', '_DEJ2000'))
+        df_gaiadist = viz.query_region(rd, radius=0.1*u.arcsec)[0].to_pandas()
+        #'''
+        #print(len(df_gaiadist))
+        df_gaia = pd.merge(df_gaia, df_gaiadist, on=['_q'], how='inner').rename(columns={'Flag':'gaiadist_flag'})
+        #print(len(TD_gaia))
+
+        df_MW = pd.merge(df_MW, df_gaia[['GAIA_Source','rgeo','b_rgeo','B_rgeo','rpgeo','b_rpgeo','B_rpgeo','gaiadist_flag']], on='GAIA_Source',how='outer')
+
+        df_MW = df_MW.sort_values(by=['CSC__2CXO']).reset_index(drop=True)
+
+        df_MW.to_csv(f'{data_dir}/{field_name}_MW.csv',index=False)
+
+        MW_cols = ['CSC__2CXO', 'CSC_RA', 'CSC_DEC', 'CSC_err_r0', 'CSC_err_r1', 'CSC_PA', 
+           'Gaia', 'GAIA_RA', 'GAIA_DEC', 'GAIA_PU', 'GAIA__r','GAIA_Plx', 'GAIA_e_Plx', 'GAIA_PM', 'GAIA_e_PM',
+           'GAIA_epsi', 'GAIA_Gmag', 'GAIA_BPmag', 'GAIA_RPmag', 'GAIA_e_Gmag', 'GAIA_e_BPmag', 'GAIA_e_RPmag', 
+           'rgeo', 'b_rgeo', 'B_rgeo', 'rpgeo', 'b_rpgeo', 'B_rpgeo', 'gaiadist_flag',
+           'TMASS__2MASS', 'TMASS_RA', 'TMASS_DEC', 'TMASS_err0', 'TMASS_err1', 'TMASS_errPA', 'TMASS__r', 
+           'TMASS_Jmag', 'TMASS_Hmag', 'TMASS_Kmag', 'TMASS_e_Jmag', 'TMASS_e_Hmag', 'TMASS_e_Kmag',
+           'ALLWISE_AllWISE','ALLWISE_RA','ALLWISE_DEC','ALLWISE_err0','ALLWISE_err1','ALLWISE_errPA','ALLWISE__r',
+           'ALLWISE_W1mag','ALLWISE_W2mag','ALLWISE_W3mag','ALLWISE_W4mag',
+           'ALLWISE_e_W1mag','ALLWISE_e_W2mag','ALLWISE_e_W3mag','ALLWISE_e_W4mag',
+           'CATWISE_Name','CATWISE_RA', 'CATWISE_DEC', 'CATWISE_PU', 'CATWISE__r', 
+           'CATWISE_W1mproPM', 'CATWISE_W2mproPM', 'CATWISE_e_W1mproPM', 'CATWISE_e_W2mproPM',
+           'Separation_max', 'ncat', 'dist_bayesfactor', 'dist_bayesfactor_corrected', 'dist_post',
+           'p_single', 'p_any', 'p_i', 'match_flag']
+
+        df_MW = df_MW[MW_cols].rename(columns={'CSC__2CXO':'name','CSC_RA':'ra', 'CSC_DEC':'dec'})
+
+        df_ave = df_ave[['name','significance','flux_aper90_ave_s','e_flux_aper90_ave_s','flux_aper90_ave_m','e_flux_aper90_ave_m',\
+                  'flux_aper90_ave_h','e_flux_aper90_ave_h','flux_aper90_ave_b','e_flux_aper90_ave_b',
+                 'kp_prob_b_max', 'var_inter_prob']].rename(columns={'flux_aper90_ave_s':'Fcsc_s','e_flux_aper90_ave_s':'e_Fcsc_s',\
+                 'flux_aper90_ave_m':'Fcsc_m','e_flux_aper90_ave_m':'e_Fcsc_m','flux_aper90_ave_h':'Fcsc_h','e_flux_aper90_ave_h':'e_Fcsc_h',
+                 'flux_aper90_ave_b':'Fcsc_b','e_flux_aper90_ave_b':'e_Fcsc_b','kp_prob_b_max':'var_intra_prob'})
+
+        df_comb = pd.merge(df_MW, df_ave,  on='name',how='outer').sort_values(by=['name', 'p_i'], ascending=[True, False]).reset_index(drop=True)
+        print(len(df_ave), len(df_MW), len(df_comb))
+        #df_comb = df_comb.replace({'-99':np.nan})
+        df_comb['CSC_name'] = df_comb['name']
+        df_dup = df_comb[df_comb.duplicated(subset=['name'],keep=False)][['name','Gaia','Fcsc_b','match_flag']]#.reset_index(drop=True)
+
+        for name in df_dup['name'].unique():
+            dup_idx = df_dup[df_dup['name']==name].index#()
+            num_dup = len(dup_idx)
+            for i, jj in enumerate(dup_idx):
+                #print(i)
+                df_comb.loc[jj, 'name'] = df_comb.loc[jj, 'name']+f'-{i+1}'
+
+        catalogs = {'GAIA': ['Gmag','BPmag','RPmag'], 
+                    'TMASS': ['Jmag','Hmag','Kmag' ],
+                    'ALLWISE': ['W1mag','W2mag','W3mag','W4mag'],
+                    'CATWISE':['W1mproPM','W2mproPM']}
+        for cat in catalogs:
+            for col in catalogs[cat]:
+                print(col)
+                df_comb = df_comb.rename(columns={cat+'_'+col:col, cat+'_e_'+col:'e_'+col})
+
+        df_comb = df_comb.fillna('-99')
+        df_comb = df_comb.replace({-99:'-99'})
+        df_comb = df_comb.replace({-99.:'-99'})
+        #df_comb = df_comb.replace({'-99':np.nan})
+        df_comb = df_comb.replace({1e20:'-99'})
+
+        # combine ALLWISE, CatWISE and UnWISE
+
+        for w in ['W1','W2']:
+            df_comb.loc[df_comb['ALLWISE_AllWISE']=='-99', w+'mag']      = df_comb.loc[df_comb['ALLWISE_AllWISE']=='-99', w+'mproPM']
+            df_comb.loc[df_comb['ALLWISE_AllWISE']=='-99', 'e_'+w+'mag'] = df_comb.loc[df_comb['ALLWISE_AllWISE']=='-99', 'e_'+w+'mproPM']
+
+        df_comb = df_comb.replace({'-99':np.nan})
+        
+        from gdpyc import GasMap, DustMap
+        coords = SkyCoord(df_comb['ra'], df_comb['dec'], unit='deg')
+        df_comb['ebv'] = DustMap.ebv(coords, dustmap='SFD') * 0.86 # 0.86 is the correction described in Schlafly et al. 2010 and Schlafly & Finkbeiner 2011
+        df_comb.to_csv(f'{data_dir}/{field_name}_MW_comb.csv',index=False)
+
+        df_MW = df_comb
+
+    return df_MW
 
 def CMweight_probability(df, class_labels, TD_evaluation):
 
@@ -380,7 +503,7 @@ def combine_class_result(field_name, data_dir, dir_out, class_labels,TD_evaluati
     #print(df_save.columns)
     
     df_save['PU_TeV'] = region_size
-    df_save['TeV_extent'] = 'point'
+    df_save['TeV_extent'] = 'p'
 
     mwbands = ['G','BP', 'RP', 'J','H', 'K', 'W1', 'W2', 'W3']
     df_save['cp_flag'] = 1
@@ -392,7 +515,7 @@ def combine_class_result(field_name, data_dir, dir_out, class_labels,TD_evaluati
     df_save['HR_hms'] = (df_save['F_h']-df_save['F_m']-df_save['F_s'])/(df_save['F_h']+df_save['F_m']+df_save['F_s'])
 
     class_prob_columns = [ 'P_'+c for c in class_labels]+[  'e_P_'+c for c in class_labels]
-    df_save[['name','ra','dec','PU_X','significance','F_b','HR_hms','P_inter','P_intra','G','J','W1','cp_counts','CSC_flags','Class','Class_prob','Class_prob_e','conf_flag','CT','PU_TeV','TeV_extent','true_Class']+\
+    df_save[['name','ra','dec','PU_X','significance','F_b','HR_hms','P_inter','P_intra','G','J','W1','cp_counts','CSC_flags','Class','Class_prob','Class_prob_e','CT','PU_TeV','TeV_extent','true_Class']+\
         class_prob_columns].to_csv(f'{dir_out}/{field_name}_class.csv',index=False)
 
 
@@ -650,7 +773,7 @@ def plot_bbsed(TD, field, dir_plot, plot_class='YSO', save_class=['YSO','AGN'], 
     TD_mw, TD_spec = prepare_sed(TD_sed, name_col=TD_name_col)
     #print(TD_spec.loc[0])
     if confidence:
-        field_sed = field_sed[field_sed.conf_flag>0].reset_index(drop=True)
+        field_sed = field_sed[field_sed.CT>=CT_thres].reset_index(drop=True)
     field_mw, field_spec = prepare_sed(field_sed, name_col='name')
     
     #print(field_spec.loc[0])
@@ -680,7 +803,7 @@ def plot_class_matrix(field_name, df_plot, dir_plot, class_labels):
     plt.close(fig)
 
     df = df[df.Class_prob>=0.2].reset_index(drop=True)
-    df_conf = df[df.conf_flag>0]
+    df_conf = df[df.CT>=CT_thres]
 
     if len(df_conf)>0:
 
@@ -716,7 +839,7 @@ def plot_class_matrix(field_name, df_plot, dir_plot, class_labels):
                     , classes=class_labels, normalize=True,title=field_name, nocmap=True,cmap=plt.get_cmap('YlOrRd'))
 
   
-def prepare_evts_plot_xray_class(field_name, ra_field, dec_field, radius, data_dir, dir_out,find_obs_filter=True,include_TD=False):
+def prepare_evts_plot_xray_class(field_name, ra_field, dec_field, radius, data_dir, dir_out,find_obs_filter=True,include_TD=False,TeV_extent='p'):
 
     evt2_dir = dir_out+'/evt2'
     dir_plot = data_dir+'/plot'
@@ -728,12 +851,12 @@ def prepare_evts_plot_xray_class(field_name, ra_field, dec_field, radius, data_d
     merge_script = []
 
 
-    df_per = pd.read_csv(f'{data_dir}/{field_name}_per.csv')
+    df_per = pd.read_csv(f'{data_dir}/{field_name}_conesearch.csv')
     obsids = find_obs(df_per,ra_field,dec_field,filter=find_obs_filter)#.astype(str)
     #if field_name == 'J1023-575':
     #    obsids = [21848]
 
-    #print(obsids)
+    print(obsids)
 
     os.system('rm -rf to_merge.sh')
     if len(obsids) == 1:
@@ -834,7 +957,7 @@ def prepare_evts_plot_xray_class(field_name, ra_field, dec_field, radius, data_d
         evt2_data = xy_filter_evt2(evt2_data)
         
         #print(evt2_data)
-
+        #print(dir_out)
         all_csv = pd.read_csv(f'{dir_out}/{field_name}_class.csv')
         test_csv = all_csv[all_csv.true_Class.isnull()].reset_index(drop=True)
         if include_TD:
@@ -843,7 +966,7 @@ def prepare_evts_plot_xray_class(field_name, ra_field, dec_field, radius, data_d
         if conf == '':
             dat_csv = test_csv
         elif conf == '_conf':
-            dat_csv = test_csv[test_csv.conf_flag>0]#.reset_index(drop=True)
+            dat_csv = test_csv[test_csv.CT>=CT_thres]#.reset_index(drop=True)
         
         if len(dat_csv)>0:
             x_min, x_max, y_min, y_max = evt2_data[0].min(), evt2_data[0].max(), evt2_data[1].min(), evt2_data[1].max()    
@@ -971,7 +1094,7 @@ def prepare_evts_plot_xray_class(field_name, ra_field, dec_field, radius, data_d
             x, y, rad2 = wcs_to_physical(fn_evt2, [l, b], rad, 'galactic')  
             #print(x,y,rad2)
             
-            e_color = 'blue' if dat_csv.iloc[0]['TeV_extent'] == 'extent' else 'g'
+            e_color = 'blue' if TeV_extent == 'e' else 'g'
             draw_circle = plt.Circle((x, y), radius=rad2, color=e_color, zorder=1, lw=4, fill=False)    
             ax.add_artist(draw_circle)
 
@@ -1017,7 +1140,7 @@ class CirclePlot(PointPlot):
 
 hv.Store.register({Circle: CirclePlot}, 'bokeh')
 
-def interactive_Ximg_class(field_name, evt2_data, fn_evt2, dir_out,ra_field,dec_field,radius,include_TD=False):
+def interactive_Ximg_class(field_name, evt2_data, fn_evt2, dir_out,ra_field,dec_field,radius,include_TD=False,TeV_extent='p'):
 
     dir_plot = dir_out+'/plot'
     #Path(dir_plot).mkdir(parents=True, exist_ok=True)
@@ -1069,12 +1192,12 @@ def interactive_Ximg_class(field_name, evt2_data, fn_evt2, dir_out,ra_field,dec_
 
     test_csv = all_csv[all_csv.true_Class.isnull()].reset_index(drop=True)
 
-    df_inconf = test_csv[test_csv.conf_flag==0].reset_index(drop=True)
-    df_conf =  test_csv[test_csv.conf_flag>0].reset_index(drop=True)
+    df_inconf = test_csv[test_csv.CT<CT_thres].reset_index(drop=True)
+    df_conf =  test_csv[test_csv.CT>=CT_thres].reset_index(drop=True)
     if len(df_conf)>0:
         df_conf['conf_Class'] = df_conf.apply(lambda row: 'CF-'+row['Class'], axis=1)
     #print(df_conf)
-    #dat_csv = dat_csv[dat_csv.conf_flag>0].reset_index(drop=True)
+    #dat_csv = dat_csv[dat_csv.CT>=CT_thres].reset_index(drop=True)
     if include_TD==True:
         TD_csv = all_csv[all_csv.Class.isnull()].reset_index(drop=True)
         TD_csv['wd'] = 1
@@ -1097,7 +1220,8 @@ def interactive_Ximg_class(field_name, evt2_data, fn_evt2, dir_out,ra_field,dec_
             muted_alpha=0
             )
         plot_layers = plot_layers*scatter1
-        e_color = 'blue' if df_inconf.iloc[0]['TeV_extent'] == 'extent' else 'g'
+        #e_color = 'blue' if df_inconf.iloc[0]['TeV_extent'] == 'extent' else 'g'
+        e_color = 'blue' if TeV_extent == 'e' else 'g'
     
     if len(df_conf)>0:
         for clas, (color, marker) in conf_class_colors.items():
@@ -1114,7 +1238,8 @@ def interactive_Ximg_class(field_name, evt2_data, fn_evt2, dir_out,ra_field,dec_
                     #muted_alpha=1
                     )
                 plot_layers = plot_layers * scatter2
-        e_color = 'blue' if df_conf.iloc[0]['TeV_extent'] == 'extent' else 'g'
+        #e_color = 'blue' if df_conf.iloc[0]['TeV_extent'] == 'extent' else 'g'
+        e_color = 'blue' if TeV_extent == 'e' else 'g'
 
     if include_TD==True and len(TD_csv)>0:
 

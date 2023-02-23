@@ -2,7 +2,7 @@ old_files/*
 **.pyc
 codes/ciao_library.py
 codes/NGC3532/*
-codes/4FGL/*
+codes/FGL/*
 codes/Updating/*
 codes/Review_report/*
 codes/Evaluation/private/*
@@ -14,6 +14,18 @@ files_v1/*
 files/CSCv2_all_MW_classprob_XCLASS.csv
 codes/MRT/*
 codes/buildTD/old_files/*
+codes/buildTD/data/cross-matching_check/*
+codes/buildTD/data/cross-matching_check/*
 #codes/NGC3532/data/NGC3532_02182022/Astrometry/*
 *.pyc
 codes/demo/data/**.csv
+codes/nway_cross_matching/*
+!codes/nway_cross_matching/*.py
+codes/data/*
+codes/astrometric_correction/*
+# files over 100MB
+codes/buildTD/data/CSCv2_TD_11162022_all.csv
+codes/buildTD/data/updates/dr8_v2.0_LRS_mstellar.csv
+codes/buildTD/data/updates/dr8_v2.0_LRS_stellar.csv
+/codes/Evaluation/data/LOO_test_TDv11162022_physicaloversample_results/LOO_classes.csv
+/codes/Testing/*
