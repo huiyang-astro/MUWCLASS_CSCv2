@@ -19,8 +19,8 @@ codes/buildTD/data/cross-matching_check/*
 #codes/NGC3532/data/NGC3532_02182022/Astrometry/*
 *.pyc
 codes/demo/data/**.csv
-codes/nway_cross_matching/*
-!codes/nway_cross_matching/*.py
+# codes/nway_cross_matching/*
+# !codes/nway_cross_matching/*.py
 codes/data/*
 codes/astrometric_correction/*
 # files over 100MB
