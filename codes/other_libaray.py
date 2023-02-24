@@ -12,7 +12,7 @@ from astropy.io import fits
 from astropy.table import Table
 import astropy.wcs as wcs
 from astropy.visualization import make_lupton_rgb
-import pyds9 as ds9
+# import pyds9 as ds9
 from scipy.ndimage import gaussian_filter
 from astropy.coordinates import SkyCoord, Angle
 from astropy import units as u
@@ -294,7 +294,8 @@ def prepare_field(df, data_dir, query_dir, field_name, name_col='name',Chandraty
         for i in range(len(df_ave)):
             #print(len(per_file))
             csc_name = nway.nway_cross_matching(df_ave, i, radius, query_dir,name_col='name',ra_col='ra',dec_col='dec', ra_csc_col='ra',dec_csc_col='dec',PU_col='err_ellipse_r0',r0_col='err_ellipse_r0',r1_col='err_ellipse_r1',PA_col='err_ellipse_ang',data_dir=nway_data_dir,explain=False,move=False,move_dir='check',rerun=False, sigma=2.,newcsc=True,per_file=per_file)
-
+            # print working directory
+            print(os.getcwd())
             dat = Table.read(f'./{nway_data_dir}/{csc_name}_nway.fits', format='fits')
             df = dat.to_pandas()
 

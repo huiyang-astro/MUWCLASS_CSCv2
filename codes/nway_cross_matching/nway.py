@@ -19,7 +19,7 @@ import multiprocessing as mp
 from pathlib import Path
 
 gaia_search_radius = 10 # arcsec
-nway_dir = '/Users/huiyang/Softwarses/nway-master/'
+nway_dir = '~/MUWCLASS_CSCv2/codes/nway_cross_matching/nway-master/'
 
 def CSCviewsearch(field_name, ra, dec, radius,query_dir,csc_version='2.0'):
     
@@ -884,7 +884,6 @@ def newcsc_prepare(df_q,X_name,name_col='name',ra_col='ra', dec_col='dec',r0_col
     new_t.write(f'./{data_dir}/{X_name}_CSC.fits', overwrite=True)
 
     area = 550./317000
-    
     os.system(f'python {nway_dir}nway-write-header.py ./{data_dir}/{X_name}_CSC.fits CSC {area}')
     
     return None
