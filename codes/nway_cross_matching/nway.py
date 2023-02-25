@@ -868,7 +868,7 @@ def nway_cross_matching_v4(TD, i, radius, query_dir, PU_col='err_ellipse_r0',dat
     return None
 
 
-def newcsc_prepare(df_q,X_name,name_col='name',ra_col='ra', dec_col='dec',r0_col='r0',r1_col='r1',PA_col='PA',data_dir='data',sigma=2):
+def newcsc_prepare(df_q,X_name, mode='cluster', radius=12, name_col='name',ra_col='ra', dec_col='dec',r0_col='r0',r1_col='r1',PA_col='PA',data_dir='data',sigma=2):
 
     df_q['_2CXO'] = df_q[name_col]
     df_q['RA']  = df_q[ra_col]
@@ -883,14 +883,17 @@ def newcsc_prepare(df_q,X_name,name_col='name',ra_col='ra', dec_col='dec',r0_col
 
     new_t.write(f'./{data_dir}/{X_name}_CSC.fits', overwrite=True)
 
-    area = 550./317000
+    if mode=='cluster':
+        area = np.pi*(radius/60)**2
+    else:
+        area = 550./317000
+
     os.system(f'python {nway_dir}nway-write-header.py ./{data_dir}/{X_name}_CSC.fits CSC {area}')
     
     return None
 
-def nway_mw_prepare(ra_x, dec_x, X_name, ref_mjd=np.array([57388.]),catalog='gaia',data_dir='data',plot_density_curve=False,sigma=2):
+def nway_mw_prepare(ra_x, dec_x, X_name, mode='cluster', radius=12, ref_mjd=np.array([57388.]),catalog='gaia',data_dir='data',plot_density_curve=False,sigma=2, rerun=False):
     
-    #catalog = 'I/355/gaiadr3'
     '''
     mjd_difs = {'gaia':X_mjd-57388.,'gaiadist':X_mjd-57388.,'2mass':max(abs(X_mjd-50600),(X_mjd-51955)),'catwise':X_mjd-57170.0,
               'unwise':max(abs(X_mjd-55203.),abs(X_mjd-55593.),abs(X_mjd-56627),abs(X_mjd-58088)),
@@ -898,15 +901,29 @@ def nway_mw_prepare(ra_x, dec_x, X_name, ref_mjd=np.array([57388.]),catalog='gai
               'vphas':max(abs(X_mjd-55923),abs(X_mjd-56536))
             }
     '''    
+    # check if file exists, if so, skip
+    if os.path.exists(f'./{data_dir}/{X_name}_{catalog}.fits') and not rerun:
+        print(f'./{data_dir}/{X_name}_{catalog}.fits exists, skipping')
+        return
+
     viz = Vizier(row_limit=-1,  timeout=5000, columns=vizier_cols_dict[vizier_cols_dict['catalogs'][catalog]],catalog=vizier_cols_dict['catalogs'][catalog])
-          
-    search_radius = vizier_cols_dict['search_radius'][catalog] # arcmin, we plot the density vs radius and see it starts to converge at around 4'
     
-    query = viz.query_region(SkyCoord(ra=ra_x, dec=dec_x,
-                        unit=(u.deg, u.deg),frame='icrs'),
-                        radius=search_radius*60*u.arcsec)
-                        #,column_filters={'Gmag': '<19'}
-    #print(catalog, ra_x, dec_x, search_radius*60)
+    # if Chandra sources are individual sources spread out over the sky, we use a search radius of around 4' around each source to get accurate density
+    # if Chandra sources are a cluster, we use a search radius of 12' around the cluster center to get average density
+    if mode=='individual':
+
+        radius = vizier_cols_dict['search_radius'][catalog] # arcmin, we plot the density vs radius and see it starts to converge at around 4'
+        
+        query = viz.query_region(SkyCoord(ra=ra_x, dec=dec_x,
+                            unit=(u.deg, u.deg),frame='icrs'),
+                            radius=radius*60*u.arcsec)
+                            #,column_filters={'Gmag': '<19'}
+        #print(catalog, ra_x, dec_x, search_radius*60)
+    elif mode=='cluster':
+        query = viz.query_region(SkyCoord(ra=ra_x, dec=dec_x,
+                            unit=(u.deg, u.deg),frame='icrs'),
+                            radius=radius*u.arcmin)
+
     query_res = query[0]
 
     df_q = query_res.to_pandas()
@@ -1127,7 +1144,7 @@ def nway_mw_prepare(ra_x, dec_x, X_name, ref_mjd=np.array([57388.]),catalog='gai
     if catalog == 'CSC':
         area = 550./317000
     else:
-        area = np.pi * (search_radius/60)**2
+        area = np.pi * (radius/60)**2 # in deg^2
     #area = 550./317000
     os.system(f'python {nway_dir}nway-write-header.py ./{data_dir}/{X_name}_{catalog}.fits {catalog} {area}')
     
@@ -1155,7 +1172,7 @@ def nway_cross_matching(TD, i, radius, query_dir, name_col='name',ra_col='ra',de
         #csc_name, CSC_id, r0 = df_r.loc[i, 'name'][5:], df_r.loc[i, 'ID'], TD_old.loc[i, 'r0']
 
         if newcsc:
-            newcsc_prepare(TD.iloc[[i]].reset_index(drop=True),X_name=csc_name,name_col=name_col,ra_col=ra_col, dec_col=dec_col,r0_col=r0_col,r1_col=r1_col,PA_col=PA_col,data_dir=data_dir,sigma=2)
+            newcsc_prepare(TD.iloc[[i]].reset_index(drop=True), X_name=csc_name,name_col=name_col,ra_col=ra_col, dec_col=dec_col,r0_col=r0_col,r1_col=r1_col,PA_col=PA_col,data_dir=data_dir,sigma=2)
         else:
             nway_mw_prepare(ra, dec,  X_name=csc_name, ref_mjd=mjds, catalog='CSC',data_dir=data_dir,sigma=sigma)
 
@@ -1190,6 +1207,59 @@ def nway_cross_matching(TD, i, radius, query_dir, name_col='name',ra_col='ra',de
     #os.system(f'cp  ./{data_dir}/{csc_name}_nway.fits_explain_1_options.pdf ./AGN_check/radiusr0/')    
         
     return csc_name
+
+def nway_cross_matching_cluster(df, field_name, ra, dec, radius, query_dir, name_col='name',ra_col='ra',dec_col='dec', ra_csc_col='ra',dec_csc_col='dec',PU_col='err_ellipse_r0',r0_col='r0',r1_col='r1',PA_col='PA',data_dir='data',explain=False,move=False,move_dir='check',rerun=False, sigma=2.,newcsc=False,per_file='txt'):
+    # csc_name, ra, dec,ra_csc,dec_csc, r0 = TD.loc[i, name_col][5:], TD.loc[i, ra_col], TD.loc[i, dec_col], TD.loc[i, ra_csc_col], TD.loc[i, dec_csc_col], TD.loc[i, PU_col]#'r0']#err_ellipse_r0']#r0']
+    #print(csc_name, ra, dec)
+    if path.exists(f'./{data_dir}/{field_name}_nway.fits') == False or rerun==True:
+        if type(per_file) == pd.DataFrame:
+            df_r = per_file[per_file['name'].isin(df[name_col])].reset_index(drop=True)   
+        elif type(per_file) == str and per_file == 'txt':
+            #print('txt')
+            if path.exists(f'{query_dir}/{field_name}.txt') == False:
+                CSCviewsearch(field_name, ra, dec, radius,query_dir,csc_version='2.0')
+            df_r = pd.read_csv(f'{query_dir}/{field_name}.txt', header=154, sep='\t')
+        else:
+            print('else')
+              
+
+        df_r['mjd'] = np.nan
+        df_r['mjd'] = df_r.apply(lambda r: Time(r['gti_obs'], format='isot', scale='utc').mjd,axis=1)
+        mjds = df_r['mjd'].values
+
+        #csc_name, CSC_id, r0 = df_r.loc[i, 'name'][5:], df_r.loc[i, 'ID'], TD_old.loc[i, 'r0']
+
+        if newcsc:
+            newcsc_prepare(df.reset_index(drop=True),X_name=field_name, mode='cluster', radius=12, name_col=name_col,ra_col=ra_col, dec_col=dec_col,r0_col=r0_col,r1_col=r1_col,PA_col=PA_col,data_dir=data_dir,sigma=2)
+        else:
+            nway_mw_prepare(ra, dec, X_name=field_name, mode='cluster', radius=12, ref_mjd=mjds, catalog='CSC',data_dir=data_dir,sigma=sigma)
+
+        for catalog in ['gaia','tmass','allwise','catwise']:
+            nway_mw_prepare(ra, dec, X_name=field_name, mode='cluster', radius=12, ref_mjd=mjds, catalog=catalog,data_dir=data_dir,sigma=sigma)
+
+        os.system(f'python {nway_dir}nway.py ./{data_dir}/{field_name}_CSC.fits :err_r0:err_r1:PA \
+              ./{data_dir}/{field_name}_gaia.fits :PU ./{data_dir}/{field_name}_tmass.fits :err0:err0:errPA \
+              ./{data_dir}/{field_name}_allwise.fits :err0:err1:errPA ./{data_dir}/{field_name}_catwise.fits :PU \
+              --out=./{data_dir}/{field_name}_nway.fits --radius 3 --prior-completeness 1:1:1:1')
+
+    
+    if explain:
+
+        os.system(f'python {nway_dir}nway-explain.py ./{data_dir}/{field_name}_nway.fits 1') 
+
+    if move:
+        Path(f'./{move_dir}/').mkdir(parents=True, exist_ok=True)
+        os.system(f'cp  ./{data_dir}/{field_name}_nway.fits_explain_1.pdf ./{move_dir}/')   
+        os.system(f'cp  ./{data_dir}/{field_name}_nway.fits_explain_1_options.pdf ./{move_dir}/')        
+            
+
+    #os.system(f'cp  ./{data_dir}/{csc_name}_nway.fits_explain_1.pdf ./AGN_check/')   
+    #os.system(f'cp  ./{data_dir}/{csc_name}_nway.fits_explain_1_options.pdf ./AGN_check/')    
+
+    #os.system(f'cp  ./{data_dir}/{csc_name}_nway.fits_explain_1.pdf ./AGN_check/radiusr0/')   
+    #os.system(f'cp  ./{data_dir}/{csc_name}_nway.fits_explain_1_options.pdf ./AGN_check/radiusr0/')    
+        
+    return field_name
 
 def update_nway(TD):
 

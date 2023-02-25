@@ -218,7 +218,7 @@ def find_obs(df_per, ra, dec,filter=True):
     return obsids
 
 
-def prepare_field(df, data_dir, query_dir, field_name, name_col='name',Chandratype='CSC',pu_astro=0., search_mode='cone_search',engine='curl',csc_version='2.0',create_perobs='query',convert_hms_to_deg=True, gaia_precomputed=True,cross_matching='old'):
+def prepare_field(df, data_dir, query_dir, field_name, ra, dec, name_col='name',Chandratype='CSC',pu_astro=0., search_mode='cone_search',engine='curl',csc_version='2.0',create_perobs='query',convert_hms_to_deg=True, gaia_precomputed=True,cross_matching='old'):
     
     #'''
     if Chandratype=='CSC':
@@ -291,16 +291,25 @@ def prepare_field(df, data_dir, query_dir, field_name, name_col='name',Chandraty
         per_file = pd.read_csv(f'{data_dir}/{field_name}_per.csv')
         df_MW = pd.DataFrame()
 
-        for i in range(len(df_ave)):
-            #print(len(per_file))
-            csc_name = nway.nway_cross_matching(df_ave, i, radius, query_dir,name_col='name',ra_col='ra',dec_col='dec', ra_csc_col='ra',dec_csc_col='dec',PU_col='err_ellipse_r0',r0_col='err_ellipse_r0',r1_col='err_ellipse_r1',PA_col='err_ellipse_ang',data_dir=nway_data_dir,explain=False,move=False,move_dir='check',rerun=False, sigma=2.,newcsc=True,per_file=per_file)
-            # print working directory
-            print(os.getcwd())
-            dat = Table.read(f'./{nway_data_dir}/{csc_name}_nway.fits', format='fits')
-            df = dat.to_pandas()
+        # for i in range(len(df_ave)):
+        #     #print(len(per_file))
+        #     csc_name = nway.nway_cross_matching(df_ave, i, radius, query_dir,name_col='name',ra_col='ra',dec_col='dec', ra_csc_col='ra',dec_csc_col='dec',PU_col='err_ellipse_r0',r0_col='err_ellipse_r0',r1_col='err_ellipse_r1',PA_col='err_ellipse_ang',data_dir=nway_data_dir,explain=False,move=False,move_dir='check',rerun=False, sigma=2.,newcsc=True,per_file=per_file)
+        #     # print working directory
+        #     print(os.getcwd())
+        #     dat = Table.read(f'./{nway_data_dir}/{csc_name}_nway.fits', format='fits')
+        #     df = dat.to_pandas()
 
 
-            df_MW = pd.concat([df_MW, df[(df['match_flag']==1) | (df['match_flag']==2)]], ignore_index=True, sort=False)
+        #     df_MW = pd.concat([df_MW, df[(df['match_flag']==1) | (df['match_flag']==2)]], ignore_index=True, sort=False)
+
+        # match whole df_ave at once instead of one by one
+
+        radius = 12 # arcmin
+        nway.nway_cross_matching_cluster(df_ave, field_name, ra, dec, radius, query_dir,name_col='name',ra_col='ra',dec_col='dec', ra_csc_col='ra',dec_csc_col='dec',PU_col='err_ellipse_r0',r0_col='err_ellipse_r0',r1_col='err_ellipse_r1',PA_col='err_ellipse_ang',data_dir=nway_data_dir,explain=True,move=False,move_dir='check',rerun=False, sigma=2.,newcsc=True,per_file=per_file)
+
+        dat = Table.read(f'./{nway_data_dir}/{field_name}_nway.fits', format='fits')
+        df_MW = dat.to_pandas()
+
 
         print(df_MW['match_flag'].value_counts())
 
@@ -320,11 +329,14 @@ def prepare_field(df, data_dir, query_dir, field_name, name_col='name',Chandraty
 
         # cross-matching to Gaiadist catalog
 
-        viz = Vizier(row_limit=-1,  timeout=5000, columns=["**", "+_r"], catalog='I/352/gedr3dis')
+        df_gaia_coords = SkyCoord(ra=df_gaia['GAIA_RA'], dec=df_gaia['GAIA_DEC'], unit=(u.deg, u.deg))
+        table_gaia_coords = df_gaia_coords.to_table()
+        table_gaia_coords.rename_column('ra', '_RAJ2000')
+        table_gaia_coords.rename_column('dec', '_DEJ2000')
 
-        radec = [[df_gaia.loc[i, 'GAIA_RA'], df_gaia.loc[i, 'GAIA_DEC']] for i in range(len(df_gaia))]
-        rd = Table(Angle(radec, 'deg'), names=('_RAJ2000', '_DEJ2000'))
-        df_gaiadist = viz.query_region(rd, radius=0.1*u.arcsec)[0].to_pandas()
+        viz = Vizier(row_limit=-1,  timeout=5000, columns=["**", "+_r"], catalog='I/352/gedr3dis')
+        df_gaiadist = viz.query_region(table_gaia_coords, radius=0.1*u.arcsec)[0].to_pandas()
+
         #'''
         #print(len(df_gaiadist))
         df_gaia = pd.merge(df_gaia, df_gaiadist, on=['_q'], how='inner').rename(columns={'Flag':'gaiadist_flag'})
