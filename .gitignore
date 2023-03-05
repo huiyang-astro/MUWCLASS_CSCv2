@@ -29,3 +29,4 @@ codes/buildTD/data/updates/dr8_v2.0_LRS_mstellar.csv
 codes/buildTD/data/updates/dr8_v2.0_LRS_stellar.csv
 /codes/Evaluation/data/LOO_test_TDv11162022_physicaloversample_results/LOO_classes.csv
 /codes/Testing/*
+/codes/buildTD/data/TD_new_nway/*

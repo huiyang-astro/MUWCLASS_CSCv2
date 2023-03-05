@@ -513,6 +513,8 @@ def combine_class_result(field_name, data_dir, dir_out, class_labels,TD_evaluati
     class_prob_columns = [ 'P_'+c for c in class_labels]+[  'e_P_'+c for c in class_labels]
     df_save[['name','ra','dec','PU_X','significance','F_b','HR_hms','P_inter','P_intra','G','J','W1','cp_counts','CSC_flags','Class','Class_prob','Class_prob_e','CT','PU_TeV','TeV_extent','true_Class']+\
         class_prob_columns].to_csv(f'{dir_out}/{field_name}_class.csv',index=False)
+    df_save[['name','ra','dec','PU_X','significance','F_b','HR_hms','P_inter','P_intra','G','J','W1','cp_counts','CSC_flags','Class','Class_prob','Class_prob_e','CT','PU_TeV','TeV_extent','true_Class']+\
+        class_prob_columns].to_csv(f'{data_dir}/{field_name}_class.csv',index=False)
 
 
     return df_save#field_mw_class
@@ -952,7 +954,7 @@ def prepare_evts_plot_xray_class(field_name, ra_field, dec_field, radius, data_d
         
         #print(evt2_data)
         #print(dir_out)
-        all_csv = pd.read_csv(f'{dir_out}/{field_name}_class.csv')
+        all_csv = pd.read_csv(f'{data_dir}/{field_name}_class.csv')
         test_csv = all_csv[all_csv.true_Class.isnull()].reset_index(drop=True)
         if include_TD:
             TD_csv = all_csv[all_csv.Class.isnull()].reset_index(drop=True)
