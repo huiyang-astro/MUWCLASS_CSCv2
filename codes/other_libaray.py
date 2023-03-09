@@ -364,9 +364,9 @@ def prepare_field(df, data_dir, query_dir, field_name, ra, dec, name_col='name',
 
         df_MW = df_MW[MW_cols].rename(columns={'CSC__2CXO':'name','CSC_RA':'ra', 'CSC_DEC':'dec'})
 
-        df_ave = df_ave[['name','significance','flux_aper90_ave_s','e_flux_aper90_ave_s','flux_aper90_ave_m','e_flux_aper90_ave_m',\
+        df_ave = df_ave[['name','significance', 'flux_significance_b_max','flux_aper90_ave_s','e_flux_aper90_ave_s','flux_aper90_ave_m','e_flux_aper90_ave_m',\
                   'flux_aper90_ave_h','e_flux_aper90_ave_h','flux_aper90_ave_b','e_flux_aper90_ave_b',
-                 'kp_prob_b_max', 'var_inter_prob']].rename(columns={'flux_aper90_ave_s':'Fcsc_s','e_flux_aper90_ave_s':'e_Fcsc_s',\
+                 'kp_prob_b_max', 'var_inter_prob', 'flux_flag']].rename(columns={'flux_aper90_ave_s':'Fcsc_s','e_flux_aper90_ave_s':'e_Fcsc_s',\
                  'flux_aper90_ave_m':'Fcsc_m','e_flux_aper90_ave_m':'e_Fcsc_m','flux_aper90_ave_h':'Fcsc_h','e_flux_aper90_ave_h':'e_Fcsc_h',
                  'flux_aper90_ave_b':'Fcsc_b','e_flux_aper90_ave_b':'e_Fcsc_b','kp_prob_b_max':'var_intra_prob'})
 
