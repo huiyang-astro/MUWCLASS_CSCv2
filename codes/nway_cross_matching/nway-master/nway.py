@@ -185,6 +185,7 @@ for fitsname in filenames:
 	assert 'SKYAREA' in fits_table.header, 'file "%s", table "%s" does not have a field "SKYAREA", which should contain the area of the catalogue in square degrees' % (fitsname, table_name)
 	area = fits_table.header['SKYAREA'] * 1.0 # in square degrees
 	area_total = (4 * pi * (180 / pi)**2)
+	print(n/area)
 	density = n / area * area_total
 	print('      from catalogue "%s" (%d), density gives %.2e on entire sky' % (table_name, n, density))
 	# this takes into account that the source may be absent

@@ -885,14 +885,14 @@ def newcsc_prepare(df_q,X_name, mode='cluster', radius=12, name_col='name',ra_co
 
     if mode=='cluster':
         area = np.pi*(radius/60)**2
-    else:
+    elif mode=='individual':
         area = 550./317000
 
     os.system(f'python {nway_dir}nway-write-header.py ./{data_dir}/{X_name}_CSC.fits CSC {area}')
     
     return None
 
-def nway_mw_prepare(ra_x, dec_x, X_name, mode='cluster', radius=12, ref_mjd=np.array([57388.]),catalog='gaia',data_dir='data',plot_density_curve=False,sigma=2, rerun=False):
+def nway_mw_prepare(ra_x, dec_x, X_name, mode='individual', radius=12, ref_mjd=np.array([57388.]),catalog='gaia',data_dir='data',plot_density_curve=False,sigma=2, rerun=False):
     
     '''
     mjd_difs = {'gaia':X_mjd-57388.,'gaiadist':X_mjd-57388.,'2mass':max(abs(X_mjd-50600),(X_mjd-51955)),'catwise':X_mjd-57170.0,
@@ -916,7 +916,7 @@ def nway_mw_prepare(ra_x, dec_x, X_name, mode='cluster', radius=12, ref_mjd=np.a
         
         query = viz.query_region(SkyCoord(ra=ra_x, dec=dec_x,
                             unit=(u.deg, u.deg),frame='icrs'),
-                            radius=radius*60*u.arcsec)
+                            radius=radius*u.arcmin)
                             #,column_filters={'Gmag': '<19'}
         #print(catalog, ra_x, dec_x, search_radius*60)
     elif mode=='cluster':
@@ -984,7 +984,7 @@ def nway_mw_prepare(ra_x, dec_x, X_name, mode='cluster', radius=12, ref_mjd=np.a
              #df_q['epsi'].fillna(0.)**2)/1e3
         #df_q['PU'] = df_q.apply(lambda r: max(r.PU_c,0.2), axis=1)
         #print(df_q[['sigma_pos','Plx','e_Plx','PM','sigma_pm','epsi','PU_c','PU']].describe())
-        new_t = Table.from_pandas(df_q[['RA','DEC','PU','Source','_r','e_Pos','Plx','e_Plx','PM','e_PM','epsi','Gmag','BPmag','RPmag','e_Gmag','e_BPmag','e_RPmag']])
+        new_t = Table.from_pandas(df_q[['RA','DEC','PU','Source','_r','e_Pos','Plx','e_Plx','PM','e_PM','pmRA','e_pmRA','pmDE','e_pmDE','epsi','Gmag','BPmag','RPmag','e_Gmag','e_BPmag','e_RPmag']])
         #print(df_q[~df_q['RA'].isnull()][['RA','DEC','PU','Source','_r','e_Pos','Plx','e_Plx','PM','e_PM','epsi']])
         df_q[['RA','DEC','PU','Source','_r','e_Pos','Plx','e_Plx','PM','e_PM','epsi']].to_csv(f'./{data_dir}/{X_name}_gaia.csv',index=False)
     
@@ -1033,6 +1033,11 @@ def nway_mw_prepare(ra_x, dec_x, X_name, mode='cluster', radius=12, ref_mjd=np.a
             
             df_q['err0'] = df_q['errMaj'] * sigma
             df_q['err1'] = df_q['errMin'] * sigma
+
+        # suspect tmass errors underestimated, set minimum error to 0.35 arcsec
+        # df_q['err0'] = df_q['err0'].apply(lambda x: max(x,0.35))
+        # df_q['err1'] = df_q['err1'].apply(lambda x: max(x,0.35))
+
         
         #print(df_q[['err0','err1']].describe())
         new_t = Table.from_pandas(df_q[['RA','DEC','err0','err1','errPA','_2MASS','_r','Jmag','Hmag','Kmag','e_Jmag','e_Hmag','e_Kmag']])
@@ -1075,6 +1080,10 @@ def nway_mw_prepare(ra_x, dec_x, X_name, mode='cluster', radius=12, ref_mjd=np.a
       
             df_q['err0'] = df_q['eeMaj'] * sigma
             df_q['err1'] = df_q['eeMin'] * sigma
+        
+        # suspect AllWISE errors underestimated, set minimum error to 0.35 arcsec
+        # df_q['err0'] = df_q['err0'].apply(lambda x: max(x,0.35))
+        # df_q['err1'] = df_q['err1'].apply(lambda x: max(x,0.35))
 
         df_q = df_q.rename(columns={'eePA':'errPA'})    
         #print(df_q[['eeMaj','eeMin','eePA','e_RA_pm','e_DE_pm']].describe())
@@ -1125,6 +1134,10 @@ def nway_mw_prepare(ra_x, dec_x, X_name, mode='cluster', radius=12, ref_mjd=np.a
                 #(df_q['PU_PM'].fillna(0.))**2+(df_q['PU_ePM'].fillna(0.))**2)
         #print(df_q[['e_RAPMdeg','e_DEPMdeg','e_pos','PM','e_PM','plx1','e_plx1','PU_c']].describe())
         #df_q['PU'] = df_q.apply(lambda r: max(r.PU_c,0.3), axis=1)
+
+        # suspect catwise errors underestimated, set minimum PU to 0.5 arcsec
+        # df_q['PU'] = df_q['PU'].apply(lambda x: max(x,0.5))
+
         new_t = Table.from_pandas(df_q[['RA','DEC','PU','Name','_r','W1mproPM','W2mproPM','e_W1mproPM','e_W2mproPM']])
     
     
@@ -1145,12 +1158,19 @@ def nway_mw_prepare(ra_x, dec_x, X_name, mode='cluster', radius=12, ref_mjd=np.a
         area = 550./317000
     else:
         area = np.pi * (radius/60)**2 # in deg^2
-    #area = 550./317000
+
+    if catalog == 'tmass':
+        area = area / 6
+    if catalog == 'allwise':
+        area = area / 20
+    if catalog == 'catwise':
+        area = area / 5
+
     os.system(f'python {nway_dir}nway-write-header.py ./{data_dir}/{X_name}_{catalog}.fits {catalog} {area}')
     
     return len(df_q)
 
-def nway_cross_matching(TD, i, radius, query_dir, name_col='name',ra_col='ra',dec_col='dec', ra_csc_col='ra',dec_csc_col='dec',PU_col='err_ellipse_r0',r0_col='r0',r1_col='r1',PA_col='PA',data_dir='data',explain=False,move=False,move_dir='check',rerun=False, sigma=2.,newcsc=False,per_file='txt'):
+def nway_cross_matching(TD, i, radius, query_dir, name_col='name',ra_col='ra',dec_col='dec', ra_csc_col='ra',dec_csc_col='dec',PU_col='err_ellipse_r0',r0_col='r0',r1_col='r1',PA_col='PA',csc_version='current',data_dir='data',explain=False,move=False,move_dir='check',rerun=False, sigma=2.,newcsc=False,per_file='txt'):
     csc_name, ra, dec,ra_csc,dec_csc, r0 = TD.loc[i, name_col][5:], TD.loc[i, ra_col], TD.loc[i, dec_col], TD.loc[i, ra_csc_col], TD.loc[i, dec_csc_col], TD.loc[i, PU_col]#'r0']#err_ellipse_r0']#r0']
     #print(csc_name, ra, dec)
     if path.exists(f'./{data_dir}/{csc_name}_nway.fits') == False or rerun==True:
@@ -1159,7 +1179,7 @@ def nway_cross_matching(TD, i, radius, query_dir, name_col='name',ra_col='ra',de
         elif type(per_file) == str and per_file == 'txt':
             #print('txt')
             if path.exists(f'{query_dir}/{csc_name}.txt') == False:
-                CSCviewsearch(csc_name, ra_csc, dec_csc, radius,query_dir,csc_version='2.0')
+                CSCviewsearch(csc_name, ra_csc, dec_csc, radius,query_dir,csc_version=csc_version)
             df_r = pd.read_csv(f'{query_dir}/{csc_name}.txt', header=154, sep='\t')
         else:
             print('else')
@@ -1172,17 +1192,17 @@ def nway_cross_matching(TD, i, radius, query_dir, name_col='name',ra_col='ra',de
         #csc_name, CSC_id, r0 = df_r.loc[i, 'name'][5:], df_r.loc[i, 'ID'], TD_old.loc[i, 'r0']
 
         if newcsc:
-            newcsc_prepare(TD.iloc[[i]].reset_index(drop=True), X_name=csc_name,name_col=name_col,ra_col=ra_col, dec_col=dec_col,r0_col=r0_col,r1_col=r1_col,PA_col=PA_col,data_dir=data_dir,sigma=2)
+            newcsc_prepare(TD.iloc[[i]].reset_index(drop=True), mode='individual', X_name=csc_name,name_col=name_col,ra_col=ra_col, dec_col=dec_col,r0_col=r0_col,r1_col=r1_col,PA_col=PA_col,data_dir=data_dir,sigma=2)
         else:
-            nway_mw_prepare(ra, dec,  X_name=csc_name, ref_mjd=mjds, catalog='CSC',data_dir=data_dir,sigma=sigma)
+            nway_mw_prepare(ra, dec,  X_name=csc_name, mode='individual', ref_mjd=mjds, catalog='CSC',data_dir=data_dir,sigma=sigma)
 
-        nway_mw_prepare(ra, dec,  X_name=csc_name, ref_mjd=mjds, catalog='gaia',data_dir=data_dir,sigma=sigma)
+        nway_mw_prepare(ra, dec,  X_name=csc_name, mode='individual', ref_mjd=mjds, catalog='gaia',data_dir=data_dir,sigma=sigma)
 
-        nway_mw_prepare(ra, dec,  X_name=csc_name, ref_mjd=mjds, catalog='tmass',data_dir=data_dir,sigma=sigma)
+        nway_mw_prepare(ra, dec,  X_name=csc_name, mode='individual', ref_mjd=mjds, catalog='tmass',data_dir=data_dir,sigma=sigma)
 
-        nway_mw_prepare(ra, dec,  X_name=csc_name, ref_mjd=mjds, catalog='allwise',data_dir=data_dir,sigma=sigma)
+        nway_mw_prepare(ra, dec,  X_name=csc_name, mode='individual', ref_mjd=mjds, catalog='allwise',data_dir=data_dir,sigma=sigma)
 
-        nway_mw_prepare(ra, dec,  X_name=csc_name,ref_mjd=mjds, catalog='catwise',data_dir=data_dir,sigma=sigma)
+        nway_mw_prepare(ra, dec,  X_name=csc_name, mode='individual', ref_mjd=mjds, catalog='catwise',data_dir=data_dir,sigma=sigma)
 
         os.system(f'python {nway_dir}nway.py ./{data_dir}/{csc_name}_CSC.fits :err_r0:err_r1:PA \
               ./{data_dir}/{csc_name}_gaia.fits :PU ./{data_dir}/{csc_name}_tmass.fits :err0:err0:errPA \
@@ -1208,7 +1228,7 @@ def nway_cross_matching(TD, i, radius, query_dir, name_col='name',ra_col='ra',de
         
     return csc_name
 
-def nway_cross_matching_cluster(df, field_name, ra, dec, radius, query_dir, name_col='name',ra_col='ra',dec_col='dec', ra_csc_col='ra',dec_csc_col='dec',PU_col='err_ellipse_r0',r0_col='r0',r1_col='r1',PA_col='PA',data_dir='data',explain=False,move=False,move_dir='check',rerun=False, sigma=2.,newcsc=False,per_file='txt'):
+def nway_cross_matching_cluster(df, field_name, ra, dec, radius, query_dir, csc_version='current', name_col='name',ra_col='ra',dec_col='dec', ra_csc_col='ra',dec_csc_col='dec',PU_col='err_ellipse_r0',r0_col='r0',r1_col='r1',PA_col='PA',data_dir='data',explain=False,move=False,move_dir='check',rerun=False, sigma=2.,newcsc=False,per_file='txt'):
     # csc_name, ra, dec,ra_csc,dec_csc, r0 = TD.loc[i, name_col][5:], TD.loc[i, ra_col], TD.loc[i, dec_col], TD.loc[i, ra_csc_col], TD.loc[i, dec_csc_col], TD.loc[i, PU_col]#'r0']#err_ellipse_r0']#r0']
     #print(csc_name, ra, dec)
     if path.exists(f'./{data_dir}/{field_name}_nway.fits') == False or rerun==True:
@@ -1217,7 +1237,7 @@ def nway_cross_matching_cluster(df, field_name, ra, dec, radius, query_dir, name
         elif type(per_file) == str and per_file == 'txt':
             #print('txt')
             if path.exists(f'{query_dir}/{field_name}.txt') == False:
-                CSCviewsearch(field_name, ra, dec, radius,query_dir,csc_version='2.0')
+                CSCviewsearch(field_name, ra, dec, radius, query_dir, csc_version=csc_version)
             df_r = pd.read_csv(f'{query_dir}/{field_name}.txt', header=154, sep='\t')
         else:
             print('else')
@@ -1230,18 +1250,18 @@ def nway_cross_matching_cluster(df, field_name, ra, dec, radius, query_dir, name
         #csc_name, CSC_id, r0 = df_r.loc[i, 'name'][5:], df_r.loc[i, 'ID'], TD_old.loc[i, 'r0']
 
         if newcsc:
-            newcsc_prepare(df.reset_index(drop=True),X_name=field_name, mode='cluster', radius=12, name_col=name_col,ra_col=ra_col, dec_col=dec_col,r0_col=r0_col,r1_col=r1_col,PA_col=PA_col,data_dir=data_dir,sigma=2)
+            newcsc_prepare(df.reset_index(drop=True),X_name=field_name, mode='cluster', radius=radius/60, name_col=name_col,ra_col=ra_col, dec_col=dec_col,r0_col=r0_col,r1_col=r1_col,PA_col=PA_col,data_dir=data_dir,sigma=2)
         else:
-            nway_mw_prepare(ra, dec, X_name=field_name, mode='cluster', radius=12, ref_mjd=mjds, catalog='CSC',data_dir=data_dir,sigma=sigma)
+            nway_mw_prepare(ra, dec, X_name=field_name, mode='cluster', radius=radius, ref_mjd=mjds, catalog='CSC',data_dir=data_dir,sigma=sigma, rerun=rerun)
 
         for catalog in ['gaia','tmass','allwise','catwise']:
-            nway_mw_prepare(ra, dec, X_name=field_name, mode='cluster', radius=12, ref_mjd=mjds, catalog=catalog,data_dir=data_dir,sigma=sigma)
+            nway_mw_prepare(ra, dec, X_name=field_name, mode='cluster', radius=radius, ref_mjd=mjds, catalog=catalog,data_dir=data_dir,sigma=sigma, rerun=rerun)
 
         os.system(f'python {nway_dir}nway.py ./{data_dir}/{field_name}_CSC.fits :err_r0:err_r1:PA \
               ./{data_dir}/{field_name}_gaia.fits :PU ./{data_dir}/{field_name}_tmass.fits :err0:err0:errPA \
               ./{data_dir}/{field_name}_allwise.fits :err0:err1:errPA ./{data_dir}/{field_name}_catwise.fits :PU \
-              --out=./{data_dir}/{field_name}_nway.fits --radius 3 --prior-completeness 1:1:1:1')
-
+              --out=./{data_dir}/{field_name}_nway.fits --radius 3 --prior-completeness 0.82:0.1:0.1:0.1')
+        # --prior-completeness 0.82:0.64:0.31:0.46
     
     if explain:
 
@@ -1265,7 +1285,7 @@ def update_nway(TD):
 
     nway_cols = {'gaia':['Gaia','GAIA_RA', 'GAIA_DEC',
        'GAIA_PU', 'GAIA_Source', 'GAIA__r', 'GAIA_e_Pos', 'GAIA_Plx',
-       'GAIA_e_Plx', 'GAIA_PM', 'GAIA_e_PM', 'GAIA_epsi', 'GAIA_Gmag',
+       'GAIA_e_Plx', 'GAIA_PM', 'GAIA_e_PM', 'GAIA_pmRA', 'GAIA_e_pmRA', 'GAIA_pmDE', 'GAIA_e_pmDE', 'GAIA_epsi', 'GAIA_Gmag',
        'GAIA_BPmag', 'GAIA_RPmag', 'GAIA_e_Gmag', 'GAIA_e_BPmag'],
             'tmass':['TMASS_RA', 'TMASS_DEC', 'TMASS_err0', 'TMASS_err1',
        'TMASS_errPA', 'TMASS__2MASS', 'TMASS__r', 'TMASS_Jmag', 'TMASS_Hmag',

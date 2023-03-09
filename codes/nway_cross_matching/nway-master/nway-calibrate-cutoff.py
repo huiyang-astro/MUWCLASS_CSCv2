@@ -58,7 +58,7 @@ plt.figure(figsize=(5,5))
 plt.plot(cutoffs, efficiency, '-', color='k', label='selection efficiency', lw=2)
 plt.plot(cutoffs, error_rate, '--', color='r', label='false selection rate')
 
-plt.ylabel('fraction(>p_any)')
+plt.ylabel('fraction(>p_any)')	
 plt.xlabel('p_any')
 plt.legend(loc='lower left', prop=dict(size=10))
 plt.savefig(args.realfile + '_p_any_cutoffquality.pdf', bbox_inches='tight')
@@ -67,9 +67,9 @@ plt.close()
 print('created plot "%s_p_any_cutoffquality.pdf"' % args.realfile)
 
 plt.figure(figsize=(5,5))
-plt.plot(p_any, p_i, '. ', color='r', label='real')
-plt.plot(p_any_offset, p_i_offset, '. ', color='gray', label='offset')
-
+plt.plot(p_any, p_i, 'x', color='r', label='real', alpha=0.5, markersize=2)
+plt.plot(p_any_offset, p_i_offset, 'x', color='gray', label='offset', alpha=0.5, markersize=2)
+print('test')
 plt.ylabel('p_i')
 plt.xlabel('p_any')
 plt.legend(loc='lower left', prop=dict(size=10))
@@ -78,7 +78,7 @@ plt.savefig(args.realfile + '_p_any_p_i.png', bbox_inches='tight')
 plt.close()
 print('created plot "%s_p_any_p_i.pdf"' % args.realfile)
 
-for rate in [0.01,0.03,0.05,0.1]:
+for rate in [0.01,0.03,0.05,0.1,0.2,0.3,0.4,0.5]:
 	print()
 	# find where error-rate is < rate
 	mask = numpy.array(error_rate) < rate
