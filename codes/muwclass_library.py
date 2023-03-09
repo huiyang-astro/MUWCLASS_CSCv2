@@ -343,7 +343,7 @@ def sample_data(df,Xray='CSC',distance='nodist',Uncer_flag=False,random_state=No
             # set distance of sources with negative parallaxes and parallaxes with large errors (fpu<2) to nan, already done in making of TD?
             # the cleaning of features should be done when creating the test data
             df.loc[df['Plx']<0, [dist_feature, 'e_'+dist_feature]]=np.nan
-            df.loc[df['Plx']/df['e_Plx']<2, [dist_feature, 'e_'+dist_feature]]=np.nan
+            df.loc[df['Plx']/df['e_Plx']<3, [dist_feature, 'e_'+dist_feature]]=np.nan
 
             df = asymmetric_errors(df, dist_feature)
 

@@ -218,7 +218,7 @@ def find_obs(df_per, ra, dec,filter=True):
     return obsids
 
 
-def prepare_field(df, data_dir, query_dir, field_name, ra, dec, name_col='name',Chandratype='CSC',pu_astro=0., search_mode='cone_search',engine='curl',csc_version='2.0',create_perobs='query',convert_hms_to_deg=True, gaia_precomputed=True,cross_matching='old'):
+def prepare_field(df, data_dir, query_dir, field_name, ra, dec, name_col='name',Chandratype='CSC',pu_astro=0., search_mode='cone_search',engine='curl',csc_version='2.0',create_perobs='query',convert_hms_to_deg=True, gaia_precomputed=True,cross_matching='old', mode='individual', radius=12, rerun=False):
     
     #'''
     if Chandratype=='CSC':
@@ -285,30 +285,30 @@ def prepare_field(df, data_dir, query_dir, field_name, ra, dec, name_col='name',
         df_MW = df_remove
     
     if cross_matching == 'nway':
-        radius = 0.01
         nway_data_dir = data_dir+'/nway'
         Path(nway_data_dir).mkdir(parents=True, exist_ok=True)
         per_file = pd.read_csv(f'{data_dir}/{field_name}_per.csv')
         df_MW = pd.DataFrame()
 
-        # for i in range(len(df_ave)):
-        #     #print(len(per_file))
-        #     csc_name = nway.nway_cross_matching(df_ave, i, radius, query_dir,name_col='name',ra_col='ra',dec_col='dec', ra_csc_col='ra',dec_csc_col='dec',PU_col='err_ellipse_r0',r0_col='err_ellipse_r0',r1_col='err_ellipse_r1',PA_col='err_ellipse_ang',data_dir=nway_data_dir,explain=False,move=False,move_dir='check',rerun=False, sigma=2.,newcsc=True,per_file=per_file)
-        #     # print working directory
-        #     print(os.getcwd())
-        #     dat = Table.read(f'./{nway_data_dir}/{csc_name}_nway.fits', format='fits')
-        #     df = dat.to_pandas()
+        if mode=='individual':
+            radius = 0.01
+            for i in range(len(df_ave)):
+                #print(len(per_file))
+                csc_name = nway.nway_cross_matching(df_ave, i, radius, query_dir,name_col='name',ra_col='ra',dec_col='dec', ra_csc_col='ra',dec_csc_col='dec',PU_col='err_ellipse_r0',r0_col='err_ellipse_r0',r1_col='err_ellipse_r1',PA_col='err_ellipse_ang',csc_version=csc_version,data_dir=nway_data_dir,explain=False,move=False,move_dir='check',rerun=rerun, sigma=2.,newcsc=True,per_file=per_file)
+                # print working directory
+                print(os.getcwd())
+                dat = Table.read(f'./{nway_data_dir}/{csc_name}_nway.fits', format='fits')
+                df = dat.to_pandas()
 
 
-        #     df_MW = pd.concat([df_MW, df[(df['match_flag']==1) | (df['match_flag']==2)]], ignore_index=True, sort=False)
+                df_MW = pd.concat([df_MW, df[(df['match_flag']==1) | (df['match_flag']==2)]], ignore_index=True, sort=False)
 
         # match whole df_ave at once instead of one by one
+        elif mode=='cluster':   
+            nway.nway_cross_matching_cluster(df_ave, field_name, ra, dec, radius, query_dir,name_col='name',ra_col='ra',dec_col='dec', ra_csc_col='ra',dec_csc_col='dec',PU_col='err_ellipse_r0',r0_col='err_ellipse_r0',r1_col='err_ellipse_r1',PA_col='err_ellipse_ang',csc_version=csc_version,data_dir=nway_data_dir,explain=True,move=False,move_dir='check',rerun=rerun, sigma=2.,newcsc=True,per_file=per_file)
 
-        radius = 12 # arcmin
-        nway.nway_cross_matching_cluster(df_ave, field_name, ra, dec, radius, query_dir,name_col='name',ra_col='ra',dec_col='dec', ra_csc_col='ra',dec_csc_col='dec',PU_col='err_ellipse_r0',r0_col='err_ellipse_r0',r1_col='err_ellipse_r1',PA_col='err_ellipse_ang',data_dir=nway_data_dir,explain=True,move=False,move_dir='check',rerun=False, sigma=2.,newcsc=True,per_file=per_file)
-
-        dat = Table.read(f'./{nway_data_dir}/{field_name}_nway.fits', format='fits')
-        df_MW = dat.to_pandas()
+            dat = Table.read(f'./{nway_data_dir}/{field_name}_nway.fits', format='fits')
+            df_MW = dat.to_pandas()
 
 
         print(df_MW['match_flag'].value_counts())
@@ -350,6 +350,7 @@ def prepare_field(df, data_dir, query_dir, field_name, ra, dec, name_col='name',
 
         MW_cols = ['CSC__2CXO', 'CSC_RA', 'CSC_DEC', 'CSC_err_r0', 'CSC_err_r1', 'CSC_PA', 
            'Gaia', 'GAIA_RA', 'GAIA_DEC', 'GAIA_PU', 'GAIA__r','GAIA_Plx', 'GAIA_e_Plx', 'GAIA_PM', 'GAIA_e_PM',
+           'GAIA_pmRA', 'GAIA_e_pmRA', 'GAIA_pmDE', 'GAIA_e_pmDE',
            'GAIA_epsi', 'GAIA_Gmag', 'GAIA_BPmag', 'GAIA_RPmag', 'GAIA_e_Gmag', 'GAIA_e_BPmag', 'GAIA_e_RPmag', 
            'rgeo', 'b_rgeo', 'B_rgeo', 'rpgeo', 'b_rpgeo', 'B_rpgeo', 'gaiadist_flag',
            'TMASS__2MASS', 'TMASS_RA', 'TMASS_DEC', 'TMASS_err0', 'TMASS_err1', 'TMASS_errPA', 'TMASS__r', 
@@ -528,7 +529,7 @@ def combine_class_result(field_name, data_dir, dir_out, class_labels,TD_evaluati
     df_save['HR_hms'] = (df_save['F_h']-df_save['F_m']-df_save['F_s'])/(df_save['F_h']+df_save['F_m']+df_save['F_s'])
 
     class_prob_columns = [ 'P_'+c for c in class_labels]+[  'e_P_'+c for c in class_labels]
-    df_save[['name','ra','dec','PU_X','significance','F_b','HR_hms','P_inter','P_intra','G','J','W1','cp_counts','CSC_flags','Class','Class_prob','Class_prob_e','CT','PU_TeV','TeV_extent','true_Class']+\
+    df_save[['name','ra','dec','PU_X','significance','flux_significance_b_max','F_b','HR_hms','P_inter','P_intra','G','J','W1','cp_counts','CSC_flags','Class','Class_prob','Class_prob_e','CT','PU_TeV','TeV_extent','true_Class']+\
         class_prob_columns].to_csv(f'{dir_out}/{field_name}_class.csv',index=False)
 
 

@@ -36,7 +36,7 @@ parser = HelpfulParser(description=__doc__,
 parser.add_argument('--radius', type=float, required=True,
 	help='Remove sources which are near original sources, within this radius (arcsec).')
 
-parser.add_argument('inputfile', type=str, help="input catalogue fits file")
+parser.add_argument('inputfile', type=str, help="input PRIMARY catalogue fits file")
 parser.add_argument('outputfile', help='output catalogue fits file')
 
 # parsing arguments
