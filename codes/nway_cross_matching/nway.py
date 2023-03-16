@@ -1035,8 +1035,8 @@ def nway_mw_prepare(ra_x, dec_x, X_name, mode='individual', radius=12, ref_mjd=n
             df_q['err1'] = df_q['errMin'] * sigma
 
         # suspect tmass errors underestimated, set minimum error to 0.35 arcsec
-        # df_q['err0'] = df_q['err0'].apply(lambda x: max(x,0.35))
-        # df_q['err1'] = df_q['err1'].apply(lambda x: max(x,0.35))
+        df_q['err0'] = df_q['err0'].apply(lambda x: max(x,0.35))
+        df_q['err1'] = df_q['err1'].apply(lambda x: max(x,0.35))
 
         
         #print(df_q[['err0','err1']].describe())
@@ -1082,8 +1082,8 @@ def nway_mw_prepare(ra_x, dec_x, X_name, mode='individual', radius=12, ref_mjd=n
             df_q['err1'] = df_q['eeMin'] * sigma
         
         # suspect AllWISE errors underestimated, set minimum error to 0.35 arcsec
-        # df_q['err0'] = df_q['err0'].apply(lambda x: max(x,0.35))
-        # df_q['err1'] = df_q['err1'].apply(lambda x: max(x,0.35))
+        df_q['err0'] = df_q['err0'].apply(lambda x: max(x,0.35))
+        df_q['err1'] = df_q['err1'].apply(lambda x: max(x,0.35))
 
         df_q = df_q.rename(columns={'eePA':'errPA'})    
         #print(df_q[['eeMaj','eeMin','eePA','e_RA_pm','e_DE_pm']].describe())
@@ -1136,7 +1136,7 @@ def nway_mw_prepare(ra_x, dec_x, X_name, mode='individual', radius=12, ref_mjd=n
         #df_q['PU'] = df_q.apply(lambda r: max(r.PU_c,0.3), axis=1)
 
         # suspect catwise errors underestimated, set minimum PU to 0.5 arcsec
-        # df_q['PU'] = df_q['PU'].apply(lambda x: max(x,0.5))
+        df_q['PU'] = df_q['PU'].apply(lambda x: max(x,0.5))
 
         new_t = Table.from_pandas(df_q[['RA','DEC','PU','Name','_r','W1mproPM','W2mproPM','e_W1mproPM','e_W2mproPM']])
     
@@ -1159,12 +1159,21 @@ def nway_mw_prepare(ra_x, dec_x, X_name, mode='individual', radius=12, ref_mjd=n
     else:
         area = np.pi * (radius/60)**2 # in deg^2
 
+    # normalize densities to Gaia density by decreasing area
     if catalog == 'tmass':
         area = area / 6
     if catalog == 'allwise':
         area = area / 20
     if catalog == 'catwise':
         area = area / 5
+
+    # normalize densities to allwise density by increasing area
+    # if catalog == 'gaia':
+    #     area = area * 17.5
+    # if catalog == '2mass':
+    #     area = area * 3.2
+    # if catalog == 'catwise':
+    #     area = area * 3.3
 
     os.system(f'python {nway_dir}nway-write-header.py ./{data_dir}/{X_name}_{catalog}.fits {catalog} {area}')
     
@@ -1250,7 +1259,7 @@ def nway_cross_matching_cluster(df, field_name, ra, dec, radius, query_dir, csc_
         #csc_name, CSC_id, r0 = df_r.loc[i, 'name'][5:], df_r.loc[i, 'ID'], TD_old.loc[i, 'r0']
 
         if newcsc:
-            newcsc_prepare(df.reset_index(drop=True),X_name=field_name, mode='cluster', radius=radius/60, name_col=name_col,ra_col=ra_col, dec_col=dec_col,r0_col=r0_col,r1_col=r1_col,PA_col=PA_col,data_dir=data_dir,sigma=2)
+            newcsc_prepare(df.reset_index(drop=True),X_name=field_name, mode='cluster', radius=radius, name_col=name_col,ra_col=ra_col, dec_col=dec_col,r0_col=r0_col,r1_col=r1_col,PA_col=PA_col,data_dir=data_dir,sigma=2)
         else:
             nway_mw_prepare(ra, dec, X_name=field_name, mode='cluster', radius=radius, ref_mjd=mjds, catalog='CSC',data_dir=data_dir,sigma=sigma, rerun=rerun)
 
@@ -1260,7 +1269,7 @@ def nway_cross_matching_cluster(df, field_name, ra, dec, radius, query_dir, csc_
         os.system(f'python {nway_dir}nway.py ./{data_dir}/{field_name}_CSC.fits :err_r0:err_r1:PA \
               ./{data_dir}/{field_name}_gaia.fits :PU ./{data_dir}/{field_name}_tmass.fits :err0:err0:errPA \
               ./{data_dir}/{field_name}_allwise.fits :err0:err1:errPA ./{data_dir}/{field_name}_catwise.fits :PU \
-              --out=./{data_dir}/{field_name}_nway.fits --radius 3 --prior-completeness 0.82:0.1:0.1:0.1')
+              --out=./{data_dir}/{field_name}_nway.fits --radius 1.75 --prior-completeness 0.85:0.3:0.3:0.3')
         # --prior-completeness 0.82:0.64:0.31:0.46
     
     if explain:

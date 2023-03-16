@@ -320,7 +320,7 @@ print('  computing probabilities ...')
 log_bf = numpy.zeros(len(table)) * numpy.nan
 prior = numpy.zeros(len(table)) * numpy.nan
 # handle all cases (also those with missing counterparts in some catalogues)
-for case in range(2**(len(table_names)-1)):
+for case in range(2**(len(table_names)-1)):	
 	table_mask = numpy.array([True] + [(case // 2**(ti)) % 2 == 0 for ti in range(len(tables)-1)])
 	ncat = table_mask.sum()
 	# select those cases
