@@ -1035,8 +1035,8 @@ def nway_mw_prepare(ra_x, dec_x, X_name, mode='individual', radius=12, ref_mjd=n
             df_q['err1'] = df_q['errMin'] * sigma
 
         # suspect tmass errors underestimated, set minimum error to 0.35 arcsec
-        df_q['err0'] = df_q['err0'].apply(lambda x: max(x,0.35))
-        df_q['err1'] = df_q['err1'].apply(lambda x: max(x,0.35))
+        # df_q['err0'] = df_q['err0'].apply(lambda x: max(x,0.35))
+        # df_q['err1'] = df_q['err1'].apply(lambda x: max(x,0.35))
 
         
         #print(df_q[['err0','err1']].describe())
@@ -1082,8 +1082,8 @@ def nway_mw_prepare(ra_x, dec_x, X_name, mode='individual', radius=12, ref_mjd=n
             df_q['err1'] = df_q['eeMin'] * sigma
         
         # suspect AllWISE errors underestimated, set minimum error to 0.35 arcsec
-        df_q['err0'] = df_q['err0'].apply(lambda x: max(x,0.35))
-        df_q['err1'] = df_q['err1'].apply(lambda x: max(x,0.35))
+        # df_q['err0'] = df_q['err0'].apply(lambda x: max(x,0.35))
+        # df_q['err1'] = df_q['err1'].apply(lambda x: max(x,0.35))
 
         df_q = df_q.rename(columns={'eePA':'errPA'})    
         #print(df_q[['eeMaj','eeMin','eePA','e_RA_pm','e_DE_pm']].describe())
@@ -1136,7 +1136,7 @@ def nway_mw_prepare(ra_x, dec_x, X_name, mode='individual', radius=12, ref_mjd=n
         #df_q['PU'] = df_q.apply(lambda r: max(r.PU_c,0.3), axis=1)
 
         # suspect catwise errors underestimated, set minimum PU to 0.5 arcsec
-        df_q['PU'] = df_q['PU'].apply(lambda x: max(x,0.5))
+        # df_q['PU'] = df_q['PU'].apply(lambda x: max(x,0.5))
 
         new_t = Table.from_pandas(df_q[['RA','DEC','PU','Name','_r','W1mproPM','W2mproPM','e_W1mproPM','e_W2mproPM']])
     
@@ -1160,12 +1160,12 @@ def nway_mw_prepare(ra_x, dec_x, X_name, mode='individual', radius=12, ref_mjd=n
         area = np.pi * (radius/60)**2 # in deg^2
 
     # normalize densities to Gaia density by decreasing area
-    if catalog == 'tmass':
-        area = area / 6
-    if catalog == 'allwise':
-        area = area / 20
-    if catalog == 'catwise':
-        area = area / 5
+    # if catalog == 'tmass':
+    #     area = area / 6
+    # if catalog == 'allwise':
+    #     area = area / 20
+    # if catalog == 'catwise':
+    #     area = area / 5
 
     # normalize densities to allwise density by increasing area
     # if catalog == 'gaia':

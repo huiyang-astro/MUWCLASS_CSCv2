@@ -63,20 +63,30 @@ def log_bf(p, s):
 	s: errors (list of N arrays)
 	"""
 
+	print(f'len s: {len(s)}')
 	n = len(s)
 	# precision parameter w = 1/sigma^2
 	w = [numpy.asarray(si, dtype=float)**-2. for si in s]
+	print(f'w: {w}')
+	print(f'log_arcsec2rad', log_arcsec2rad)
 	norm = (n - 1) * log(2) + 2 * (n - 1) * log_arcsec2rad
+	# norm = (n - 1) * log(2)
+	print(f'norm: {norm}')
 	del s
 
 	wsum = numpy.sum(w, axis=0)
 	slog = numpy.sum(log(w), axis=0) - log(wsum)
+	print(f'wsum: {wsum}')
+	print(f'slog: {slog}')
 	q = 0
 	for i, wi in enumerate(w):
 		for j, wj in enumerate(w):
 			if i < j:
-				q += wi * wj * p[i][j]**2
+				q += wi * wj * (p[i][j])**2
+	print(f'q: {q}')
 	exponent = - q / 2 / wsum
+	print(f'exponent: {exponent}')
+	print(f'(norm + slog + exponent) * log10(e): {(norm + slog + exponent) * log10(e)}')
 	return (norm + slog + exponent) * log10(e)
 
 # vectorized in the following means that many 2D matrices/vectors are going to be handled.

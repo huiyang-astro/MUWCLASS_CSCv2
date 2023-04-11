@@ -349,7 +349,7 @@ def prepare_field(df, data_dir, query_dir, field_name, ra, dec, name_col='name',
         df_MW.to_csv(f'{data_dir}/{field_name}_MW.csv',index=False)
 
         MW_cols = ['CSC__2CXO', 'CSC_RA', 'CSC_DEC', 'CSC_err_r0', 'CSC_err_r1', 'CSC_PA', 
-           'Gaia', 'GAIA_RA', 'GAIA_DEC', 'GAIA_PU', 'GAIA__r','GAIA_Plx', 'GAIA_e_Plx', 'GAIA_PM', 'GAIA_e_PM',
+           'Gaia', 'GAIA_Source', 'GAIA_RA', 'GAIA_DEC', 'GAIA_PU', 'GAIA__r','GAIA_Plx', 'GAIA_e_Plx', 'GAIA_PM', 'GAIA_e_PM',
            'GAIA_pmRA', 'GAIA_e_pmRA', 'GAIA_pmDE', 'GAIA_e_pmDE',
            'GAIA_epsi', 'GAIA_Gmag', 'GAIA_BPmag', 'GAIA_RPmag', 'GAIA_e_Gmag', 'GAIA_e_BPmag', 'GAIA_e_RPmag', 
            'rgeo', 'b_rgeo', 'B_rgeo', 'rpgeo', 'b_rpgeo', 'B_rpgeo', 'gaiadist_flag',
@@ -359,8 +359,8 @@ def prepare_field(df, data_dir, query_dir, field_name, ra, dec, name_col='name',
            'ALLWISE_W1mag','ALLWISE_W2mag','ALLWISE_W3mag','ALLWISE_W4mag',
            'ALLWISE_e_W1mag','ALLWISE_e_W2mag','ALLWISE_e_W3mag','ALLWISE_e_W4mag',
            'CATWISE_Name','CATWISE_RA', 'CATWISE_DEC', 'CATWISE_PU', 'CATWISE__r', 
-           'CATWISE_W1mproPM', 'CATWISE_W2mproPM', 'CATWISE_e_W1mproPM', 'CATWISE_e_W2mproPM',
-           'Separation_max', 'ncat', 'dist_bayesfactor', 'dist_bayesfactor_corrected', 'dist_post',
+           'CATWISE_W1mproPM', 'CATWISE_W2mproPM', 'CATWISE_e_W1mproPM', 'CATWISE_e_W2mproPM', 'Separation_GAIA_CSC', 'Separation_TMASS_CSC', 'Separation_ALLWISE_CSC', 'Separation_CATWISE_CSC',
+           'Separation_max', 'CSC_ID', 'ncat', 'dist_bayesfactor', 'dist_bayesfactor_corrected', 'dist_post',
            'p_single', 'p_any', 'p_i', 'match_flag']
 
         df_MW = df_MW[MW_cols].rename(columns={'CSC__2CXO':'name','CSC_RA':'ra', 'CSC_DEC':'dec'})
