@@ -55,22 +55,28 @@ def log_bf3(p12,p23,p31, s1,s2,s3):
 	q = ss3 * p12**2 + ss1 * p23**2 + ss2 * p31**2
 	return (log(4) + 4 * log_arcsec2rad - log(s) - q / 2 / s) * log10(e)
 
-def log_bf(p, s):
+def log_bf(p, s, area):
 	"""
 	log10 of the multi-way Bayes factor, see eq.(18)
 
 	p: separations matrix (NxN matrix of arrays)
 	s: errors (list of N arrays)
+	area: area of the catalog in square degrees
 	"""
 
 	print(f'len s: {len(s)}')
 	n = len(s)
 	# precision parameter w = 1/sigma^2
-	w = [numpy.asarray(si, dtype=float)**-2. for si in s]
+	w = [numpy.asarray(si, dtype=float)**-2 for si in s]
+	# precision parameter w = 4*pi/(pi*sigma^2)
+	# w = [4*pi/(pi*numpy.asarray(si / 3600 / 180 * pi, dtype=float)**2) for si in s]
+	print(f's: {s}')
 	print(f'w: {w}')
 	print(f'log_arcsec2rad', log_arcsec2rad)
-	norm = (n - 1) * log(2) + 2 * (n - 1) * log_arcsec2rad
+	# norm = (n - 1) * log(2) + 2 * (n - 1) * log_arcsec2rad
 	# norm = (n - 1) * log(2)
+	norm = (n - 1) * log(2) + (n - 1) * log(area*(pi/180)**2/(4*pi)) +  2 * (n - 1) * log_arcsec2rad
+	print(f'area norm: {(n - 1) * log(area*(pi/180)**2)}')
 	print(f'norm: {norm}')
 	del s
 
@@ -82,7 +88,8 @@ def log_bf(p, s):
 	for i, wi in enumerate(w):
 		for j, wj in enumerate(w):
 			if i < j:
-				q += wi * wj * (p[i][j])**2
+				q += wi * wj * pi*(p[i][j])**2
+				# q += wi * wj * pi*(p[i][j] / 3600 / 180 * pi)**2
 	print(f'q: {q}')
 	exponent = - q / 2 / wsum
 	print(f'exponent: {exponent}')

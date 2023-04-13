@@ -1160,12 +1160,12 @@ def nway_mw_prepare(ra_x, dec_x, X_name, mode='individual', radius=12, ref_mjd=n
         area = np.pi * (radius/60)**2 # in deg^2
 
     # normalize densities to Gaia density by decreasing area
-    # if catalog == 'tmass':
-    #     area = area / 6
-    # if catalog == 'allwise':
-    #     area = area / 20
-    # if catalog == 'catwise':
-    #     area = area / 5
+    if catalog == 'tmass':
+        area = area / 6
+    if catalog == 'allwise':
+        area = area / 20
+    if catalog == 'catwise':
+        area = area / 5
 
     # normalize densities to allwise density by increasing area
     # if catalog == 'gaia':
@@ -1269,8 +1269,9 @@ def nway_cross_matching_cluster(df, field_name, ra, dec, radius, query_dir, csc_
         os.system(f'python {nway_dir}nway.py ./{data_dir}/{field_name}_CSC.fits :err_r0:err_r1:PA \
               ./{data_dir}/{field_name}_gaia.fits :PU ./{data_dir}/{field_name}_tmass.fits :err0:err0:errPA \
               ./{data_dir}/{field_name}_allwise.fits :err0:err1:errPA ./{data_dir}/{field_name}_catwise.fits :PU \
-              --out=./{data_dir}/{field_name}_nway.fits --radius 1.75 --prior-completeness 0.85:0.3:0.3:0.3')
+              --out=./{data_dir}/{field_name}_nway.fits --radius 1.75 --prior-completeness 0.82:0.64:0.31:0.46')
         # --prior-completeness 0.82:0.64:0.31:0.46
+        # --prior-completeness 0.85:0.3:0.3:0.3
     
     if explain:
 
