@@ -185,13 +185,11 @@ for fitsname in filenames:
 	assert 'SKYAREA' in fits_table.header, 'file "%s", table "%s" does not have a field "SKYAREA", which should contain the area of the catalogue in square degrees' % (fitsname, table_name)
 	area = fits_table.header['SKYAREA'] * 1.0 # in square degrees
 	area_total = (4 * pi * (180 / pi)**2)
-	print(n/area)
+	print(area)
 	density = n / area * area_total
-	# density = n / area * (180 / pi)**2
 	print('      from catalogue "%s" (%d), density gives %.2e on entire sky' % (table_name, n, density))
 	# this takes into account that the source may be absent
 	density_plus = (n + 1) / area * area_total
-	# density_plus = (n + 1) / area * (180 / pi)**2
 	source_densities.append(density)
 	source_densities_plus.append(density_plus)
 
@@ -346,20 +344,24 @@ for case in range(2**(len(table_names)-1)):
 		separations_selected_dec = [[cell[mask] for cell, m in zip(row, table_mask) if m] 
 			for row, m in zip(separations_dec, table_mask) if m]
 		log_bf[mask] = bayesdist.log_bf_elliptical(
-			separations_selected_ra, separations_selected_dec, errors_selected)
+			separations_selected_ra, separations_selected_dec, errors_selected, area)
 	print(f'source densities: {source_densities}, completeness: {prior_completeness[table_mask]}, source_densities_plus: {source_densities_plus[table_mask]}')
 	prior[mask] = source_densities[0] * numpy.product(prior_completeness[table_mask]) / numpy.product(source_densities_plus[table_mask])
 	assert numpy.isfinite(prior[mask]).all(), (source_densities, prior_completeness[table_mask], numpy.product(source_densities_plus[table_mask]))
 
 assert numpy.isfinite(prior).all(), (prior, log_bf)
 assert numpy.isfinite(log_bf).all(), (prior, log_bf)
+columns.append(pyfits.Column(name='prior', format='E', array=prior))
 columns.append(pyfits.Column(name='dist_bayesfactor', format='E', array=log_bf))
 
 ncat = table['ncat']
 ncats = len(tables)
+print('ncat:', ncat)
+print('ncats:', ncats)
 
 if args.consider_unrelated_associations:
 	candidates = numpy.where(ncat <= ncats - 2)[0]
+	print('candidates:', candidates)
 	if len(candidates) > 0:
 		print('    correcting for unrelated associations ...')
 		# correct for unrelated associations
@@ -368,10 +370,13 @@ if args.consider_unrelated_associations:
 		for i in tqdm.tqdm(candidates):
 			# list which ones we are missing
 			missing_cats = [k for k, sep in enumerate(separations[0]) if numpy.isnan(sep[i])]
+			print('separations[0]:', separations[0])
+			print('missing_cats:', missing_cats)
 			pid = table[primary_id_key][i]
 			pid_index = primary_ids.index(pid)
 			best_logpost = 0
 			# go through more complex associations
+			print('pid_index:', pid_index, 'primary_id_start[pid_index]:', primary_id_start[pid_index], 'primary_id_end[pid_index]:', primary_id_end[pid_index])
 			for j in range(primary_id_start[pid_index], primary_id_end[pid_index]):
 				if not (ncat[j] > 2): continue
 				# check if this association has sufficient overlap with the one we are looking for
@@ -379,13 +384,16 @@ if args.consider_unrelated_associations:
 				augmented_cats = []
 				for k in missing_cats:
 					if not numpy.isnan(separations[0][k][j]):
+						print('j:', j, 'k:', k, 'separations[0][k][j]:', separations[0][k][j])
 						augmented_cats.append(k)
 				n_augmented_cats = len(augmented_cats)
+				print('augmented_cats:', augmented_cats, 'n_augmented_cats:', n_augmented_cats)
 				if n_augmented_cats >= 2:
 					# ok, this is helpful.
 					# identify the separations and errors
 					# identify the prior
 					prior_j = source_densities[augmented_cats[0]] / numpy.product(source_densities_plus[augmented_cats])
+					print('prior_j:', prior_j)
 					# compute a log_bf
 					if simple_errors:
 						errors_selected = [[errors[k][j]] for k in augmented_cats]
@@ -393,6 +401,7 @@ if args.consider_unrelated_associations:
 							for k2 in augmented_cats] for k in augmented_cats]
 						log_bf_j = bayesdist.log_bf(numpy.array(separations_selected),
 							numpy.array(errors_selected), area)
+						print('log_bf_j:', log_bf_j)
 					else:
 						separations_selected_ra = [[[separations_ra[k][k2][j]] 
 							for k2 in augmented_cats] for k in augmented_cats]
@@ -402,16 +411,20 @@ if args.consider_unrelated_associations:
 							for k in augmented_cats]
 						log_bf_j = bayesdist.log_bf_elliptical(numpy.array(separations_selected_ra),
 							 numpy.array(separations_selected_dec), 
-							 numpy.array(errors_selected))
+							 numpy.array(errors_selected), area)
 					logpost_j = bayesdist.unnormalised_log_posterior(prior_j, log_bf_j, n_augmented_cats)
+					print('logpost_j:', logpost_j)
 					if logpost_j > best_logpost:
-						#print('post:', logpost_j, log_bf_j, prior_j)
+						print('post:', logpost_j, log_bf_j, prior_j)
 						best_logpost = logpost_j
+						print('best_logpost:', best_logpost)
 	
 			# ok, we have our correction factor, best_logpost
 			# lets multiply it onto log_bf
 			if best_logpost > 0:
+				print('log_bf before correction:', log_bf[i])
 				log_bf[i] += best_logpost
+				print('log_bf after correction:', log_bf[i])
 		columns.append(pyfits.Column(name='dist_bayesfactor_corrected', format='E', array=log_bf))
 	else:
 		print('      correcting for unrelated associations ... not necessary')
