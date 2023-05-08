@@ -362,12 +362,14 @@ print('ncats:', ncats)
 if args.consider_unrelated_associations:
 	candidates = numpy.where(ncat <= ncats - 2)[0]
 	print('candidates:', candidates)
+	best_logposts = numpy.zeros(len(ncat))
 	if len(candidates) > 0:
 		print('    correcting for unrelated associations ...')
 		# correct for unrelated associations
 		# identify those in need of correction
 		# two unconsidered catalogues are needed for an unrelated association
 		for i in tqdm.tqdm(candidates):
+			print('CSC_ID', table['CSC_ID'][i])
 			# list which ones we are missing
 			missing_cats = [k for k, sep in enumerate(separations[0]) if numpy.isnan(sep[i])]
 			print('separations[0]:', separations[0])
@@ -424,8 +426,12 @@ if args.consider_unrelated_associations:
 			if best_logpost > 0:
 				print('log_bf before correction:', log_bf[i])
 				log_bf[i] += best_logpost
+				best_logposts[i] = best_logpost
 				print('log_bf after correction:', log_bf[i])
+		print('shape of log_bf:', log_bf.shape)
+		print('shape of best_logposts:', len(best_logposts))
 		columns.append(pyfits.Column(name='dist_bayesfactor_corrected', format='E', array=log_bf))
+		columns.append(pyfits.Column(name='best_logpost', format='E', array=best_logposts))
 	else:
 		print('      correcting for unrelated associations ... not necessary')
 

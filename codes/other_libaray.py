@@ -360,7 +360,7 @@ def prepare_field(df, data_dir, query_dir, field_name, ra, dec, name_col='name',
            'ALLWISE_e_W1mag','ALLWISE_e_W2mag','ALLWISE_e_W3mag','ALLWISE_e_W4mag',
            'CATWISE_Name','CATWISE_RA', 'CATWISE_DEC', 'CATWISE_PU', 'CATWISE__r', 
            'CATWISE_W1mproPM', 'CATWISE_W2mproPM', 'CATWISE_e_W1mproPM', 'CATWISE_e_W2mproPM', 'Separation_GAIA_CSC', 'Separation_TMASS_CSC', 'Separation_ALLWISE_CSC', 'Separation_CATWISE_CSC',
-           'Separation_max', 'CSC_ID', 'ncat', 'dist_bayesfactor', 'dist_bayesfactor_corrected', 'dist_post',
+           'Separation_max', 'CSC_ID', 'ncat', 'dist_bayesfactor', 'dist_post',
            'p_single', 'p_any', 'p_i', 'match_flag']
 
         df_MW = df_MW[MW_cols].rename(columns={'CSC__2CXO':'name','CSC_RA':'ra', 'CSC_DEC':'dec'})

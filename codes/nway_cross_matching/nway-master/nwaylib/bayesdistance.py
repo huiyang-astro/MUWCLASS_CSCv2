@@ -8,6 +8,7 @@ Authors: Tamas Budavari (C) 2012
 from __future__ import print_function, division
 import numpy
 from numpy import log, log10, pi, e
+from math import comb
 
 # use base 10 everywhere
 
@@ -70,28 +71,33 @@ def log_bf(p, s, area):
 	# w = [numpy.asarray(si, dtype=float)**-2 for si in s]
 	# precision parameter w = 4*pi/(sigma^2)
 	w = [4*pi/(numpy.asarray(si / 3600 / 180 * pi, dtype=float)**2) for si in s]
-	print(f's: {s}')
-	print(f'w: {w}')
-	print(f'log_arcsec2rad', log_arcsec2rad)
+	# print(f's: {s}')
+	# print(f'w: {w}')
 	# norm = (n - 1) * log(2) + 2 * (n - 1) * log_arcsec2rad
 	norm = (n - 1) * log(2)
 	# norm = (n - 1) * log(2) + (n - 1) * log(area*(pi/180)**2/(4*pi)) +  2 * (n - 1) * log_arcsec2rad
 	# print(f'area norm: {(n - 1) * log(area*(pi/180)**2)}')
-	print(f'norm: {norm}')
+	# print(f'norm: {norm}')
 	del s
 
 	wsum = numpy.sum(w, axis=0)
 	slog = numpy.sum(log(w), axis=0) - log(wsum)
-	print(f'wsum: {wsum}')
-	print(f'slog: {slog}')
+	# print(f'wsum: {wsum}')
+	# print(f'slog: {slog}')
 	q = 0
+	correction_factor = 1/((n-1) / comb(n-1, 2))
 	for i, wi in enumerate(w):
 		for j, wj in enumerate(w):
 			if i < j:
-				# q += wi * wj * (p[i][j])**2
-				q += wi * wj * (p[i][j] / 3600 / 180 * pi)**2
-				print('wi, wj:', wi, wj)
-				print(f'p[i][j]: {(p[i][j] / 3600 / 180 * pi)**2}')
+				print(f'i: {i}, j: {j}')
+				if i!=0 and j!=0:
+					print('non-primary catalog associations factor: ', correction_factor)
+					q += wi * wj * (p[i][j] / 3600 / 180 * pi)**2 * correction_factor
+				else:
+					# q += wi * wj * (p[i][j])**2
+					q += wi * wj * (p[i][j] / 3600 / 180 * pi)**2
+					# print('wi, wj:', wi, wj)
+					# print(f'p[i][j]: {(p[i][j] / 3600 / 180 * pi)**2}')
 	print(f'q: {q}')
 	exponent = - q / 2 / wsum
 	print(f'exponent: {exponent}')
