@@ -835,7 +835,7 @@ def plot_class_matrix(field_name, df_plot, dir_plot, class_labels):
                     , classes=class_labels, normalize=True,title=field_name, nocmap=True,cmap=plt.get_cmap('YlOrRd'))
 
   
-def prepare_evts_plot_xray_class(field_name, ra_field, dec_field, radius, data_dir, dir_out,find_obs_filter=True,include_TD=False,TeV_extent='p'):
+def prepare_evts_plot_xray_class(field_name, ra_field, dec_field, radius, data_dir, dir_out,find_obs_filter=True,include_TD=False,TeV_extent='p',obsids=False):
 
     evt2_dir = dir_out+'/evt2'
     dir_plot = data_dir+'/plot'
@@ -846,14 +846,16 @@ def prepare_evts_plot_xray_class(field_name, ra_field, dec_field, radius, data_d
     obj_info = {}
     merge_script = []
 
+    if obsids==False:
 
-    df_per = pd.read_csv(f'{data_dir}/{field_name}_conesearch.csv')
-    obsids = find_obs(df_per,ra_field,dec_field,filter=find_obs_filter)#.astype(str)
-    #if field_name == 'J1023-575':
-    #    obsids = [21848]
+        df_per = pd.read_csv(f'{data_dir}/{field_name}_conesearch.csv')
+        obsids = find_obs(df_per,ra_field,dec_field,filter=find_obs_filter)#.astype(str)
+        #if field_name == 'J1023-575':
+        #    obsids = [21848]
 
-    print(obsids)
-
+        print(obsids)
+    else:
+        pass
     os.system('rm -rf to_merge.sh')
     if len(obsids) == 1:
         url, fn = get_evt2_file(obsids[0], path=evt2_dir) 

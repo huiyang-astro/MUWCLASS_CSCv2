@@ -1160,13 +1160,16 @@ def nway_cross_matching(TD, i, radius, query_dir, name_col='name',ra_col='ra',de
         else:
             nway_mw_prepare(ra, dec,  X_name=csc_name, ref_mjd=mjds, catalog='CSC',data_dir=data_dir,sigma=sigma)
 
-        nway_mw_prepare(ra, dec,  X_name=csc_name, ref_mjd=mjds, catalog='gaia',data_dir=data_dir,sigma=sigma)
+        
+        for mw_cat in ['gaia', 'tmass', 'allwise', 'catwise']:
+            if path.exists(f'./{data_dir}/{csc_name}_{mw_cat}.fits') == False:
+                nway_mw_prepare(ra, dec,  X_name=csc_name, ref_mjd=mjds, catalog=mw_cat,data_dir=data_dir,sigma=sigma)
 
-        nway_mw_prepare(ra, dec,  X_name=csc_name, ref_mjd=mjds, catalog='tmass',data_dir=data_dir,sigma=sigma)
+        #nway_mw_prepare(ra, dec,  X_name=csc_name, ref_mjd=mjds, catalog='tmass',data_dir=data_dir,sigma=sigma)
 
-        nway_mw_prepare(ra, dec,  X_name=csc_name, ref_mjd=mjds, catalog='allwise',data_dir=data_dir,sigma=sigma)
+        #nway_mw_prepare(ra, dec,  X_name=csc_name, ref_mjd=mjds, catalog='allwise',data_dir=data_dir,sigma=sigma)
 
-        nway_mw_prepare(ra, dec,  X_name=csc_name,ref_mjd=mjds, catalog='catwise',data_dir=data_dir,sigma=sigma)
+        #nway_mw_prepare(ra, dec,  X_name=csc_name,ref_mjd=mjds, catalog='catwise',data_dir=data_dir,sigma=sigma)
 
         os.system(f'python {nway_dir}nway.py ./{data_dir}/{csc_name}_CSC.fits :err_r0:err_r1:PA \
               ./{data_dir}/{csc_name}_gaia.fits :PU ./{data_dir}/{csc_name}_tmass.fits :err0:err0:errPA \
@@ -1182,6 +1185,67 @@ def nway_cross_matching(TD, i, radius, query_dir, name_col='name',ra_col='ra',de
         Path(f'./{move_dir}/').mkdir(parents=True, exist_ok=True)
         os.system(f'cp  ./{data_dir}/{csc_name}_nway.fits_explain_1.pdf ./{move_dir}/')   
         os.system(f'cp  ./{data_dir}/{csc_name}_nway.fits_explain_1_options.pdf ./{move_dir}/')        
+            
+
+    #os.system(f'cp  ./{data_dir}/{csc_name}_nway.fits_explain_1.pdf ./AGN_check/')   
+    #os.system(f'cp  ./{data_dir}/{csc_name}_nway.fits_explain_1_options.pdf ./AGN_check/')    
+
+    #os.system(f'cp  ./{data_dir}/{csc_name}_nway.fits_explain_1.pdf ./AGN_check/radiusr0/')   
+    #os.system(f'cp  ./{data_dir}/{csc_name}_nway.fits_explain_1_options.pdf ./AGN_check/radiusr0/')    
+        
+    return csc_name
+
+
+def nway_cross_matching_mag(TD, i, radius, query_dir, mag_catalogs=[], mags=[], hist_files=[], name_col='name',ra_col='ra',dec_col='dec', ra_csc_col='ra',dec_csc_col='dec',PU_col='err_ellipse_r0',r0_col='r0',r1_col='r1',PA_col='PA',data_dir='data',explain=False,move=False,move_dir='check',rerun=False, sigma=2.,newcsc=False,per_file='txt'):
+    csc_name, ra, dec,ra_csc,dec_csc, r0 = TD.loc[i, name_col][5:], TD.loc[i, ra_col], TD.loc[i, dec_col], TD.loc[i, ra_csc_col], TD.loc[i, dec_csc_col], TD.loc[i, PU_col]#'r0']#err_ellipse_r0']#r0']
+    #print(csc_name, ra, dec)
+    if path.exists(f'./{data_dir}/{csc_name}_nway_mag.fits') == False or rerun==True:
+        if type(per_file) == pd.DataFrame:
+            df_r = per_file[per_file['name']==TD.loc[i, name_col]].reset_index(drop=True)   
+        elif type(per_file) == str and per_file == 'txt':
+            #print('txt')
+            if path.exists(f'{query_dir}/{csc_name}.txt') == False:
+                CSCviewsearch(csc_name, ra_csc, dec_csc, radius,query_dir,csc_version='2.0')
+            df_r = pd.read_csv(f'{query_dir}/{csc_name}.txt', header=154, sep='\t')
+        else:
+            print('else')
+              
+
+        df_r['mjd'] = np.nan
+        df_r['mjd'] = df_r.apply(lambda r: Time(r['gti_obs'], format='isot', scale='utc').mjd,axis=1)
+        mjds = df_r['mjd'].values
+
+        #csc_name, CSC_id, r0 = df_r.loc[i, 'name'][5:], df_r.loc[i, 'ID'], TD_old.loc[i, 'r0']
+
+        if newcsc:
+            newcsc_prepare(TD.iloc[[i]].reset_index(drop=True),X_name=csc_name,name_col=name_col,ra_col=ra_col, dec_col=dec_col,r0_col=r0_col,r1_col=r1_col,PA_col=PA_col,data_dir=data_dir,sigma=2)
+        else:
+            nway_mw_prepare(ra, dec,  X_name=csc_name, ref_mjd=mjds, catalog='CSC',data_dir=data_dir,sigma=sigma)
+
+        for mw_cat in ['gaia', 'tmass', 'allwise', 'catwise']:
+            if path.exists(f'./{data_dir}/{csc_name}_{mw_cat}.fits') == False:
+                nway_mw_prepare(ra, dec,  X_name=csc_name, ref_mjd=mjds, catalog=mw_cat,data_dir=data_dir,sigma=sigma)
+
+        codes = f'python {nway_dir}nway.py ./{data_dir}/{csc_name}_CSC.fits :err_r0:err_r1:PA \
+              ./{data_dir}/{csc_name}_gaia.fits :PU ./{data_dir}/{csc_name}_tmass.fits :err0:err0:errPA \
+              ./{data_dir}/{csc_name}_allwise.fits :err0:err1:errPA ./{data_dir}/{csc_name}_catwise.fits :PU \
+              --out=./{data_dir}/{csc_name}_nway_mag.fits --radius {min(r0*1.5, 3)} --prior-completeness 0.82:0.64:0.31:0.46' # r0 is 2-sigma
+              #--out=./{data_dir}/{csc_name}_nway.fits --radius {min(r0*1.5, 3)} --prior-completeness 0.82:0.64:0.31:0.46') # 1.5 * r0 is 3-sigma
+    
+        for mag_cat, mag, hist_file in zip(mag_catalogs, mags, hist_files):
+            codes = codes + f' --mag {mag_cat}:{mag} {hist_file}'
+
+        #print(codes)
+        os.system(codes)
+
+    if explain:
+
+        os.system(f'python {nway_dir}nway-explain.py ./{data_dir}/{csc_name}_nway_mag.fits 1') 
+
+    if move:
+        Path(f'./{move_dir}/').mkdir(parents=True, exist_ok=True)
+        os.system(f'cp  ./{data_dir}/{csc_name}_nway_mag.fits_explain_1.pdf ./{move_dir}/')   
+        os.system(f'cp  ./{data_dir}/{csc_name}_nway_mag.fits_explain_1_options.pdf ./{move_dir}/')        
             
 
     #os.system(f'cp  ./{data_dir}/{csc_name}_nway.fits_explain_1.pdf ./AGN_check/')   

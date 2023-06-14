@@ -155,7 +155,13 @@ rare_sources_removed_dict = {'2CXO J083520.6-451034': 'Vela pulsar, complicated 
                         
 }
 
-
+# needs to be changed : '2CXO J163553.8-472540' -> LMXB
+#.   '2CXO J043715.8-471508' -> LMXB, a high proper motion NS PSR J0437 in a binary with a WD
+# UltraCompCAT: 45: good, a gaia cp is matched
+# 48, okay?, cp should not be matched, https://ui.adsabs.harvard.edu/abs/2007MNRAS.377.1295J/abstract
+# ID  ra             dec   Fxpeak                mag     2CXO_name
+# 45 271.034875 -34.347553 1.970000e-09 V=17.71±0.02 2CXO J180408.3-342051
+# 48 259.695917 -32.170428 1.070000e-09 I>23.5 2CXO J171847.0-321013
 
 # rare-type sources saving
 
@@ -175,7 +181,8 @@ rare_sources_saving_dict = {# Reclassification
     
                         # sources with Ambiguous classifications 
                        '2CXO J122637.5-624613':{'Class':'HMXB', 'Comment':'https://www.aanda.org/articles/aa/full_html/2019/09/aa36045-19/aa36045-19.html'},
-                       '2CXO J163553.8-472540':{'Class':'HMXB', 'Comment':'https://www.aanda.org/articles/aa/pdf/2008/24/aa8774-07.pdf'},
+                       '2CXO J163553.8-472540':{'Class':'HMXB', 'Comment':'https://www.aanda.org/articles/aa/pdf/2008/24/aa8774-07.pdf'}, # from https://binary-revolution.github.io/HMXBwebcat/ group,  IGR J16358-4726 did not make it to their HMXB catalogue: 2010A&A...516A..94N find with K-band spectroscopy that the companion star is a cool, low mass star with CO absorption bands. These features are not seen in sgB[e] systems such as IGR J16318-4848 and as such the source was re-classified as a symbiotic LMXB.
+
                        '2CXO J180438.9-145647':{'Class':'CV', 'Comment':'https://arxiv.org/pdf/1108.1105.pdf'},
                        '2CXO J230108.2+585244':{'Class':'NS', 'Comment':'Magnetar'},
                        '2CXO J182608.5-125634':{'Class':'NS', 'Comment':' It is an isolated pulsar with compact faint PWN. see 2005AJ....129.1993M, 2019MNRAS.487.1964K, 2015ApJ...814..128K'},
