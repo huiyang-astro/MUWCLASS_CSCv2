@@ -1831,6 +1831,111 @@ def interactive_Ximg_class_ellipse(field_name, fgl_name, evt2_data, fn_evt2, dir
 
     return plot#()
 
+def interactive_Ximg_class_ellipse_noclass(field_name, fgl_name, fgl_names, evt2_data, fn_evt2, dir_out,reg_phys_ellipse,include_TD=False,TeV_extent='p',include_others=pd.DataFrame(),sig_cut=0,suffix='',srcs_list=[]):
+
+    dir_plot = dir_out+'/plot'
+    #Path(dir_plot).mkdir(parents=True, exist_ok=True)
+
+    conf_class_colors = {
+        'CF-AGN': ['cyan','circle_dot'], 'CF-NS': ['magenta','triangle_dot'], 'CF-CV': ['orange','hex_dot'], 
+        'CF-LM-STAR': ['gold','star_dot'], 'CF-HM-STAR': ['deepskyblue','square_dot'], 'CF-LMXB': ['lime','inverted_triangle'], 
+        'CF-YSO': ['blue','diamond_dot'],'CF-HMXB':['peru','square_pin'],'CF-NS+LMXB':['lightgreen','square_x']
+    }
+    x_min, x_max, y_min, y_max = evt2_data[0].min(), evt2_data[0].max(), evt2_data[1].min(), evt2_data[1].max()    
+    w, h = x_max - x_min, y_max - y_min     
+    #print(x_min, x_max, y_min, y_max, w, h)
+    cntr = [(x_max + x_min)/2, (y_max + y_min)/2]
+    NBINS = (1500, int(1500 * h / w))
+
+
+
+    H, xe, ye = np.histogram2d(evt2_data[0], evt2_data[1],bins=NBINS)
+
+    sigma_y = 1
+    sigma_x = 1
+
+    # Apply gaussian filter
+    sigma = [sigma_y, sigma_x]
+    H = sp.ndimage.filters.gaussian_filter(H, sigma, mode='constant')
+
+    update_image = np.flip(H.T, axis=0)
+
+    # produce an image of the 2d histogram
+    #cxo_obs = hv.Image(update_image, bounds=(x_min, y_min,x_max, y_max)).opts(cmap='plasma', clim=(0.01,H.max()), width=3000, height=3000)
+    #cxo_obs = hv.Image(update_image, bounds=(x_min, y_min,x_max, y_max)).opts(aspect='equal',logz=True, cmap='hot', clim=(0.01,H.max()), width=int(1000), height=int(1000))#int(1000*w/h))
+    #cxo_obs = hv.Image(update_image, bounds=(x_min, y_min,x_max, y_max)).opts(aspect='equal',logz=True, cmap='plasma', clim=(0.01,H.max()), width=int(1000), height=int(1000))#int(1000*w/h))
+    cxo_obs = hv.Image(update_image, bounds=(x_min, y_min,x_max, y_max)).opts(aspect='equal',logz=True, cmap='plasma', clim=(0.003,H.max()), width=int(1000), height=int(1000))#int(1000*w/h))
+    
+    #cxo_obs = hv.Image(np.flip(H.T, axis=0)).opts(logz=True, cmap='hot', clim=(0.01,H.max()), width=int(800), height=int(800*h/w))
+
+    all_csv = pd.read_csv(f'{dir_out}/{field_name}_class.csv')
+    all_csv = all_csv[(all_csv['significance']>=sig_cut) | (~all_csv['true_Class'].isnull()) | (all_csv['name'].isin(srcs_list))].reset_index(drop=True)
+    all_csv = all_csv.drop_duplicates(subset=['X_src']).reset_index(drop=True)
+    all_csv[['reg_phys_x', 'reg_phys_y']] = get_reg_phys(fn_evt2, all_csv)
+
+    #df_fgl = pd.DataFrame(data={'ra':fgl_ra, 'dec':fgl_dec})
+    #df_fgl[['reg_phys_x', 'reg_phys_y']] = get_reg_phys(fn_evt2, df_fgl)
+    
+    plot_layers = cxo_obs
+
+    if len(all_csv)>0:
+
+        scatter = all_csv.hvplot.scatter('reg_phys_x', 'reg_phys_y', color="white", marker='circle', size=50,line_width=1,hover_cols=['name']
+            ).opts(tools=[hover3],
+            alpha=0.,
+            line_alpha=1,
+            #show_legend=True,
+            muted_alpha=0,
+            #muted_alpha=1
+            )
+        plot_layers = plot_layers * scatter
+        e_color = 'blue' if TeV_extent == 'e' else 'lime'
+
+        for i in range(len(all_csv)):
+            text = hv.Text(all_csv.loc[i, 'reg_phys_x']-5, all_csv.loc[i, 'reg_phys_y']+50, all_csv.loc[i, 'name'],fontsize=8).opts(text_color='white')#,text_font=6)
+                           
+
+            plot_layers = plot_layers * text
+    
+    for i, reg_phys_ell in enumerate(reg_phys_ellipse):
+        ellipse =hv.Curve(reg_phys_ell).opts(color=e_color,line_alpha=1,line_width=3)
+
+        #scatter = Circle((x, y)).opts(radius=rad2,alpha=0.,color=e_color,line_alpha=1)
+        plot_layers = plot_layers * ellipse
+
+        fgl_ra = np.mean(np.array([xy[0] for xy in  reg_phys_ell]))
+        fgl_dec = np.mean(np.array([xy[1] for xy in  reg_phys_ell]))
+        fglname = fgl_names[i]
+
+        text = hv.Text(fgl_ra+5, fgl_dec+230,fglname,fontsize=10).opts(text_color='lime')
+
+        plot_layers = plot_layers * text
+    
+
+
+    #print(800, 800 * h / w)
+    plot = (plot_layers).opts(
+            hooks=[hook],
+            xlabel="pixel",
+            ylabel="pixel",
+            aspect='equal',
+            #width=int(1000),
+            #height=int(1000. * h / w),
+            fontscale=1,
+            #show_legend=True,
+            #legend_position='top_left',
+            fontsize={
+                'legend': int(8),
+                # 'a': 20,
+            },
+            title=fgl_name,
+            ) 
+
+    hvplot.save(plot, f'{dir_out}/plot/{fgl_name}{suffix}_noclass.html')
+    #hvplot.save(plot, f'{dir_out}/plot/{field_name}.png')
+
+    return plot#()
+
 
 def interactive_Ximg_class_ellipse_conf(field_name, evt2_data, fn_evt2, dir_out,reg_phys_ellipse,include_TD=False,TeV_extent='p',include_others=pd.DataFrame(),sig_cut=0,suffix=''):
 
