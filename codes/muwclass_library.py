@@ -747,7 +747,7 @@ def loo_prepare(args):
     if scaler_switch==True:
         X_train, [X_test] = scaling(ML_scaler, X_train, [X_test])
     if oversample_switch ==True:
-        ML_oversampler = SMOTE(random_state=random_state_smote, k_neighbors=4, n_jobs=-1) 
+        ML_oversampler = SMOTE(random_state=random_state_smote, k_neighbors=4)#, n_jobs=-1) 
         X_train, y_train = oversampling(ML_oversampler, X_train, y_train)
     
     X_train = X_train.fillna(-100)
