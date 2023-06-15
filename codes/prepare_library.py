@@ -1251,7 +1251,7 @@ def CSC_counterpart_clean(df, X_PU='err_ellipse_r0',catalog='gaia',pu_factor=1.5
         #print(df['_r2_'+catalog])
 
     df[['_rs_'+catalog]] = df[['_rs_'+catalog]].fillna('[]')
-    df['_r2_'+catalog] = df.apply(lambda row: np.fromstring(row['_rs_'+catalog][1:-1], dtype=float, sep=', ')[1] if len(np.fromstring(row['_rs_'+catalog][1:-1], dtype=np.float, sep=', '))>1 else np.nan, axis=1)
+    df['_r2_'+catalog] = df.apply(lambda row: np.fromstring(row['_rs_'+catalog][1:-1], dtype=float, sep=', ')[1] if len(np.fromstring(row['_rs_'+catalog][1:-1], dtype=float, sep=', '))>1 else np.nan, axis=1)
     #s = np.where(((df['_r2_'+catalog]<1.5*df['_r_'+catalog]) | (df['_r2_'+catalog]<pu_factor*df['X_PU_'+catalog])) & (df['cp_flag_'+catalog]==0) )[0]
     #df.loc[s,'cp_flag_'+catalog] = df.loc[s,'cp_flag_'+catalog] +1 
 
