@@ -388,8 +388,8 @@ def nway_mw_prepare_v2(ra_x, dec_x, X_name, ref_mjd=np.array([57388.]),catalog='
             df_gaia = pd.read_csv(f'./{data_dir}/{X_name}_gaia.csv')
             #df_gaia = df_gaia[df_gaia['_r']<gaia_search_radius].reset_index(drop=True)
             #if len(df_gaia)>0:
-            c = SkyCoord(ra=df_q['RA']*u.degree, dec=df_q['DEC']*u.degree)
-            cata = SkyCoord(ra=df_gaia['RA']*u.degree, dec=df_gaia['DEC']*u.degree)
+            c = SkyCoord(ra=df_q['RA'], dec=df_q['DEC'], unit=(u.deg, u.deg))
+            cata = SkyCoord(ra=df_gaia['RA'], dec=df_gaia['DEC'], unit=(u.deg, u.deg))
             idx, d2d, d3d = c.match_to_catalog_sky(cata)
             df_q['_r_gaia'] = d2d.arcsec
             for col in ['e_Pos', 'Plx', 'e_Plx', 'PM', 'e_PM', 'epsi']:
@@ -432,8 +432,8 @@ def nway_mw_prepare_v2(ra_x, dec_x, X_name, ref_mjd=np.array([57388.]),catalog='
             df_gaia = pd.read_csv(f'./{data_dir}/{X_name}_gaia.csv')
             #df_gaia = df_gaia[df_gaia['_r']<gaia_search_radius].reset_index(drop=True)
             #if len(df_gaia)>0:
-            c = SkyCoord(ra=df_q['RA']*u.degree, dec=df_q['DEC']*u.degree)
-            cata = SkyCoord(ra=df_gaia['RA']*u.degree, dec=df_gaia['DEC']*u.degree)
+            c = SkyCoord(ra=df_q['RA'], dec=df_q['DEC'], unit=(u.deg, u.deg))
+            cata = SkyCoord(ra=df_gaia['RA'], dec=df_gaia['DEC'], unit=(u.deg, u.deg))
             idx, d2d, d3d = c.match_to_catalog_sky(cata)
             df_q['_r_gaia'] = d2d.arcsec
             for col in ['e_Pos', 'Plx', 'e_Plx', 'PM', 'e_PM', 'epsi']:
@@ -471,8 +471,8 @@ def nway_mw_prepare_v2(ra_x, dec_x, X_name, ref_mjd=np.array([57388.]),catalog='
             df_gaia = pd.read_csv(f'./{data_dir}/{X_name}_gaia.csv')
             #df_gaia = df_gaia[df_gaia['_r']<gaia_search_radius].reset_index(drop=True)
             #if len(df_gaia)>0:
-            c = SkyCoord(ra=df_q['RA']*u.degree, dec=df_q['DEC']*u.degree)
-            cata = SkyCoord(ra=df_gaia['RA']*u.degree, dec=df_gaia['DEC']*u.degree)
+            c = SkyCoord(ra=df_q['RA'], dec=df_q['DEC'], unit=(u.deg, u.deg))
+            cata = SkyCoord(ra=df_gaia['RA'], dec=df_gaia['DEC'], unit=(u.deg, u.deg))
             idx, d2d, d3d = c.match_to_catalog_sky(cata)
             df_q['_r_gaia'] = d2d.arcsec
             for col in ['e_Pos', 'Plx', 'e_Plx', 'PM', 'e_PM', 'epsi']:
@@ -669,8 +669,8 @@ def nway_mw_prepare_v3(ra_x, dec_x, X_name, ref_mjd=np.array([57388.]),catalog='
             df_gaia = df_gaia[~df_gaia['RA'].isnull()].reset_index(drop=True)
             #df_gaia = df_gaia[df_gaia['_r']<gaia_search_radius].reset_index(drop=True)
             #if len(df_gaia)>0:
-            c = SkyCoord(ra=df_q['RA']*u.degree, dec=df_q['DEC']*u.degree)
-            cata = SkyCoord(ra=df_gaia['RA']*u.degree, dec=df_gaia['DEC']*u.degree)
+            c = SkyCoord(ra=df_q['RA'], dec=df_q['DEC'], unit=(u.deg, u.deg))
+            cata = SkyCoord(ra=df_gaia['RA'], dec=df_gaia['DEC'], unit=(u.deg, u.deg))
             #print(c, cata)
             idx, d2d, d3d = c.match_to_catalog_sky(cata)
             df_q['_r_gaia'] = d2d.arcsec
@@ -716,8 +716,8 @@ def nway_mw_prepare_v3(ra_x, dec_x, X_name, ref_mjd=np.array([57388.]),catalog='
             df_gaia = df_gaia[~df_gaia['RA'].isnull()].reset_index(drop=True)
             #df_gaia = df_gaia[df_gaia['_r']<gaia_search_radius].reset_index(drop=True)
             #if len(df_gaia)>0:
-            c = SkyCoord(ra=df_q['RA']*u.degree, dec=df_q['DEC']*u.degree)
-            cata = SkyCoord(ra=df_gaia['RA']*u.degree, dec=df_gaia['DEC']*u.degree)
+            c = SkyCoord(ra=df_q['RA'], dec=df_q['DEC'], unit=(u.deg, u.deg))
+            cata = SkyCoord(ra=df_gaia['RA'], dec=df_gaia['DEC'], unit=(u.deg, u.deg))
             #print(c, cata)
             idx, d2d, d3d = c.match_to_catalog_sky(cata)
             df_q['_r_gaia'] = d2d.arcsec
@@ -757,8 +757,8 @@ def nway_mw_prepare_v3(ra_x, dec_x, X_name, ref_mjd=np.array([57388.]),catalog='
             df_gaia = df_gaia[~df_gaia['RA'].isnull()].reset_index(drop=True)
             #df_gaia = df_gaia[df_gaia['_r']<gaia_search_radius].reset_index(drop=True)
             #if len(df_gaia)>0:
-            c = SkyCoord(ra=df_q['RA']*u.degree, dec=df_q['DEC']*u.degree)
-            cata = SkyCoord(ra=df_gaia['RA']*u.degree, dec=df_gaia['DEC']*u.degree)
+            c = SkyCoord(ra=df_q['RA'], dec=df_q['DEC'], unit=(u.deg, u.deg))
+            cata = SkyCoord(ra=df_gaia['RA'], dec=df_gaia['DEC'], unit=(u.deg, u.deg))
             idx, d2d, d3d = c.match_to_catalog_sky(cata)
             df_q['_r_gaia'] = d2d.arcsec
             for col in ['e_Pos', 'Plx', 'e_Plx', 'PM', 'e_PM', 'epsi']:
@@ -1008,8 +1008,8 @@ def nway_mw_prepare(ra_x, dec_x, X_name, mode='individual', radius=12, ref_mjd=n
             df_gaia = df_gaia[~df_gaia['RA'].isnull()].reset_index(drop=True)
             #df_gaia = df_gaia[df_gaia['_r']<gaia_search_radius].reset_index(drop=True)
             #if len(df_gaia)>0:
-            c = SkyCoord(ra=df_q['RA']*u.degree, dec=df_q['DEC']*u.degree)
-            cata = SkyCoord(ra=df_gaia['RA']*u.degree, dec=df_gaia['DEC']*u.degree)
+            c = SkyCoord(ra=df_q['RA'], dec=df_q['DEC'], unit=(u.deg, u.deg))
+            cata = SkyCoord(ra=df_gaia['RA'], dec=df_gaia['DEC'], unit=(u.deg, u.deg))
             #print(c, cata)
             idx, d2d, d3d = c.match_to_catalog_sky(cata)
             df_q['_r_gaia'] = d2d.arcsec
@@ -1060,8 +1060,8 @@ def nway_mw_prepare(ra_x, dec_x, X_name, mode='individual', radius=12, ref_mjd=n
             df_gaia = df_gaia[~df_gaia['RA'].isnull()].reset_index(drop=True)
             #df_gaia = df_gaia[df_gaia['_r']<gaia_search_radius].reset_index(drop=True)
             #if len(df_gaia)>0:
-            c = SkyCoord(ra=df_q['RA']*u.degree, dec=df_q['DEC']*u.degree)
-            cata = SkyCoord(ra=df_gaia['RA']*u.degree, dec=df_gaia['DEC']*u.degree)
+            c = SkyCoord(ra=df_q['RA'], dec=df_q['DEC'], unit=(u.deg, u.deg))
+            cata = SkyCoord(ra=df_gaia['RA'], dec=df_gaia['DEC'], unit=(u.deg, u.deg))
             #print(c, cata)
             idx, d2d, d3d = c.match_to_catalog_sky(cata)
             df_q['_r_gaia'] = d2d.arcsec
@@ -1110,8 +1110,8 @@ def nway_mw_prepare(ra_x, dec_x, X_name, mode='individual', radius=12, ref_mjd=n
             df_gaia = df_gaia[~df_gaia['RA'].isnull()].reset_index(drop=True)
             #df_gaia = df_gaia[df_gaia['_r']<gaia_search_radius].reset_index(drop=True)
             #if len(df_gaia)>0:
-            c = SkyCoord(ra=df_q['RA']*u.degree, dec=df_q['DEC']*u.degree)
-            cata = SkyCoord(ra=df_gaia['RA']*u.degree, dec=df_gaia['DEC']*u.degree)
+            c = SkyCoord(ra=df_q['RA'], dec=df_q['DEC'], unit=(u.deg, u.deg))
+            cata = SkyCoord(ra=df_gaia['RA'], dec=df_gaia['DEC'], unit=(u.deg, u.deg))
             idx, d2d, d3d = c.match_to_catalog_sky(cata)
             df_q['_r_gaia'] = d2d.arcsec
             for col in ['e_Pos', 'Plx', 'e_Plx', 'PM', 'e_PM', 'epsi']:
