@@ -56,7 +56,34 @@ def log_bf3(p12,p23,p31, s1,s2,s3):
 	q = ss3 * p12**2 + ss1 * p23**2 + ss2 * p31**2
 	return (log(4) + 4 * log_arcsec2rad - log(s) - q / 2 / s) * log10(e)
 
-def log_bf(p, s, area):
+def log_bf(p, s):
+	"""
+	log10 of the multi-way Bayes factor, see eq.(18)
+
+	p: separations matrix (NxN matrix of arrays)
+	s: errors (list of N arrays)
+	"""
+
+	n = len(s)
+	# precision parameter w = 1/sigma^2
+	w = [numpy.asarray(si, dtype=float)**-2. for si in s]
+	norm = (n - 1) * log(2) + 2 * (n - 1) * log_arcsec2rad
+	del s
+
+	wsum = numpy.sum(w, axis=0)
+	slog = numpy.sum(log(w), axis=0) - log(wsum)
+	q = 0
+	for i, wi in enumerate(w):
+		for j, wj in enumerate(w):
+			if i < j:
+				q += wi * wj * p[i][j]**2
+	exponent = - q / 2 / wsum
+	return (norm + slog + exponent) * log10(e)
+
+# vectorized in the following means that many 2D matrices/vectors are going to be handled.
+# i.e., each entry in the matrix or vector, is a vector of numbers.
+
+def log_bf_custom(p, s, area):
 	"""
 	log10 of the multi-way Bayes factor, see eq.(18)
 
@@ -209,7 +236,42 @@ def convert_from_ellipse(a, b, phi):
 	rho = c * s * (a2 - b2) / (sigma_x * sigma_y)
 	return sigma_x, sigma_y, rho
 
-def log_bf_elliptical(separations_ra, separations_dec, pos_errors, area):
+def log_bf_elliptical(separations_ra, separations_dec, pos_errors):
+	"""
+	log10 of the multi-way Bayes factor, see eq.(18)
+
+	separations_ra: RA separations matrix (NxN matrix of arrays)
+	separations_dec: DEC separations matrix (NxN matrix of arrays)
+	pos_errors: errors (list of (N,3) arrays) giving sigma_RA, sigma_DEC, rho
+	"""
+
+	error_matrices = [make_invcovmatrix(si, sj, rho)
+		for si, sj, rho in pos_errors]
+
+	circ_pos_errors = [((si**2 + sj**2) / 2)**0.5 for si, sj, rho in pos_errors]
+
+	new_separations = [[None for j in range(len(error_matrices))] for i in range(len(error_matrices))]
+
+	for i, Mi in enumerate(error_matrices):
+		for j, Mj in enumerate(error_matrices):
+			if i < j:
+				v = (separations_ra[i][j], separations_dec[i][j])
+				# get separation length
+				d2 = vector_multiply(v, v)
+				d = d2**0.5
+				# get error in direction of separation
+				vnormed = vector_normalised(v)
+				wi = vector_multiply(apply_vector_left(vnormed, Mi), vnormed)
+				wj = vector_multiply(apply_vector_left(vnormed, Mj), vnormed)
+				# ratio of circular error to directional error:
+				# combine the uncertainties by adding the variances
+				dist_ratio = (circ_pos_errors[i]**2 + circ_pos_errors[j]**2) / (1/wi + 1/wj)
+				# provide new separation
+				new_separations[i][j] = d * dist_ratio**-0.5
+
+	return log_bf(new_separations, circ_pos_errors)
+
+def log_bf_elliptical_custom(separations_ra, separations_dec, pos_errors, area):
 	"""
 	log10 of the multi-way Bayes factor, see eq.(18)
 

@@ -344,8 +344,10 @@ for case in range(2**(len(table_names)-1)):
 		separations_selected_dec = [[cell[mask] for cell, m in zip(row, table_mask) if m] 
 			for row, m in zip(separations_dec, table_mask) if m]
 		log_bf[mask] = bayesdist.log_bf_elliptical(
-			separations_selected_ra, separations_selected_dec, errors_selected, area)
-	print(f'source densities: {source_densities}, completeness: {prior_completeness[table_mask]}, source_densities_plus: {source_densities_plus[table_mask]}')
+			separations_selected_ra, separations_selected_dec, errors_selected)
+		# log_bf[mask] = bayesdist.log_bf_elliptical_custom(
+			# separations_selected_ra, separations_selected_dec, errors_selected, area)
+	# print(f'source densities: {source_densities}, completeness: {prior_completeness[table_mask]}, source_densities_plus: {source_densities_plus[table_mask]}')
 	prior[mask] = source_densities[0] * numpy.product(prior_completeness[table_mask]) / numpy.product(source_densities_plus[table_mask])
 	assert numpy.isfinite(prior[mask]).all(), (source_densities, prior_completeness[table_mask], numpy.product(source_densities_plus[table_mask]))
 
@@ -356,12 +358,12 @@ columns.append(pyfits.Column(name='dist_bayesfactor', format='E', array=log_bf))
 
 ncat = table['ncat']
 ncats = len(tables)
-print('ncat:', ncat)
-print('ncats:', ncats)
+# print('ncat:', ncat)
+# print('ncats:', ncats)
 
 if args.consider_unrelated_associations:
 	candidates = numpy.where(ncat <= ncats - 2)[0]
-	print('candidates:', candidates)
+	# print('candidates:', candidates)
 	best_logposts = numpy.zeros(len(ncat))
 	if len(candidates) > 0:
 		print('    correcting for unrelated associations ...')
@@ -369,16 +371,16 @@ if args.consider_unrelated_associations:
 		# identify those in need of correction
 		# two unconsidered catalogues are needed for an unrelated association
 		for i in tqdm.tqdm(candidates):
-			print('CSC_ID', table['CSC_ID'][i])
+			# print('CSC_ID', table['CSC_ID'][i])
 			# list which ones we are missing
 			missing_cats = [k for k, sep in enumerate(separations[0]) if numpy.isnan(sep[i])]
-			print('separations[0]:', separations[0])
-			print('missing_cats:', missing_cats)
+			# print('separations[0]:', separations[0])
+			# print('missing_cats:', missing_cats)
 			pid = table[primary_id_key][i]
 			pid_index = primary_ids.index(pid)
 			best_logpost = 0
 			# go through more complex associations
-			print('pid_index:', pid_index, 'primary_id_start[pid_index]:', primary_id_start[pid_index], 'primary_id_end[pid_index]:', primary_id_end[pid_index])
+			# print('pid_index:', pid_index, 'primary_id_start[pid_index]:', primary_id_start[pid_index], 'primary_id_end[pid_index]:', primary_id_end[pid_index])
 			for j in range(primary_id_start[pid_index], primary_id_end[pid_index]):
 				if not (ncat[j] > 2): continue
 				# check if this association has sufficient overlap with the one we are looking for
@@ -386,16 +388,16 @@ if args.consider_unrelated_associations:
 				augmented_cats = []
 				for k in missing_cats:
 					if not numpy.isnan(separations[0][k][j]):
-						print('j:', j, 'k:', k, 'separations[0][k][j]:', separations[0][k][j])
+						# print('j:', j, 'k:', k, 'separations[0][k][j]:', separations[0][k][j])
 						augmented_cats.append(k)
 				n_augmented_cats = len(augmented_cats)
-				print('augmented_cats:', augmented_cats, 'n_augmented_cats:', n_augmented_cats)
+				# print('augmented_cats:', augmented_cats, 'n_augmented_cats:', n_augmented_cats)
 				if n_augmented_cats >= 2:
 					# ok, this is helpful.
 					# identify the separations and errors
 					# identify the prior
 					prior_j = source_densities[augmented_cats[0]] / numpy.product(source_densities_plus[augmented_cats])
-					print('prior_j:', prior_j)
+					# print('prior_j:', prior_j)
 					# compute a log_bf
 					if simple_errors:
 						errors_selected = [[errors[k][j]] for k in augmented_cats]
@@ -403,7 +405,7 @@ if args.consider_unrelated_associations:
 							for k2 in augmented_cats] for k in augmented_cats]
 						log_bf_j = bayesdist.log_bf(numpy.array(separations_selected),
 							numpy.array(errors_selected), area)
-						print('log_bf_j:', log_bf_j)
+						# print('log_bf_j:', log_bf_j)
 					else:
 						separations_selected_ra = [[[separations_ra[k][k2][j]] 
 							for k2 in augmented_cats] for k in augmented_cats]
@@ -415,21 +417,21 @@ if args.consider_unrelated_associations:
 							 numpy.array(separations_selected_dec), 
 							 numpy.array(errors_selected), area)
 					logpost_j = bayesdist.unnormalised_log_posterior(prior_j, log_bf_j, n_augmented_cats)
-					print('logpost_j:', logpost_j)
+					# print('logpost_j:', logpost_j)
 					if logpost_j > best_logpost:
-						print('post:', logpost_j, log_bf_j, prior_j)
+						# print('post:', logpost_j, log_bf_j, prior_j)
 						best_logpost = logpost_j
-						print('best_logpost:', best_logpost)
+						# print('best_logpost:', best_logpost)
 	
 			# ok, we have our correction factor, best_logpost
 			# lets multiply it onto log_bf
 			if best_logpost > 0:
-				print('log_bf before correction:', log_bf[i])
+				# print('log_bf before correction:', log_bf[i])
 				log_bf[i] += best_logpost
 				best_logposts[i] = best_logpost
-				print('log_bf after correction:', log_bf[i])
-		print('shape of log_bf:', log_bf.shape)
-		print('shape of best_logposts:', len(best_logposts))
+				# print('log_bf after correction:', log_bf[i])
+		# print('shape of log_bf:', log_bf.shape)
+		# print('shape of best_logposts:', len(best_logposts))
 		columns.append(pyfits.Column(name='dist_bayesfactor_corrected', format='E', array=log_bf))
 		columns.append(pyfits.Column(name='best_logpost', format='E', array=best_logposts))
 	else:
@@ -538,11 +540,11 @@ print('Computing final probabilities ...')
 
 # add the posterior column
 total = log_bf + sum(biases.values())
-print('prior', prior)
-print('log_bf', log_bf)
-print('total', total)
+# print('prior', prior)
+# print('log_bf', log_bf)
+# print('total', total)
 post = bayesdist.posterior(prior, total)
-print('post', post)
+# print('post', post)
 columns.append(pyfits.Column(name='p_single', format='E', array=post))
 
 # compute weights for group posteriors
@@ -568,8 +570,8 @@ for primary_id, ilo, ihi in tqdm.tqdm(list(zip(primary_ids, primary_id_start, pr
 	# compute no-match probability
 	values = log_post_weight[mask]
 	offset = values.max()
-	print('values', values, 'offset', offset)
-	print(10**(values - offset), (10**(values - offset)).sum(), log10((10**(values - offset)).sum()))
+	# print('values', values, 'offset', offset)
+	# print(10**(values - offset), (10**(values - offset)).sum(), log10((10**(values - offset)).sum()))
 	bfsum = log10((10**(values - offset)).sum()) + offset
 	if len(values) > 1:
 		offset = values[1:].max()
@@ -579,9 +581,9 @@ for primary_id, ilo, ihi in tqdm.tqdm(list(zip(primary_ids, primary_id_start, pr
 	
 	# for p_any, find the one without counterparts
 	p_none = float(values[0])
-	print('p_none', p_none, 'bfsum', bfsum,)
+	# print('p_none', p_none, 'bfsum', bfsum,)
 	p_any = 1 - 10**(p_none - bfsum)
-	print('p_any', p_any)
+	# print('p_any', p_any)
 	# this avoids overflows in the no-counterpart solution, 
 	# which we want to set to 0
 	values[0] = bfsum1
