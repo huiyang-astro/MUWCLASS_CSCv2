@@ -1,0 +1,408 @@
+J/ApJ/941/104       Classification of Chandra sources              (Yang+, 2022)
+================================================================================
+Classifying Unidentified X-Ray Sources in the Chandra Source Catalog Using a
+Multiwavelength Machine-learning Approach.
+    Yang H., Hare J., Kargaltsev O., Volkov I., Chen S., Rangelov B.
+    <Astrophys. J. 941, 104 (2022)> 
+    =2022ApJ...941..104Y        (SIMBAD/NED BibCode)
+================================================================================
+ADC_Keywords: Active gal. nuclei ; Binaries, X-ray ; X-ray sources
+Keywords: Catalogs - X-ray sources - Classification - Random Forests -
+          X-ray binary stars - Active galactic nuclei - X-ray stars -
+          Young stellar objects - Cataclysmic variable stars -
+          Astrostatistics tools - X-ray surveys - Compact objects
+
+Abstract:
+  The rapid increase in serendipitous X-ray source detections requires the
+  development of novel approaches to efficiently explore the nature of X-ray
+  sources. If even a fraction of these sources could be reliably classified, it
+  would enable population studies for various astrophysical source types on a
+  much larger scale than currently possible. Classification of large numbers of
+  sources from multiple classes characterized by multiple properties (features)
+  must be done automatically and supervised machine learning (ML) seems to
+  provide the only feasible approach. We perform classification of Chandra
+  Source Catalog version 2.0 (CSCv2) sources to explore the potential of the ML
+  approach and identify various biases, limitations, and bottlenecks that
+  present themselves in these kinds of studies. We establish the framework and
+  present a flexible and expandable Python pipeline, which can be used and
+  improved by others. We also release the training data set of 2941 X-ray
+  sources with confidently established classes. In addition to providing
+  probabilistic classifications of 66,369 CSCv2 sources (21% of the entire CSCv2
+  catalog), we perform several narrower-focused case studies (high-mass X-ray
+  binary candidates and X-ray sources within the extent of the H.E.S.S. TeV
+  sources) to demonstrate some possible applications of our ML approach. We also
+  discuss future possible modifications of the presented pipeline, which are
+  expected to lead to substantial improvements in classification confidences.
+
+Description:
+  The following tables present the properties and classification results of the
+  good CSCv2 sample (GCS), the training dataset (TD), and the X-ray sources
+  within the unidentified HESS sources using the multiwavelength machine-
+  learning method (MUWCLASS).
+
+File Summary:
+--------------------------------------------------------------------------------
+ FileName    Lrecl   Records    Explanations
+--------------------------------------------------------------------------------
+ReadMe        80        .  this file
+gcs.dat      468    66369  Classification of good CSCv2 sample
+td.dat       551     2941  Classification of training dataset
+hess.dat     541     2000  Classification of HESS field sources
+--------------------------------------------------------------------------------
+
+See also:
+   IX/57   : The Chandra Source Catalog (CSC), Release 2.0 (Evans+, 2019)
+
+Byte-by-byte Description of file: gcs.dat
+--------------------------------------------------------------------------------
+  Bytes  Format  Units  Label        Explanations
+--------------------------------------------------------------------------------
+  1- 21   A21    ---    CSCv2_name    CSCv2 source name in the form “2CXO
+                                   Jhhmmss.s{+|–}ddmmss”
+ 23- 30   E8.3   deg    CSCv2_RA     [0.0/360.0] CSCv2 master source J2000 Right
+                                   Ascension
+ 32- 42   F11.7  deg    CSCv2_DEC    [-85.28/89.28] CSCv2 master source J2000
+                                   Declination
+ 44- 47   F4.2   arcsec CSCv2_PU     [0.71/0.99] [0.71/0.99] CSCv2 master source
+                                   err_ellipse_r0, the major radius of the 95%
+                                   confidence level position error ellipse
+ 49- 54   F6.2   ---    CSCv2_S/N    [3.0/407.86] [3.0/407.86] CSCv2 master
+                                   source X-ray significance
+ 56- 63   E8.3   mW/m2  Fs           [0.0/0.01] [0.0/0.01] Average soft (0.5-1.2
+                                   keV) band flux
+ 65- 69   E5.1   mW/m2  e_Fs         [0.0/0.01] [0.0/0.01] 1-sigma Fs
+                                   uncertainty
+ 71- 78   E8.3   mW/m2  Fm           [0.0/0.01] [0.0/0.01] Average medium (1.2-2
+                                   keV) band flux
+ 80- 84   E5.1   mW/m2  e_Fm         [0.0/0.01] [0.0/0.01] 1-sigma Fm
+                                   uncertainty
+ 86- 93   E8.3   mW/m2  Fh           [0.0/0.01] [0.0/0.01] Average hard (2-7
+                                   keV) band flux
+ 95- 99   E5.1   mW/m2  e_Fh         [0.0/0.01] [0.0/0.01] 1-sigma Fh
+                                   uncertainty
+101-108   E8.3   mW/m2  Fb           [0.0/0.01] [0.0/0.01] Average broad (0.5-7
+                                   keV) band flux
+110-114   E5.1   mW/m2  e_Fb         [0.0/0.01] [0.0/0.01] 1-sigma Fb
+                                   uncertainty
+116-121   F6.3   ---    P_intra      ? Highest value of Kuiper’s test
+                                   variability probability across all
+                                   observations available in CSCv2
+123-128   F6.3   ---    P_inter      ? Inter-observation variability probability
+130-136   F7.3   mag    Gmag         [3.52/22.11]? Gaia EDR3 G band magnitude
+138-143   F6.3   mag    e_Gmag       [0.0/0.2]? 1-sigma Gmag uncertainty
+145-151   F7.3   mag    BPmag        [3.49/23.6]? Gaia EDR3 BP band magnitude
+153-158   F6.3   mag    e_BPmag      [0.0/3.0]? 1-sigma BPmag uncertainty
+160-166   F7.3   mag    RPmag        [2.99/22.33]? Gaia EDR3 RP band magnitude
+168-173   F6.3   mag    e_RPmag      [0.0/3.0]? 1-sigma RPmag uncertainty
+175-180   F6.2   mag    Jmag         [0.8/20.0]? 2MASS J band magnitude
+182-186   F5.2   mag    e_Jmag       [0.01/3.0]? 1-sigma Jmag uncertainty
+188-193   F6.2   mag    Hmag         [0.5/17.87]? 2MASS H band magnitude
+195-200   F6.2   mag    e_Hmag       [0.01/10.0]? 1-sigma Hmag uncertainty
+202-207   F6.2   mag    Kmag         [0.5/16.84]? 2MASS K band magnitude
+209-213   F5.2   mag    e_Kmag       [0.01/1.0]? 1-sigma Kmag uncertainty
+215-222   F8.4   mag    W1mag        [-1.94/21.0]? W1 band magnitude from
+                                   AllWISE, CatWISE2020 and unWISE catalogs
+224-230   F7.4   mag    e_W1mag      ? 1-sigma W1 uncertainty
+232-239   F8.4   mag    W2mag        [-1.47/19.61]? W2 band magnitude from
+                                   AllWISE, CatWISE2020 and unWISE catalogs
+241-247   F7.4   mag    e_W2mag      ? 1-sigma W2 uncertainty
+249-255   F7.3   mag    W3mag        [-5.87/13.82]? W3 band magnitude from
+                                   AllWISE, CatWISE2020 and unWISE catalogs
+257-262   F6.3   mag    e_W3mag      [0.0/0.5]? 1-sigma W3 uncertainty
+264-270   F7.3   mas    Plx          [-10.0/51.19]? Gaia EDR3 absolute stellar
+                                   parallax
+272-277   F6.3   mas    e_Plx        [0.0/4.0]? 1-sigma Plx uncertainty
+279-286   F8.3   mas/yr PM           [0.0/445.68]? Gaia EDR3 total proper
+                                   motion
+288-295   F8.1   pc     rgeo         [20.0/34766.0]? Median of the geometric
+                                   distance from Gaia EDR3 Distances catalog
+297-304   F8.1   pc     b_rgeo       [20.0/25786.0]? 16th percentile of the
+                                   geometric distance from Gaia EDR3 Distances
+                                   catalog
+306-313   F8.1   pc     B_rgeo       [20.0/55224.0]? 84th percentile of the
+                                   geometric distance from Gaia EDR3 Distances
+                                   catalog
+315-320   F6.4   ---    P_AGN         Classification probability of the X-ray
+                                   source to be classified as an AGN
+322-327   F6.4   ---    P_CV          Classification probability of the X-ray
+                                   source to be classified as a CV
+329-335   F7.4   ---    P_HM-STAR     Classification probability of the X-ray
+                                   source to be classified as a HM-STAR
+337-343   F7.4   ---    P_HMXB        Classification probability of the X-ray
+                                   source to be classified as a HMXB
+345-351   F7.4   ---    P_LM-STAR     Classification probability of the X-ray
+                                   source to be classified as a LM-STAR
+353-358   F6.4   ---    P_LMXB        Classification probability of the X-ray
+                                   source to be classified as a LMXB
+360-365   F6.4   ---    P_NS          Classification probability of the X-ray
+                                   source to be classified as a NS
+367-372   F6.4   ---    P_YSO         Classification probability of the X-ray
+                                   source to be classified as a YSO
+374-379   F6.4   ---    e_P_AGN       1-sigma P_AGN uncertainty
+381-386   F6.4   ---    e_P_CV        1-sigma P_CV uncertainty
+388-393   F6.4   ---    e_P_HM-STAR   1-sigma P_HM-STAR uncertainty
+395-400   F6.4   ---    e_P_HMXB      1-sigma P_HMXB uncertainty
+402-407   F6.4   ---    e_P_LM-STAR   1-sigma P_LM-STAR uncertainty
+409-414   F6.4   ---    e_P_LMXB      1-sigma P_LMXB uncertainty
+416-421   F6.4   ---    e_P_NS        1-sigma P_NS uncertainty
+423-428   F6.4   ---    e_P_YSO       1-sigma P_YSO uncertainty
+430-436   A7     ---    Class         The predicted class of the source with the
+                                   highest classification probability among
+                                   eight classes
+438-443   F6.4   ---    Class_prob   [0.18/1.0] [0.18/1.0] The classification
+                                   probability of the predicted class calculated
+                                   from MUWCLASS
+445-450   F6.4   ---    e_Class_prob  1-sigma Class_prob uncertainty
+452-461   F10.3  ---    CT            The classification confidence threshold
+463-468   A6     ---    CSCv2_flags  ? The compilation of CSCv2 master source
+                                   flags including conf flag (“conf”), extent
+                                   flag (“extent”), and pileup flag (“pileup”),
+                                   jointed by a “|”
+
+--------------------------------------------------------------------------------
+
+Byte-by-byte Description of file: td.dat
+--------------------------------------------------------------------------------
+  Bytes  Format  Units  Label        Explanations
+--------------------------------------------------------------------------------
+  1- 21   A21    ---    CSCv2_name    CSCv2 source name in the form “2CXO
+                                   Jhhmmss.s{+|–}ddmmss”
+ 23- 33   F11.7  deg    CSCv2_RA     [0.03/359.93] CSCv2 master source J2000
+                                   Right Ascension
+ 35- 45   F11.7  deg    CSCv2_DEC    [-78.2/85.24] CSCv2 master source J2000
+                                   Declination
+ 47- 50   F4.2   arcsec CSCv2_PU     [0.71/2.46] [0.71/2.46] CSCv2 master source
+                                   err_ellipse_r0, the major radius of the 95%
+                                   confidence level position error ellipse
+ 52- 57   F6.2   ---    CSCv2_S/N    [0.91/376.06] [0.91/376.06] CSCv2 master
+                                   source X-ray significance
+ 59- 66   E8.3   mW/m2  Fs           [0.0/0.01] [0.0/0.01] Average soft (0.5-1.2
+                                   keV) band flux
+ 68- 72   E5.1   mW/m2  e_Fs         [0.0/0.01] [0.0/0.01] 1-sigma Fs
+                                   uncertainty
+ 74- 81   E8.3   mW/m2  Fm           [0.0/0.01] [0.0/0.01] Average medium (1.2-2
+                                   keV) band flux
+ 83- 87   E5.1   mW/m2  e_Fm         [0.0/0.01] [0.0/0.01] 1-sigma Fm
+                                   uncertainty
+ 89- 97   E9.4   mW/m2  Fh           [0.0/0.01] [0.0/0.01] Average hard (2-7
+                                   keV) band flux
+ 99-103   E5.1   mW/m2  e_Fh         [0.0/0.01] [0.0/0.01] 1-sigma Fh
+                                   uncertainty
+105-113   E9.4   mW/m2  Fb           [0.0/0.01] [0.0/0.01] Average broad (0.5-7
+                                   keV) band flux
+115-119   E5.1   mW/m2  e_Fb         [0.0/0.01] [0.0/0.01] 1-sigma Fb
+                                   uncertainty
+121-126   F6.3   ---    P_intra      ? Highest value of Kuiper’s test
+                                   variability probability across all
+                                   observations available in CSCv2
+128-133   F6.3   ---    P_inter      [0.0/1.0]? Inter-observation variability
+                                   probability
+135-141   F7.3   mag    Gmag         [3.32/21.86]? Gaia EDR3 G band magnitude
+143-148   F6.3   mag    e_Gmag       [0.0/0.1]? 1-sigma Gmag uncertainty
+150-156   F7.3   mag    BPmag        [4.02/22.6]? Gaia EDR3 BP band magnitude
+158-163   F6.3   mag    e_BPmag      [0.0/1.0]? 1-sigma BPmag uncertainty
+165-171   F7.3   mag    RPmag        [2.64/21.0]? Gaia EDR3 RP band magnitude
+173-178   F6.3   mag    e_RPmag      [0.0/0.8]? 1-sigma RPmag uncertainty
+180-185   F6.2   mag    Jmag         [1.5/18.68]? 2MASS J band magnitude
+187-192   F6.2   mag    e_Jmag       [0.02/10.0]? 1-sigma Jmag uncertainty
+194-199   F6.2   mag    Hmag         [0.5/17.95]? 2MASS H band magnitude
+201-205   F5.2   mag    e_Hmag       [0.01/0.4]? 1-sigma Hmag uncertainty
+207-212   F6.2   mag    Kmag         [0.1/16.97]? 2MASS K band magnitude
+214-218   F5.2   mag    e_Kmag       [0.01/0.4]? 1-sigma Kmag uncertainty
+220-227   F8.4   mag    W1mag        [-1.8/18.9]? W1 band magnitude from
+                                   AllWISE, CatWISE2020 and unWISE catalogs
+229-235   F7.4   mag    e_W1mag      [0.0/0.5]? 1-sigma W1 uncertainty
+237-244   F8.4   mag    W2mag        [-2.0/18.3]? W2 band magnitude from
+                                   AllWISE, CatWISE2020 and unWISE catalogs
+246-252   F7.4   mag    e_W2mag      [0.0/2.0]? 1-sigma W2 uncertainty
+254-259   F6.2   mag    W3mag        [-6.65/13.65]? W3 band magnitude from
+                                   AllWISE, CatWISE2020 and unWISE catalogs
+261-265   F5.2   mag    e_W3mag      [0.01/0.5]? 1-sigma W3 uncertainty
+267-272   F6.2   mas    Plx          [-4.0/31.8]? Gaia EDR3 absolute stellar
+                                   parallax
+274-278   F5.2   mas    e_Plx        [0.01/3.0]? 1-sigma Plx uncertainty
+280-286   F7.3   mas/yr PM           [0.0/99.24]? Gaia EDR3 total proper
+                                   motion
+288-295   F8.1   pc     rgeo         [31.0/20780.0]? Median of the geometric
+                                   distance from Gaia EDR3 Distances catalog
+297-304   F8.1   pc     b_rgeo       [31.0/16661.0]? 16th percentile of the
+                                   geometric distance from Gaia EDR3 Distances
+                                   catalog
+306-313   F8.1   pc     B_rgeo       [31.0/36992.0]? 84th percentile of the
+                                   geometric distance from Gaia EDR3 Distances
+                                   catalog
+315-320   F6.4   ---    P_AGN         Classification probability of the X-ray
+                                   source to be classified as an AGN
+322-327   F6.4   ---    P_CV          Classification probability of the X-ray
+                                   source to be classified as a CV
+329-334   F6.4   ---    P_HM-STAR     Classification probability of the X-ray
+                                   source to be classified as a HM-STAR
+336-341   F6.4   ---    P_HMXB        Classification probability of the X-ray
+                                   source to be classified as a HMXB
+343-348   F6.4   ---    P_LM-STAR     Classification probability of the X-ray
+                                   source to be classified as a LM-STAR
+350-355   F6.4   ---    P_LMXB        Classification probability of the X-ray
+                                   source to be classified as a LMXB
+357-362   F6.4   ---    P_NS          Classification probability of the X-ray
+                                   source to be classified as a NS
+364-369   F6.4   ---    P_YSO         Classification probability of the X-ray
+                                   source to be classified as a YSO
+371-376   F6.4   ---    e_P_AGN       1-sigma P_AGN uncertainty
+378-383   F6.4   ---    e_P_CV        1-sigma P_CV uncertainty
+385-390   F6.4   ---    e_P_HM-STAR   1-sigma P_HM-STAR uncertainty
+392-397   F6.4   ---    e_P_HMXB      1-sigma P_HMXB uncertainty
+399-404   F6.4   ---    e_P_LM-STAR   1-sigma P_LM-STAR uncertainty
+406-411   F6.4   ---    e_P_LMXB      1-sigma P_LMXB uncertainty
+413-418   F6.4   ---    e_P_NS        1-sigma P_NS uncertainty
+420-425   F6.4   ---    e_P_YSO       1-sigma P_YSO uncertainty
+427-433   A7     ---    Class         The predicted class of the source with the
+                                   highest classification probability among
+                                   eight classes
+435-440   F6.4   ---    Class_prob   [0.23/1.0] [0.23/1.0] The classification
+                                   probability of the predicted class calculated
+                                   from MUWCLASS
+442-447   F6.4   ---    e_Class_prob [0.0/0.3] [0.0/0.3] 1-sigma Class_prob
+                                   uncertainty
+449-456   F8.3   ---    CT           [0.0/1310.21] [0.0/1310.21] The
+                                   classification confidence threshold
+458-475   A18    ---    CSCv2_flags  ? The compilation of CSCv2 master source
+                                   flags including conf flag (“conf”), extent
+                                   flag (“extent”), and pileup flag (“pileup”),
+                                   jointed by a “|”
+477-508   A32    ---    Catalog_name  The name of the source from the literature
+                                   verified catalogs for the classification of
+                                   TD sources
+510-516   A7     ---    True_Class    The true class of the source from the TD
+518-551   A34    ---    Class_ref     The reference of the classifications of
+                                   the TD source
+
+--------------------------------------------------------------------------------
+
+Byte-by-byte Description of file: hess.dat
+--------------------------------------------------------------------------------
+  Bytes  Format  Units  Label        Explanations
+--------------------------------------------------------------------------------
+  1- 21   A21    ---    CSCv2_name    CSCv2 source name in the form “2CXO
+                                   Jhhmmss.s{+|–}ddmmss”
+ 23- 33   F11.7  deg    CSCv2_RA     [153.95/296.0] CSCv2 master source J2000
+                                   Right Ascension
+ 35- 45   F11.7  deg    CSCv2_DEC    [-62.44/21.36] CSCv2 master source J2000
+                                   Declination
+ 47- 51   F5.2   arcsec CSCv2_PU     [0.71/17.07] [0.71/17.07] CSCv2 master
+                                   source err_ellipse_r0, the major radius of
+                                   the 95% confidence level position error
+                                   ellipse
+ 53- 58   F6.2   ---    CSCv2_S/N    [2.17/107.71] [2.17/107.71] CSCv2 master
+                                   source X-ray significance
+ 60- 67   E8.3   mW/m2  Fs           [0.0/0.01] [0.0/0.01] Average soft (0.5-1.2
+                                   keV) band flux
+ 69- 73   E5.1   mW/m2  e_Fs         [0.0/0.01] [0.0/0.01] 1-sigma Fs
+                                   uncertainty
+ 75- 82   E8.3   mW/m2  Fm           [0.0/0.01] [0.0/0.01] Average medium (1.2-2
+                                   keV) band flux
+ 84- 88   E5.1   mW/m2  e_Fm         [0.0/0.01] [0.0/0.01] 1-sigma Fm
+                                   uncertainty
+ 90- 97   E8.3   mW/m2  Fh           [0.0/0.01] [0.0/0.01] Average hard (2-7
+                                   keV) band flux
+ 99-103   E5.1   mW/m2  e_Fh         [0.0/0.01] [0.0/0.01] 1-sigma Fh
+                                   uncertainty
+105-112   E8.3   mW/m2  Fb           [0.0/0.01] [0.0/0.01] Average broad (0.5-7
+                                   keV) band flux
+114-118   E5.1   mW/m2  e_Fb         [0.0/0.01] [0.0/0.01] 1-sigma Fb
+                                   uncertainty
+120-125   F6.3   ---    P_intra      ? Highest value of Kuiper’s test
+                                   variability probability across all
+                                   observations available in CSCv2
+127-132   F6.3   ---    P_inter      [0.0/1.0]? Inter-observation variability
+                                   probability
+134-140   F7.3   mag    Gmag         [7.52/21.36]? Gaia EDR3 G band magnitude
+142-147   F6.3   mag    e_Gmag       [0.0/0.06]? 1-sigma Gmag uncertainty
+149-155   F7.3   mag    BPmag        [7.79/23.3]? Gaia EDR3 BP band magnitude
+157-162   F6.3   mag    e_BPmag      [0.0/1.0]? 1-sigma BPmag uncertainty
+164-170   F7.3   mag    RPmag        [7.1/21.29]? Gaia EDR3 RP band magnitude
+172-177   F6.3   mag    e_RPmag      [0.0/0.7]? 1-sigma RPmag uncertainty
+179-184   F6.2   mag    Jmag         [6.67/18.04]? 2MASS J band magnitude
+186-190   F5.2   mag    e_Jmag       [0.02/0.4]? 1-sigma Jmag uncertainty
+192-197   F6.2   mag    Hmag         [6.44/16.3]? 2MASS H band magnitude
+199-203   F5.2   mag    e_Hmag       [0.02/0.7]? 1-sigma Hmag uncertainty
+205-210   F6.2   mag    Kmag         [5.61/16.8]? 2MASS K band magnitude
+212-216   F5.2   mag    e_Kmag       [0.01/1.0]? 1-sigma Kmag uncertainty
+218-225   F8.4   mag    W1mag        [-1.7/17.72]? W1 band magnitude from
+                                   AllWISE, CatWISE2020 and unWISE catalogs
+227-233   F7.4   mag    e_W1mag      [0.0/0.4]? 1-sigma W1 uncertainty
+235-242   F8.4   mag    W2mag        [0.46/17.96]? W2 band magnitude from
+                                   AllWISE, CatWISE2020 and unWISE catalogs
+244-250   F7.4   mag    e_W2mag      [0.0/0.9]? 1-sigma W2 uncertainty
+252-257   F6.2   mag    W3mag        [-4.46/12.76]? W3 band magnitude from
+                                   AllWISE, CatWISE2020 and unWISE catalogs
+259-263   F5.2   mag    e_W3mag      [0.01/0.5]? 1-sigma W3 uncertainty
+265-270   F6.2   mas    Plx          [-3.0/19.63]? Gaia EDR3 absolute stellar
+                                   parallax
+272-276   F5.2   mas    e_Plx        [0.01/2.0]? 1-sigma Plx uncertainty
+278-285   F8.3   mas/yr PM           [0.15/104.35]? Gaia EDR3 total proper
+                                   motion
+287-293   F7.1   pc     rgeo         [51.0/9373.0]? Median of the geometric
+                                   distance from Gaia EDR3 Distances catalog
+295-301   F7.1   pc     b_rgeo       [51.0/6799.0]? 16th percentile of the
+                                   geometric distance from Gaia EDR3 Distances
+                                   catalog
+303-310   F8.1   pc     B_rgeo       [51.0/17341.0]? 84th percentile of the
+                                   geometric distance from Gaia EDR3 Distances
+                                   catalog
+312-317   F6.4   ---    P_AGN         Classification probability of the X-ray
+                                   source to be classified as an AGN
+319-324   F6.4   ---    P_CV          Classification probability of the X-ray
+                                   source to be classified as a CV
+326-331   F6.4   ---    P_HM-STAR     Classification probability of the X-ray
+                                   source to be classified as a HM-STAR
+333-338   F6.4   ---    P_HMXB        Classification probability of the X-ray
+                                   source to be classified as a HMXB
+340-345   F6.4   ---    P_LM-STAR     Classification probability of the X-ray
+                                   source to be classified as a LM-STAR
+347-352   F6.4   ---    P_LMXB        Classification probability of the X-ray
+                                   source to be classified as a LMXB
+354-359   F6.4   ---    P_NS          Classification probability of the X-ray
+                                   source to be classified as a NS
+361-365   F5.3   ---    P_YSO         Classification probability of the X-ray
+                                   source to be classified as a YSO
+367-372   F6.4   ---    e_P_AGN       1-sigma P_AGN uncertainty
+374-379   F6.4   ---    e_P_CV       [0.0/0.3] [0.0/0.3] 1-sigma P_CV
+                                   uncertainty
+381-386   F6.4   ---    e_P_HM-STAR  [0.0/0.3] [0.0/0.3] 1-sigma P_HM-STAR
+                                   uncertainty
+388-393   F6.4   ---    e_P_HMXB      1-sigma P_HMXB uncertainty
+395-400   F6.4   ---    e_P_LM-STAR   1-sigma P_LM-STAR uncertainty
+402-407   F6.4   ---    e_P_LMXB     [0.0/0.3] [0.0/0.3] 1-sigma P_LMXB
+                                   uncertainty
+409-414   F6.4   ---    e_P_NS        1-sigma P_NS uncertainty
+416-420   F5.3   ---    e_P_YSO      [0.0/0.2] [0.0/0.2] 1-sigma P_YSO
+                                   uncertainty
+422-428   A7     ---    Class         The predicted class of the source with the
+                                   highest classification probability among
+                                   eight classes
+430-433   F4.2   ---    Class_prob   [0.2/0.99] [0.2/0.99] The classification
+                                   probability of the predicted class calculated
+                                   from MUWCLASS
+435-438   F4.2   ---    e_Class_prob [0.02/0.3] [0.02/0.3] 1-sigma Class_prob
+                                   uncertainty
+440-445   F6.3   ---    CT            The classification confidence threshold
+447-464   A18    ---    CSCv2_flags  ? The compilation of CSCv2 master source
+                                   flags including conf flag (“conf”), extent
+                                   flag (“extent”), and pileup flag (“pileup”),
+                                   jointed by a “|”
+466-488   A23    ---    Catalog_name ? The name of the source from the
+                                   literature verified catalogs for the
+                                   classification of TD sources
+490-496   A7     ---    True_Class   ? The true class of the source from the TD
+498-531   A34    ---    Class_ref    ? The reference of the classifications of
+                                   the TD source
+533-541   A9     ---    HESS_name     The HESS source name that the CSCv2 source
+                                   resides in
+
+--------------------------------------------------------------------------------
+
+Acknowledgements:
+    Hui Yang, huiyang(at)gwmail.gwu.edu
+
+================================================================================
+     (prepared by author  / pyreadme )

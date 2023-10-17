@@ -39,8 +39,8 @@ def inverse_great_circle(r1, dec1, sep, pos_angle):
     r1, dec1 : float or `~numpy.ndarray`
         The right ascension and declination of the first point in degrees.
     sep, pos_angle : float or `~numpy.ndarray`
-        The angular separation between the two points in degrees and the position angle of the 
-        second point relative to the great circle connecting the two points in degrees.
+        The angular separation between the two points in radians and the position angle of the 
+        second point relative to the great circle connecting the two points in radians.
 
     Returns
     -------
@@ -188,7 +188,7 @@ def wcs_to_physical(fn, xy, rad, fmt):
         return xy   
     
     
-def get_reg_phys(fn_evt2, dat_csv,save_reg=False):
+def get_reg_phys(fn_evt2, dat_csv,save_reg=False,text=False):
     
     max_points = 20 # d.set(reg) has limits on length of input
     
@@ -210,9 +210,14 @@ def get_reg_phys(fn_evt2, dat_csv,save_reg=False):
 
         #ra, dec = [':'.join(row[_].strip().split()) for _ in ['ra', 'dec']]
         ra, dec = [':'.join(row[_].strip().split()) for _ in ['ra_hms', 'dec_dms']]
-
-
-        reg_points.append(f'point {ra} {dec}; ')
+        if text:
+            text = row['name']
+            #print(text)
+            #reg_points.append(f'point {ra} {dec}; ')
+            #reg_points.append(f'point {ra} {dec} 3" # point=circle text={text} color=blue; ')
+            reg_points.append(f'circle {ra} {dec} 20p # text={text} color=blue; ')
+        else:
+            reg_points.append(f'point {ra} {dec} ; ')
 
     reg_end = '"' 
     
@@ -233,12 +238,15 @@ def get_reg_phys(fn_evt2, dat_csv,save_reg=False):
         with open(save_reg, 'w') as f:
             f.write(d.get('regions'))
 
-    reg_phys = re.findall(r'\((.*?)\)', d.get('regions'))
-    reg_phys = np.array([_.split(',') for _ in reg_phys]).astype(float)
-        
-    # d.set('exit')  
-    
-    return reg_phys
+    if text:
+        return None
+    else:
+        reg_phys = re.findall(r'\((.*?)\)', d.get('regions'))
+        reg_phys = np.array([_.split(',') for _ in reg_phys]).astype(float)
+
+        # d.set('exit')  
+
+        return reg_phys
 
 def find_obs(df_per, ra, dec,filter=True):
     df_per = df_per[df_per['instrument']=='ACIS'].reset_index()
@@ -1104,7 +1112,7 @@ def prepare_evts_plot_xray_class(field_name, ra_field, dec_field, radius, data_d
 
             if include_TD and len(TD_csv) >0:
                 i = 0
-                TD_phys = get_reg_phys(fn_evt2, TD_csv,save_reg=f'{data_dir}/{field_name}{conf}_TD.reg')
+                TD_phys = get_reg_phys(fn_evt2, TD_csv,text=False)#,save_reg=f'{data_dir}/{field_name}{conf}_TD.reg')
                 for j, cat in TD_csv.iterrows(): 
                     
                     
@@ -1152,50 +1160,57 @@ def prepare_evts_plot_xray_class(field_name, ra_field, dec_field, radius, data_d
             # d.set('exit')  
     return evt2_data,  fn_evt2
 
-def prepare_evts_plot_xray_class_ellipse(field_name, ra_fields, dec_fields, r0s, r1s, PAs, data_dir, dir_out,find_obs_filter=True,include_TD=False,TeV_extent='p',rerun=False,obsids=False):
+def prepare_evts_plot_xray_class_ellipse(field_name, ra_fields, dec_fields, r0s, r1s, PAs, data_dir, dir_out,find_obs_filter=True,include_TD=False,TeV_extent='p',rerun=False,obsids=False,sig_cut=1,srcs_list=[]):
 
-    evt2_dir = dir_out+'/evt2'
-    dir_plot = data_dir+'/plot'
+    evt2_dir = data_dir+'/evt2'
+    dir_plot = dir_out+'/plot'
+    merged_evts = f'{field_name}_obsid_merged_evt.fits'
+    #print(merged_evts)
+    #print(os.listdir(evt2_dir))
+    if merged_evts in os.listdir(evt2_dir):
+        fn_evt2 = f'{evt2_dir}/{merged_evts}'
+    else:
+        fn_evt2 = glob.glob(f'{evt2_dir}/acisf*evt2.fits.gz')[0]
     #evt2_dir = dir_plot+'/evt2'
-    Path(dir_plot).mkdir(parents=True, exist_ok=True)
-    Path(evt2_dir).mkdir(parents=True, exist_ok=True)
-    obsids_info = {}
-    obj_info = {}
-    merge_script = []
+    # Path(dir_plot).mkdir(parents=True, exist_ok=True)
+    # Path(evt2_dir).mkdir(parents=True, exist_ok=True)
+    # obsids_info = {}
+    # obj_info = {}
+    # merge_script = []
 
-    if obsids==False:
-        df_per = pd.read_csv(f'{data_dir}/{field_name}_conesearch.csv')
-        obsids = find_obs(df_per,ra_field,dec_field,filter=find_obs_filter)#.astype(str)
-        #if field_name == 'J1023-575':
-        #    obsids = [21848]
+    # if obsids==False:
+    #     df_per = pd.read_csv(f'{data_dir}/{field_name}_conesearch.csv')
+    #     obsids = find_obs(df_per,ra_field,dec_field,filter=find_obs_filter)#.astype(str)
+    #     #if field_name == 'J1023-575':
+    #     #    obsids = [21848]
 
-        print(obsids)
-    else:
-        pass
-    os.system('rm -rf to_merge.sh')
-    if len(obsids) == 1:
-        url, fn = get_evt2_file(obsids[0], path=evt2_dir) 
-        obj_info[field_name] = fn
-    else:
-        merged_fn = f'{field_name}_merged_evt.fits'
-        obj_info[field_name] = evt2_dir + '/' + merged_fn
+    #     print(obsids)
+    # else:
+    #     pass
+    # os.system('rm -rf to_merge.sh')
+    # if len(obsids) == 1:
+    #     url, fn = get_evt2_file(obsids[0], path=evt2_dir) 
+    #     obj_info[field_name] = fn
+    # else:
+    #     merged_fn = f'{field_name}_merged_evt.fits'
+    #     obj_info[field_name] = evt2_dir + '/' + merged_fn
 
-        if merged_fn not in os.listdir(evt2_dir) or rerun==True:             
+    #     if merged_fn not in os.listdir(evt2_dir) or rerun==True:             
 
-            merge_script += [
-                f"download_chandra_obsid {','.join(str(obs) for obs in obsids)}",
-                'punlearn merge_obs',
-                f"merge_obs {'/,'.join(str(obs) for obs in obsids)}/ tmp clobber=yes",
-                f'mv tmp_merged_evt.fits ../{merged_fn}',
-                'rm tmp*' 
-            ]
+    #         merge_script += [
+    #             f"download_chandra_obsid {','.join(str(obs) for obs in obsids)}",
+    #             'punlearn merge_obs',
+    #             f"merge_obs {'/,'.join(str(obs) for obs in obsids)}/ tmp clobber=yes",
+    #             f'mv tmp_merged_evt.fits ../{merged_fn}',
+    #             'rm tmp*' 
+    #         ]
 
-    if len(merge_script):
-        merge_script = [f'mkdir -p {evt2_dir}/merged', f'cd {evt2_dir}/merged'] + merge_script                
-        open('to_merge.sh', 'w').write('\n'.join(merge_script)) 
-        print("run 'bash to_merge.sh' to get and merge obsids")
+    # if len(merge_script):
+    #     merge_script = [f'mkdir -p {evt2_dir}/merged', f'cd {evt2_dir}/merged'] + merge_script                
+    #     open('to_merge.sh', 'w').write('\n'.join(merge_script)) 
+    #     print("run 'bash to_merge.sh' to get and merge obsids")
  
-    os.system('bash to_merge.sh')
+    # os.system('bash to_merge.sh')
 
     wolfram_colors = [[0., 0.52, 1.], [1., 0.72, 0.], [1., 0., 0.], [0., 0.7, 0.7], 
                   [0.51, 0.5, 1.], [0.784, 0.8, 0.], [0.8, 0., 0.48], 
@@ -1264,7 +1279,7 @@ def prepare_evts_plot_xray_class_ellipse(field_name, ra_fields, dec_fields, r0s,
 
         obj = field_name
 
-        fn_evt2 = obj_info[obj]
+        #fn_evt2 = obj_info[obj]
         # fits.info(fn_evt2)
         evt2_data, head = process_fits(fn_evt2)
 
@@ -1272,8 +1287,15 @@ def prepare_evts_plot_xray_class_ellipse(field_name, ra_fields, dec_fields, r0s,
         
         #print(evt2_data)
         #print(dir_out)
-        all_csv = pd.read_csv(f'{data_dir}/{field_name}_class.csv')
+        all_csv = pd.read_csv(f'{dir_out}/{field_name}_class.csv')
+        all_csv = all_csv[(all_csv['significance']>=sig_cut) | (~all_csv['true_Class'].isnull()) | (all_csv['name'].isin(srcs_list))].reset_index(drop=True)
+        all_csv = all_csv.drop_duplicates(subset=['X_name']).reset_index(drop=True)
+        #all_csv[['reg_phys_x', 'reg_phys_y']] = get_reg_phys(fn_evt2, all_csv)
+
         test_csv = all_csv[all_csv.true_Class.isnull()].reset_index(drop=True)
+
+        #all_csv = pd.read_csv(f'{data_dir}/{field_name}_class.csv')
+        #test_csv = all_csv[all_csv.true_Class.isnull()].reset_index(drop=True)
         if include_TD:
             TD_csv = all_csv[all_csv.Class.isnull()].reset_index(drop=True)
             #print(len(test_csv), len(TD_csv))
@@ -1289,7 +1311,7 @@ def prepare_evts_plot_xray_class_ellipse(field_name, ra_fields, dec_fields, r0s,
             #reg_phys = get_reg_phys(fn_evt2, dat_csv)
             
             reg_all = get_reg_phys(fn_evt2, test_csv)
-            reg_phys = get_reg_phys(fn_evt2, dat_csv,save_reg=f'{data_dir}/{field_name}{conf}.reg')
+            reg_phys = get_reg_phys(fn_evt2, dat_csv)#,save_reg=f'{data_dir}/{field_name}{conf}.reg')
 
             width = max(reg_all[:,0].max() - reg_all[:,0].min(), reg_all[:,1].max() - reg_all[:,1].min())
 
@@ -1371,7 +1393,7 @@ def prepare_evts_plot_xray_class_ellipse(field_name, ra_fields, dec_fields, r0s,
 
             if include_TD and len(TD_csv) >0:
                 i = 0
-                TD_phys = get_reg_phys(fn_evt2, TD_csv,save_reg=f'{data_dir}/{field_name}{conf}_TD.reg')
+                TD_phys = get_reg_phys(fn_evt2, TD_csv,text=False)#save_reg=f'{data_dir}/{field_name}{conf}_TD.reg')
                 for j, cat in TD_csv.iterrows(): 
                     
                     
@@ -1403,7 +1425,7 @@ def prepare_evts_plot_xray_class_ellipse(field_name, ra_fields, dec_fields, r0s,
             for ra_field, dec_field, r0, r1, PA in zip(ra_fields, dec_fields, r0s, r1s, PAs):
                 ra2s, dec2s = celestial_ellipse(ra_field, dec_field, r0, r1, PA)
                 df_FGL_ellipse = pd.DataFrame(data={'ra':ra2s, 'dec':dec2s})
-                reg_phys_ell = get_reg_phys(fn_evt2, df_FGL_ellipse)
+                reg_phys_ell = get_reg_phys(fn_evt2, df_FGL_ellipse, text=False)
 
                 #print(reg_phys_ellipse)
                 ras_ellip = np.array([xy[0] for xy in  reg_phys_ell])
@@ -1422,6 +1444,23 @@ def prepare_evts_plot_xray_class_ellipse(field_name, ra_fields, dec_fields, r0s,
 
             # d.set('exit')  
     return evt2_data,  fn_evt2, reg_phys_ellipse
+
+def save_reg(field_name, evt2_data, fn_evt2, data_dir, sig_cut=2.95,srcs_list=[]):
+    
+    all_csv = pd.read_csv(f'{data_dir}/{field_name}_class_rename.csv')
+    all_csv = all_csv[(all_csv['significance']>=sig_cut) | (~all_csv['true_Class'].isnull()) | (all_csv['name'].isin(srcs_list))].reset_index(drop=True)
+    #print(all_csv[['name','ra']])
+    all_csv = all_csv.drop_duplicates(subset=['X_name']).reset_index(drop=True)
+    #print(all_csv[['name','ra']])
+    #all_csv[['reg_phys_x', 'reg_phys_y']] = get_reg_phys(fn_evt2, all_csv)
+
+    #test_csv = all_csv#[all_csv.true_Class.isnull()].reset_index(drop=True)
+
+    if len(all_csv)>0:
+        #reg_all = get_reg_phys(fn_evt2, test_csv)
+        reg_phys = get_reg_phys(fn_evt2, all_csv,save_reg=f'{data_dir}/{field_name}.reg',text=True)
+        
+    return None
 
 import holoviews as hv
 from bokeh.plotting import figure, show
@@ -1619,7 +1658,8 @@ from bokeh.models import HoverTool
 hover = HoverTool(tooltips=[ #("error", "$x"),
                             ('Class','@Class'),
                             ('name', '@name'),
-                            ('PU_X','@PU_X'),
+                            #('PU_X','@PU_X'),
+                            ('r0','@r0'),
                             ('significance','@significance'),
                             ('F_b','@F_b'),
                             ('HR_hms','@HR_hms'),
@@ -1651,7 +1691,7 @@ hover3 = HoverTool(tooltips=[
                            ])
 #'''
 
-def interactive_Ximg_class_ellipse(field_name, fgl_name, evt2_data, fn_evt2, dir_out,reg_phys_ellipse,include_TD=False,TeV_extent='p',include_others=pd.DataFrame(),sig_cut=0,suffix=''):
+def interactive_Ximg_class_ellipse(field_name, fgl_name, evt2_data, fn_evt2, dir_out,reg_phys_ellipse,include_TD=False,TeV_extent='p',include_others=pd.DataFrame(),sig_cut=3,suffix=''):
 
     dir_plot = dir_out+'/plot'
     #Path(dir_plot).mkdir(parents=True, exist_ok=True)
@@ -1689,8 +1729,10 @@ def interactive_Ximg_class_ellipse(field_name, fgl_name, evt2_data, fn_evt2, dir
     #cxo_obs = hv.Image(np.flip(H.T, axis=0)).opts(logz=True, cmap='hot', clim=(0.01,H.max()), width=int(800), height=int(800*h/w))
 
     all_csv = pd.read_csv(f'{dir_out}/{field_name}_class.csv')
-    all_csv = all_csv[(all_csv['significance']>=sig_cut) | (~all_csv['true_Class'].isnull())].reset_index(drop=True)
     all_csv[['reg_phys_x', 'reg_phys_y']] = get_reg_phys(fn_evt2, all_csv)
+    df_insif = all_csv[(all_csv['significance']<sig_cut)].reset_index(drop=True)
+    all_csv = all_csv[(all_csv['significance']>=sig_cut) | (~all_csv['true_Class'].isnull())].reset_index(drop=True)
+    
 
     rmin = 5
     rmax = 20
@@ -1723,7 +1765,7 @@ def interactive_Ximg_class_ellipse(field_name, fgl_name, evt2_data, fn_evt2, dir
     if len(df_inconf)>0:
         markers=hv.dim("Class").categorize({'AGN': 'circle', 'NS': 'triangle', 'CV': 'hex', 'LM-STAR': 'star', 'HM-STAR': 'square', 'LMXB': 'inverted_triangle', 'YSO': 'diamond', 'HMXB':'square_pin','NS+LMXB':'plus'}, default="circle")
 
-        scatter1 = df_inconf.hvplot.scatter('reg_phys_x', 'reg_phys_y', color='Class', marker=markers, size="ms",line_width='wd',hover_cols=['name','PU_X','significance','F_b','HR_hms','P_inter','var_intra_prob','Gmag','Jmag','W1mag','GAIA_Plx','RPlx','rgeo','cp_counts','CT','Class','Class_prob','NET_COUNTS','mw_p_i','mw_p_any','wd']#'wd','ms']
+        scatter1 = df_inconf.hvplot.scatter('reg_phys_x', 'reg_phys_y', color='Class', marker=markers, size="ms",line_width='wd',hover_cols=['name','r0','significance','F_b','HR_hms','P_inter','var_intra_prob','Gmag','Jmag','W1mag','GAIA_Plx','RPlx','rgeo','cp_counts','CT','Class','Class_prob','NET_COUNTS','mw_p_i','mw_p_any','wd']#'wd','ms']
             ).opts(tools=[hover],
             cmap={'AGN': 'cyan', 'NS': 'magenta', 'CV': 'orange', 'LM-STAR': 'gold', 'HM-STAR': 'deepskyblue', 'LMXB': 'lime', 'YSO': 'blue','HMXB':'peru','NS+LMXB':'lightgreen'},
             #size=hv.dim("Class").categorize({'Unconfident Classification': 20}, default=10),
@@ -1740,7 +1782,7 @@ def interactive_Ximg_class_ellipse(field_name, fgl_name, evt2_data, fn_evt2, dir
     if len(df_conf)>0:
         for clas, (color, marker) in conf_class_colors.items():
             if len(df_conf[df_conf['conf_Class']==clas])>0:
-                scatter2 = df_conf[df_conf['conf_Class']==clas].hvplot.scatter('reg_phys_x', 'reg_phys_y', color=color, marker=marker, size="ms",line_width='wd',hover_cols=['name','PU_X','significance','F_b','HR_hms','P_inter','var_intra_prob','Gmag','Jmag','W1mag','GAIA_Plx','RPlx','rgeo','cp_counts','CT','Class','Class_prob','NET_COUNTS','mw_p_i','mw_p_any','wd'],label=clas#'wd','ms']
+                scatter2 = df_conf[df_conf['conf_Class']==clas].hvplot.scatter('reg_phys_x', 'reg_phys_y', color=color, marker=marker, size="ms",line_width='wd',hover_cols=['name','r0','significance','F_b','HR_hms','P_inter','var_intra_prob','Gmag','Jmag','W1mag','GAIA_Plx','RPlx','rgeo','cp_counts','CT','Class','Class_prob','NET_COUNTS','mw_p_i','mw_p_any','wd'],label=clas#'wd','ms']
                     ).opts(tools=[hover],
                     #cmap={'CF-AGN': 'cyan', 'CF-NS': 'magenta', 'CF-CV': 'blue', 'CF-LM-STAR': 'gold', 'CF-HM-STAR': 'deepskyblue', 'CF-LMXB': 'lime', 'CF-YSO': 'orange','CF-HMXB':'peru','CF-NS+LMXB':'lightgreen'},
                     #size=hv.dim("Class").categorize({'Unconfident Classification': 20}, default=10),
@@ -1756,12 +1798,27 @@ def interactive_Ximg_class_ellipse(field_name, fgl_name, evt2_data, fn_evt2, dir
         #e_color = 'blue' if df_conf.iloc[0]['TeV_extent'] == 'extent' else 'g'
         e_color = 'blue' if TeV_extent == 'e' else 'g'
 
+    if len(df_insif)>0:
+        scatter22 = df_insif.hvplot.scatter('reg_phys_x', 'reg_phys_y', color='white', marker='o', size=20,line_width=1,hover_cols=['name','r0','significance','Class'], label='S/N<3'#'wd','ms']
+            ).opts(#tools=[hover],
+            #cmap={'CF-AGN': 'cyan', 'CF-NS': 'magenta', 'CF-CV': 'blue', 'CF-LM-STAR': 'gold', 'CF-HM-STAR': 'deepskyblue', 'CF-LMXB': 'lime', 'CF-YSO': 'orange','CF-HMXB':'peru','CF-NS+LMXB':'lightgreen'},
+            #size=hv.dim("Class").categorize({'Unconfident Classification': 20}, default=10),
+            #line_width=hv.dim("wd"),
+            alpha=0.,
+            line_alpha=1,
+            show_legend=True,
+            muted_alpha=0,
+            #show_legend=False,
+            #muted_alpha=1
+            )
+        plot_layers = plot_layers * scatter22
+
     if include_TD==True and len(TD_csv)>0:
 
         #markers3=hv.dim("true_Class").categorize({'AGN': 'circle', 'NS': 'inverted_triangle', 'CV': 'hex', 'LM-STAR': 'star', 'HM-STAR': 'triangle', 'LMXB': 'circle_dot', 'YSO': 'diamond', 'HMXB':'diamond_cross','NS+LMXB':'plus','Unconfident Classification': 'triangle'}, default="circle")
         markers3=hv.dim("true_Class").categorize({'AGN': 'circle', 'NS': 'triangle', 'CV': 'hex', 'LM-STAR': 'star', 'HM-STAR': 'square', 'LMXB': 'inverted_triangle', 'YSO': 'diamond', 'HMXB':'square_pin','NS+LMXB':'plus'}, default="circle")
 
-        scatter3 = TD_csv.hvplot.scatter('reg_phys_x', 'reg_phys_y', color="white", marker=markers3, size=800,line_width=1,hover_cols=['name','PU_X','significance','F_b','HR_hms','P_inter','P_intra','G','J','W1','cp_counts','CSC_flags']#'wd','ms']],#'wd','ms']
+        scatter3 = TD_csv.hvplot.scatter('reg_phys_x', 'reg_phys_y', color="white", marker=markers3, size=800,line_width=1,hover_cols=['name','r0','significance','F_b','HR_hms','P_inter','P_intra','G','J','W1','cp_counts','CSC_flags']#'wd','ms']],#'wd','ms']
             ).opts(tools=[hover2],
             #cmap={'AGN': 'white', 'NS': 'white', 'CV': 'white', 'LM-STAR': 'white', 'HM-STAR': 'white', 'LMXB': 'white', 'YSO': 'white','HMXB':'white','NS+LMXB':'white'},
             #size=hv.dim("Class").categorize({'Unconfident Classification': 20}, default=10),
@@ -1831,28 +1888,54 @@ def interactive_Ximg_class_ellipse(field_name, fgl_name, evt2_data, fn_evt2, dir
 
     return plot#()
 
-def interactive_Ximg_class_ellipse_noclass(field_name, fgl_name, fgl_names, evt2_data, fn_evt2, dir_out,reg_phys_ellipse,include_TD=False,TeV_extent='p',include_others=pd.DataFrame(),sig_cut=0,suffix='',srcs_list=[]):
+def interactive_Ximg_class_ellipse_noclass(field_name, fgl_name, fgl_names, evt2_data, fn_evt2, dir_out,reg_phys_ellipse,include_TD=False,TeV_extent='p',include_others=pd.DataFrame(),sig_cut=0,suffix='',srcs_list=[],zoomin=True,center_coord=[0,0]):
 
     dir_plot = dir_out+'/plot'
     #Path(dir_plot).mkdir(parents=True, exist_ok=True)
+    text_size=25
+    if zoomin:
+        size = 0.045 # deg
+        #height = 0.5 # deg
+        center_ra, center_dec = center_coord[0], center_coord[1]
+        num = 11
+        ras_squares, dec_squares = [ f+center_ra for f in np.linspace(-1*size, size, num)/np.cos(center_dec*np.pi/180)], [center_dec-size for i in range(num)]
+        for i, f in enumerate(np.linspace(-1*size, size, num)):
+            ras_squares.append(center_ra+size/np.cos(center_dec*np.pi/180))
+            #print(center_dec-size+f)
+            dec_squares.append(center_dec+f)
+        for i, f in enumerate(np.linspace(size, -1*size, num)):
+            ras_squares.append(center_ra+f/np.cos(center_dec*np.pi/180))
+            dec_squares.append(center_dec+size)
+        for i, f in enumerate(np.linspace(size, -1*size, num)):
+            ras_squares.append(center_ra-size/np.cos(center_dec*np.pi/180))
+            dec_squares.append(center_dec+f)
 
-    conf_class_colors = {
-        'CF-AGN': ['cyan','circle_dot'], 'CF-NS': ['magenta','triangle_dot'], 'CF-CV': ['orange','hex_dot'], 
-        'CF-LM-STAR': ['gold','star_dot'], 'CF-HM-STAR': ['deepskyblue','square_dot'], 'CF-LMXB': ['lime','inverted_triangle'], 
-        'CF-YSO': ['blue','diamond_dot'],'CF-HMXB':['peru','square_pin'],'CF-NS+LMXB':['lightgreen','square_x']
-    }
+        #print(ras_squares, dec_squares)
+
+        df_square = pd.DataFrame(data={'ra':ras_squares, 'dec':dec_squares})
+        #df_square[['reg_phys_x','reg_phys_y']] = get_reg_phys(fn_evt2, df_square)
+        df_square= get_reg_phys(fn_evt2, df_square)
+        #print(df_square)
+        '''
+        ras_square = np.array([xy[0] for xy in  df_square])
+        decs_square = np.array([xy[1] for xy in  df_square])
+        x_min, x_max, y_min, y_max = min(ras_square), max(ras_square),min(decs_square), max(decs_square)    
+        w, h = x_max - x_min, y_max - y_min     
+        #print(x_min, x_max, y_min, y_max, w, h)
+        NBINS = (1500, int(1500 * h / w))
+        '''
+    #else:
     x_min, x_max, y_min, y_max = evt2_data[0].min(), evt2_data[0].max(), evt2_data[1].min(), evt2_data[1].max()    
     w, h = x_max - x_min, y_max - y_min     
     #print(x_min, x_max, y_min, y_max, w, h)
-    cntr = [(x_max + x_min)/2, (y_max + y_min)/2]
     NBINS = (1500, int(1500 * h / w))
 
 
 
     H, xe, ye = np.histogram2d(evt2_data[0], evt2_data[1],bins=NBINS)
 
-    sigma_y = 1
-    sigma_x = 1
+    sigma_y = 2
+    sigma_x = 2
 
     # Apply gaussian filter
     sigma = [sigma_y, sigma_x]
@@ -1861,26 +1944,62 @@ def interactive_Ximg_class_ellipse_noclass(field_name, fgl_name, fgl_names, evt2
     update_image = np.flip(H.T, axis=0)
 
     # produce an image of the 2d histogram
-    #cxo_obs = hv.Image(update_image, bounds=(x_min, y_min,x_max, y_max)).opts(cmap='plasma', clim=(0.01,H.max()), width=3000, height=3000)
-    #cxo_obs = hv.Image(update_image, bounds=(x_min, y_min,x_max, y_max)).opts(aspect='equal',logz=True, cmap='hot', clim=(0.01,H.max()), width=int(1000), height=int(1000))#int(1000*w/h))
-    #cxo_obs = hv.Image(update_image, bounds=(x_min, y_min,x_max, y_max)).opts(aspect='equal',logz=True, cmap='plasma', clim=(0.01,H.max()), width=int(1000), height=int(1000))#int(1000*w/h))
-    cxo_obs = hv.Image(update_image, bounds=(x_min, y_min,x_max, y_max)).opts(aspect='equal',logz=True, cmap='plasma', clim=(0.003,H.max()), width=int(1000), height=int(1000))#int(1000*w/h))
-    
-    #cxo_obs = hv.Image(np.flip(H.T, axis=0)).opts(logz=True, cmap='hot', clim=(0.01,H.max()), width=int(800), height=int(800*h/w))
+    ## cxo_obs = hv.Image(update_image, bounds=(x_min, y_min,x_max, y_max)).opts(cmap='plasma', clim=(0.01,H.max()), width=3000, height=3000)
+    ## cxo_obs = hv.Image(update_image, bounds=(x_min, y_min,x_max, y_max)).opts(aspect='equal',logz=True, cmap='hot', clim=(0.01,H.max()), width=int(1000), height=int(1000))#int(1000*w/h))
+    ## cxo_obs = hv.Image(update_image, bounds=(x_min, y_min,x_max, y_max)).opts(aspect='equal',logz=True, cmap='plasma', clim=(0.01,H.max()), width=int(1000), height=int(1000))#int(1000*w/h))
+    ## cxo_obs = hv.Image(update_image, bounds=(x_min, y_min,x_max, y_max)).opts(aspect='equal',logz=True, cmap='plasma', clim=(0.003,H.max()), width=int(1000), height=int(1000))#int(1000*w/h))
+    ### cxo_obs = hv.Image(np.flip(H.T, axis=0)).opts(logz=True, cmap='hot', clim=(0.01,H.max()), width=int(800), height=int(800*h/w))
 
-    all_csv = pd.read_csv(f'{dir_out}/{field_name}_class.csv')
+    cxo_obs = hv.Image(update_image, bounds=(x_min, y_min,x_max, y_max)).opts(aspect='equal',logz=True, cmap='gist_yarg', clim=(0.003,H.max()), width=int(1000), height=int(1000))#int(1000*w/h))
+    
+    plot_layers = cxo_obs
+
+    if zoomin:
+        square =hv.Curve(df_square).opts(color='blue',line_alpha=1,line_width=3)
+
+        #scatter = Circle((x, y)).opts(radius=rad2,alpha=0.,color=e_color,line_alpha=1)
+        plot_layers = plot_layers * square
+
+    e_color = 'green' if TeV_extent == 'e' else 'blue'
+
+    for i, reg_phys_ell in enumerate(reg_phys_ellipse):
+        ellipse =hv.Curve(reg_phys_ell).opts(color=e_color,line_alpha=1,line_width=5)
+
+        #scatter = Circle((x, y)).opts(radius=rad2,alpha=0.,color=e_color,line_alpha=1)
+        plot_layers = plot_layers * ellipse
+
+        fgl_ra = np.mean(np.array([xy[0] for xy in  reg_phys_ell]))
+        fgl_dec = np.mean(np.array([xy[1] for xy in  reg_phys_ell]))
+        fgl_dec_max = max(np.array([xy[1] for xy in  reg_phys_ell]))
+        fglname = fgl_names[i]
+
+        #text = hv.Text(fgl_ra+5, fgl_dec_max-50,fglname,fontsize=25).opts(text_color='blue')
+
+        #plot_layers = plot_layers * text
+    
+    all_csv = pd.read_csv(f'{dir_out}/{field_name}_class_rename.csv')
     all_csv = all_csv[(all_csv['significance']>=sig_cut) | (~all_csv['true_Class'].isnull()) | (all_csv['name'].isin(srcs_list))].reset_index(drop=True)
-    all_csv = all_csv.drop_duplicates(subset=['X_src']).reset_index(drop=True)
+    all_csv = all_csv.drop_duplicates(subset=['X_name']).reset_index(drop=True)
     all_csv[['reg_phys_x', 'reg_phys_y']] = get_reg_phys(fn_evt2, all_csv)
+
+    test_csv = all_csv[all_csv.true_Class.isnull()].reset_index(drop=True)
+
+    if include_TD==True:
+        TD_csv = all_csv[all_csv.Class.isnull()].reset_index(drop=True)
+        TD_csv['wd'] = 1
+        TD_special = TD_csv[TD_csv['name'].isin(srcs_list)].reset_index(drop=True)
+        TD_normal = TD_csv[~TD_csv['name'].isin(srcs_list)].reset_index(drop=True)
 
     #df_fgl = pd.DataFrame(data={'ra':fgl_ra, 'dec':fgl_dec})
     #df_fgl[['reg_phys_x', 'reg_phys_y']] = get_reg_phys(fn_evt2, df_fgl)
     
-    plot_layers = cxo_obs
+    
 
-    if len(all_csv)>0:
+    
 
-        scatter = all_csv.hvplot.scatter('reg_phys_x', 'reg_phys_y', color="white", marker='circle', size=50,line_width=1,hover_cols=['name']
+    if len(test_csv)>0:
+
+        scatter = test_csv.hvplot.scatter('reg_phys_x', 'reg_phys_y', color="red", marker='circle', size=300,line_width=2,hover_cols=['name']
             ).opts(tools=[hover3],
             alpha=0.,
             line_alpha=1,
@@ -1889,27 +2008,51 @@ def interactive_Ximg_class_ellipse_noclass(field_name, fgl_name, fgl_names, evt2
             #muted_alpha=1
             )
         plot_layers = plot_layers * scatter
-        e_color = 'blue' if TeV_extent == 'e' else 'lime'
+        
 
-        for i in range(len(all_csv)):
-            text = hv.Text(all_csv.loc[i, 'reg_phys_x']-5, all_csv.loc[i, 'reg_phys_y']+50, all_csv.loc[i, 'name'],fontsize=8).opts(text_color='white')#,text_font=6)
-                           
+        for i in range(len(test_csv)):
+            text = hv.Text(test_csv.loc[i, 'reg_phys_x']-5, test_csv.loc[i, 'reg_phys_y']+30, test_csv.loc[i, 'name'],fontsize=text_size).opts(text_color='red')#,text_font=6)
+            plot_layers = plot_layers * text
 
+    if include_TD==True and len(TD_special)>0:
+
+        scatter2 = TD_special.hvplot.scatter('reg_phys_x', 'reg_phys_y', color='magenta', marker='triangle', size=400,line_width=2,hover_cols=['name','PU_X','significance','F_b','HR_hms','P_inter','P_intra','G','J','W1','cp_counts','CSC_flags']#'wd','ms']],#'wd','ms']
+            ).opts(tools=[hover2],
+            #cmap={'AGN': 'white', 'NS': 'white', 'CV': 'white', 'LM-STAR': 'white', 'HM-STAR': 'white', 'LMXB': 'white', 'YSO': 'white','HMXB':'white','NS+LMXB':'white'},
+            #size=hv.dim("Class").categorize({'Unconfident Classification': 20}, default=10),
+            #line_width=hv.dim("wd"),
+            alpha=0.,
+            line_alpha=1,
+            show_legend=False,
+            muted_alpha=0,
+            #muted_alpha=1
+            )
+        plot_layers = plot_layers * scatter2
+
+        for i in range(len(TD_special)):
+            text = hv.Text(TD_special.loc[i, 'reg_phys_x']-5, TD_special.loc[i, 'reg_phys_y']-30, TD_special.loc[i, 'name'],fontsize=text_size).opts(text_color='magenta')#,text_font=6)        
+            plot_layers = plot_layers * text
+
+    if include_TD==True and len(TD_normal)>0:
+
+        scatter3 = TD_normal.hvplot.scatter('reg_phys_x', 'reg_phys_y', color="purple", marker='square', size=400,line_width=2,hover_cols=['name','PU_X','significance','F_b','HR_hms','P_inter','P_intra','G','J','W1','cp_counts','CSC_flags']#'wd','ms']],#'wd','ms']
+            ).opts(tools=[hover2],
+            #cmap={'AGN': 'white', 'NS': 'white', 'CV': 'white', 'LM-STAR': 'white', 'HM-STAR': 'white', 'LMXB': 'white', 'YSO': 'white','HMXB':'white','NS+LMXB':'white'},
+            #size=hv.dim("Class").categorize({'Unconfident Classification': 20}, default=10),
+            #line_width=hv.dim("wd"),
+            alpha=0.,
+            line_alpha=1,
+            show_legend=False,
+            muted_alpha=0,
+            #muted_alpha=1
+            )
+        plot_layers = plot_layers * scatter3
+
+        for i in range(len(TD_normal)):
+            text = hv.Text(TD_normal.loc[i, 'reg_phys_x']-5, TD_normal.loc[i, 'reg_phys_y']-30, TD_normal.loc[i, 'name'],fontsize=text_size).opts(text_color='purple')#,text_font=6)        
             plot_layers = plot_layers * text
     
-    for i, reg_phys_ell in enumerate(reg_phys_ellipse):
-        ellipse =hv.Curve(reg_phys_ell).opts(color=e_color,line_alpha=1,line_width=3)
 
-        #scatter = Circle((x, y)).opts(radius=rad2,alpha=0.,color=e_color,line_alpha=1)
-        plot_layers = plot_layers * ellipse
-
-        fgl_ra = np.mean(np.array([xy[0] for xy in  reg_phys_ell]))
-        fgl_dec = np.mean(np.array([xy[1] for xy in  reg_phys_ell]))
-        fglname = fgl_names[i]
-
-        text = hv.Text(fgl_ra+5, fgl_dec+230,fglname,fontsize=10).opts(text_color='lime')
-
-        plot_layers = plot_layers * text
     
 
 
