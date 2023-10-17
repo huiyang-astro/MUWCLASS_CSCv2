@@ -151,7 +151,7 @@ def CSCview_conesearch(field_name, ra, dec, radius,query_dir,engine='curl',csc_v
 
     df = pd.read_csv(f'{query_dir}/{field_name}_{engine}.txt', header=num_header, sep='\t')
     df['name'] = df['name'].str.lstrip()
-    df.to_csv(f'{data_dir}/{field_name}_conesearch.csv', index=False)
+    #df.to_csv(f'{data_dir}/{field_name}_conesearch.csv', index=False)
 
 
     return df
@@ -303,7 +303,7 @@ def stats(df, flx='flux_aper90_mean_', end='.1', drop=False):
     elif drop == False:
         return df
 
-def flux2symmetric(df, flx='flux_aper90_',bands=['s', 'm','h'],end='.1'):
+def flux2symmetric(df, flx='flux_aper90_',bands=['b','s','m','h'],end='.1'):
     # calculate the left & right uncertainties, the mean, the variance of the Fechner distribution for band fluxes
     # print("Run flux2symmetric......")
     
@@ -644,16 +644,30 @@ def combine_master(df_ave, bands=['s','m','h']):
 def nan_flux(df_ave, flux_name, flux_flag='flux_flag',end=''):
     print("Run nan_flux......")
     
-    df_ave[flux_flag] = 0
+    if end =='':
+        df_ave[flux_flag] = 0
 
-    for band, code, flux_hilim in zip(['s', 'm', 'h'], [1, 2, 4], [1e-17, 1e-17, 1e-17]):
-        col = flux_name+band+end
-        idx = np.where( (df_ave[col].isna()) | (df_ave['e_'+col].isna()) )[0]
-        
-        df_ave.loc[idx, col] = np.sqrt(2/np.pi) * flux_hilim
-        df_ave.loc[idx, 'e_'+col] = np.sqrt((1.- 2./np.pi))* flux_hilim
-        
-        df_ave.loc[idx, flux_flag] = df_ave.loc[idx, flux_flag] + code
+        for band, code, flux_hilim in zip(['s', 'm', 'h'], [1, 2, 4], [1e-17, 1e-17, 1e-17]):
+            col = flux_name+band+end
+            idx = np.where( (df_ave[col].isna()) | (df_ave['e_'+col].isna()) )[0]
+            
+            df_ave.loc[idx, col] = np.sqrt(2/np.pi) * flux_hilim
+            df_ave.loc[idx, 'e_'+col] = np.sqrt((1.- 2./np.pi))* flux_hilim
+            
+            df_ave.loc[idx, flux_flag] = df_ave.loc[idx, flux_flag] + code
+
+    elif end =='.1':
+        df_ave[flux_flag+'.1'] = 0
+        for band, code, flux_hilim in zip(['s', 'm', 'h'], [1, 2, 4], [1e-17, 1e-17, 1e-17]):
+            col = flux_name+band+end
+            idx = np.where( (df_ave[col].isna()) | (df_ave['e_'+col].isna()) )[0]
+            
+            df_ave.loc[idx, col] = np.sqrt(2/np.pi) * flux_hilim
+            df_ave.loc[idx, 'e_'+col] = np.sqrt((1.- 2./np.pi))* flux_hilim
+            
+            df_ave.loc[idx, flux_flag+'.1'] = df_ave.loc[idx, flux_flag+'.1'] + code
+        df_ave.loc[df_ave[flux_flag+'.1']==7, 'per_remove_code'] = df_ave.loc[df_ave[flux_flag+'.1']==7, 'per_remove_code']+128
+
 
     return df_ave
 
@@ -711,13 +725,13 @@ def cal_ave(df, data_dir, dtype='TD', Chandratype='CSC',PU=False,cnt=False,plot=
     #df.to_csv('TD_test.csv',index=False)
 
     if Chandratype=='CSC':
-        cols_copy = ['name', 'usrid','ra_pnt','dec_pnt', 'ra', 'dec', 'err_ellipse_r0', 'err_ellipse_r1', 'err_ellipse_ang', 'significance',
+        cols_copy = ['name', 'usrid', 'ra', 'dec', 'err_ellipse_r0', 'err_ellipse_r1', 'err_ellipse_ang', 'significance',
                   'extent_flag', 'pileup_flag','sat_src_flag', 'streak_src_flag','conf_flag',
                   'flux_aper90_mean_b', 'e_flux_aper90_mean_b', 'flux_aper90_mean_h', 'e_flux_aper90_mean_h', 
                   'flux_aper90_mean_m', 'e_flux_aper90_mean_m', 'flux_aper90_mean_s', 'e_flux_aper90_mean_s', 
                   'kp_intra_prob_b','ks_intra_prob_b','var_inter_prob_b',
                   'nh_gal','flux_powlaw_mean','e_flux_powlaw_mean','powlaw_gamma_mean','e_powlaw_gamma_mean',
-                  'powlaw_nh_mean','e_powlaw_nh_mean','powlaw_ampl_mean','e_powlaw_ampl_mean','powlaw_stat']
+                  'powlaw_nh_mean','e_powlaw_nh_mean','powlaw_ampl_mean','e_powlaw_ampl_mean','powlaw_stat'] # 'ra_pnt','dec_pnt',
    
     elif Chandratype=='CXO':
           cols_copy = ['name','usrid','ra', 'dec', 'significance', 'net_counts']
@@ -759,6 +773,152 @@ def cal_ave(df, data_dir, dtype='TD', Chandratype='CSC',PU=False,cnt=False,plot=
 
     # Calculating inter-variability
     df, df_ave = cal_var(df, df_ave, 'flux_aper90_ave2_b','flux_aper90_mean_b.1')
+    df_ave = df_ave.drop(['flux_aper90_ave2_b','e_flux_aper90_ave2_b'],axis=1)
+
+    if (Chandratype=='CSC' or  Chandratype=='CSC-CXO') and  convert_hms_to_deg==True:
+        # combine additional useful master flux
+        #df_ave = combine_master(df_ave)
+        df_ave['ra']= Angle(df_ave['ra'], 'hourangle').degree
+        df_ave['dec'] = Angle(df_ave['dec'], 'deg').degree
+    
+    df_ave = nan_flux(df_ave, 'flux_aper90_ave_')
+    
+    df_ave = cal_bflux(df_ave, 'flux_aper90_ave_',end='')
+
+    if Chandratype=='CXO' and cal_ave_coordinate == True:
+        df, df_ave = cal_ave_pos(df, df_ave, ra_col='ra.1', dec_col='dec.1', pu_col='PU.1')
+
+    if cnt:
+        df, df_ave = cal_cnt(df, df_ave, 'src_cnts_aper90_b','src_cnts_aper90_hilim_b','src_cnts_aper90_lolim_b')
+    #df_ave.to_csv('ave_test.csv',index=False)
+    #'''
+    return df_ave, df
+
+
+def cal_ave_v2(df, data_dir, dtype='TD', Chandratype='CSC',PU=False,cnt=False,plot=False, verb=False, convert_hms_to_deg=True,cal_ave_coordinate=False):
+    '''
+    description:
+        calculate the averaged data from per-observation CSC data
+
+    input: 
+        df: the DataFrame of per-observation data
+        dtype: 'TD' for training dataset and 'field' for field (testing) dataset
+        plot: plot mode
+
+    output: 
+        df_ave: the DataFrame of averaged data from per-observation CSC data
+        df: the per-observation data used to calculate the averaged data
+
+    '''
+    
+    #print("Run cal_ave......")
+    print('There are',str(len(df)),'per-obs data.')
+
+    df = df.fillna(exnum)
+    df = df.replace(r'^\s*$', exnum, regex=True)
+    df = df.apply(pd.to_numeric, errors='ignore')
+    df = df.replace({' TRUE': True, 'False': False, 'FALSE':False})
+    df = df.replace(exnum, np.nan)
+    
+    # convert asymmetric fluxes to symmetric fluxes
+    df = flux2symmetric(df, end='.1')
+
+    
+    if Chandratype == 'CSC' or  Chandratype=='CSC-CXO':
+        df = flux2symmetric(df, end='')
+        df = cal_bflux(df, flx='flux_aper90_mean_',end='')
+        df = powlaw2symmetric(df, end='')
+    
+    if dtype == 'TD' and Chandratype=='CSC':
+        # Adding new data
+        df = add_newdata(df, data_dir)
+    
+    # fxs = ['flux_aper90_'+band+'.1' for band in ['b','s','m','h']]
+    # los = ['flux_aper90_lolim_'+band+'.1' for band in ['b','s','m','h']]
+    # his = ['flux_aper90_hilim_'+band+'.1' for band in ['b','s','m','h']]
+    # bs = ['flux_aper90_'+b+'b.1' for b in ['','lolim_','hilim_']]
+    # ss = ['flux_aper90_'+b+'s.1' for b in ['','lolim_','hilim_']]
+    # ms = ['flux_aper90_'+b+'m.1' for b in ['','lolim_','hilim_']]
+    # hs = ['flux_aper90_'+b+'h.1' for b in ['','lolim_','hilim_']]
+    # fxs_cols = ['name','var_inter_prob_b', *bs, *ss, *ms, *hs]
+    # df[fxs_cols].to_csv('df_per_test.csv',index=False)
+    # a mode of 0 and an upper limit of 1E-17 are used to replace the Null values of per-obs flux
+    #df = nan_flux(df, flux_name='flux_aper90_mean_',flux_flag='per_flux_flag',end='.1')
+    #print(df['per_flux_flag'].value_counts())
+
+    
+    
+    # Apply with some filters on sat_src_flag and pile_warning at per-obs level
+    if Chandratype=='CSC' or  Chandratype=='CSC-CXO':
+        df = apply_flags_filter(df, verb=verb)# theta_flag=True,dup=True,sat_flag=True,pileup_warning=True,streak_flag=True
+    elif Chandratype=='CXO':
+        df = apply_flags_filter(df,instrument=False,sig=False,theta_flag=True,dup=False,sat_flag=False,pileup_warning=False,streak_flag=False,pu_signa_fil=False,verb=verb)
+    #'''
+    
+    #df.to_csv('TD_test.csv',index=False)
+
+    if Chandratype=='CSC':
+        cols_copy = ['name', 'usrid', 'ra', 'dec', 'err_ellipse_r0', 'err_ellipse_r1', 'err_ellipse_ang', 'significance',
+                  'extent_flag', 'pileup_flag','sat_src_flag', 'streak_src_flag','conf_flag',
+                  'flux_aper90_mean_b', 'e_flux_aper90_mean_b', 'flux_aper90_mean_h', 'e_flux_aper90_mean_h', 
+                  'flux_aper90_mean_m', 'e_flux_aper90_mean_m', 'flux_aper90_mean_s', 'e_flux_aper90_mean_s', 
+                  'kp_intra_prob_b','ks_intra_prob_b','var_inter_prob_b',
+                  'nh_gal','flux_powlaw_mean','e_flux_powlaw_mean','powlaw_gamma_mean','e_powlaw_gamma_mean',
+                  'powlaw_nh_mean','e_powlaw_nh_mean','powlaw_ampl_mean','e_powlaw_ampl_mean','powlaw_stat'] # 'ra_pnt','dec_pnt',
+   
+    elif Chandratype=='CXO':
+          cols_copy = ['name','usrid','ra', 'dec', 'significance', 'net_counts']
+    elif Chandratype=='CSC-CXO':
+        cols_copy = ['COMPONENT','name', 'usrid', 'ra', 'dec', 'err_ellipse_r0', 'err_ellipse_r1', 'err_ellipse_ang', 'significance',
+                  'extent_flag', 'pileup_flag','sat_src_flag', 'streak_src_flag','conf_flag',
+                  'flux_aper90_mean_b', 'e_flux_aper90_mean_b', 'flux_aper90_mean_h', 'e_flux_aper90_mean_h', 
+                  'flux_aper90_mean_m', 'e_flux_aper90_mean_m', 'flux_aper90_mean_s', 'e_flux_aper90_mean_s', 
+                  'kp_intra_prob_b','ks_intra_prob_b','var_inter_prob_b',
+                  'nh_gal','flux_powlaw_mean','e_flux_powlaw_mean','powlaw_gamma_mean','e_powlaw_gamma_mean',
+                  'powlaw_nh_mean','e_powlaw_nh_mean','powlaw_ampl_mean','e_powlaw_ampl_mean','powlaw_stat']
+   
+    df = df[df['per_remove_code']==0].reset_index(drop=True)
+    #df.to_csv('TD_test.csv',index=False)
+    if PU:
+        df_ave = df[cols_copy+PU].copy()
+    else:
+        df_ave = df[cols_copy].copy()
+    
+    df_ave['prod_per_remove_code'] = 0
+    for uid in df_ave.usrid.unique():
+        idx = np.where(df.usrid==uid)[0]
+        idx2 = np.where(df_ave.usrid==uid)[0]
+        df_ave.loc[idx2, 'prod_per_remove_code'] = np.prod(df.loc[idx, 'per_remove_code'].values)
+
+    df_ave = df_ave.drop_duplicates(subset =['usrid'], keep = 'first')
+    df_ave = df_ave.reset_index(drop=True)
+    df_ave['remove_code'] = 0
+    df_ave.loc[df_ave.prod_per_remove_code>0, 'remove_code'] = 1
+    df_ave = df_ave.drop('prod_per_remove_code', axis=1)
+   
+    df, df_ave = cal_sig(df, df_ave, 'flux_significance_b')
+    if Chandratype=='CXO' or Chandratype=='CSC-CXO':
+        df, df_ave = cal_theta_counts(df, df_ave, 'theta', 'NET_COUNTS_broad','NET_ERR_broad')
+
+    # Calculating average fluxes
+    df, df_ave = cal_aveflux(df, df_ave,['s','m','h'],'flux_aper90_ave_','flux_aper90_mean_')#fil =False)
+    
+########
+    df = nan_flux(df, 'flux_aper90_mean_',end='.1') # still removing those with all 3 band null fluxes
+    df = df[(df['per_remove_code']==0) | (df['flux_aper90_mean_b.1']>=0)].reset_index(drop=True)
+    df['flux_aper90_mean_ori_b.1'] = df['flux_aper90_mean_b.1'].copy()
+    df['e_flux_aper90_mean_ori_b.1'] = df['e_flux_aper90_mean_b.1'].copy()
+    df = cal_bflux(df, flx='flux_aper90_mean_',end='.1')
+    # print(df.loc[df['flux_aper90_mean_ori_b.1'].isnull(), 'flux_aper90_mean_ori_b.1'])
+    df.loc[df['flux_aper90_mean_ori_b.1'].isnull(), 'flux_aper90_mean_ori_b.1'] = df.loc[df['flux_aper90_mean_ori_b.1'].isnull(), 'flux_aper90_mean_b.1']
+    df.loc[df['flux_aper90_mean_ori_b.1'].isnull(), 'e_flux_aper90_mean_ori_b.1'] = df.loc[df['flux_aper90_mean_ori_b.1'].isnull(), 'e_flux_aper90_mean_b.1']
+    
+    # print(df.loc[df['flux_aper90_mean_ori_b.1'].isnull(), 'flux_aper90_mean_ori_b.1'])
+    df, df_ave = cal_aveflux(df, df_ave,['b'],'flux_aper90_ave2_','flux_aper90_mean_ori_',add2df=True)
+
+#######
+    # Calculating inter-variability
+    df, df_ave = cal_var(df, df_ave, 'flux_aper90_ave2_b','flux_aper90_mean_ori_b.1')
     df_ave = df_ave.drop(['flux_aper90_ave2_b','e_flux_aper90_ave2_b'],axis=1)
 
     if (Chandratype=='CSC' or  Chandratype=='CSC-CXO') and  convert_hms_to_deg==True:

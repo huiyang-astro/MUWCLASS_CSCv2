@@ -1,0 +1,299 @@
+J/A+A/657/A138    Classification of Swift and XMM-Newton sources (Tranin+, 2022)
+================================================================================
+Probabilistic classification of X-ray sources applied to Swift-XRT and
+XMM-Newton catalogs.
+    Tranin H., Godet O., Webb N. Primorac D.
+    <Astron. Astrophys. 657, A138 (2022)>
+    =2022A&A...657A.138T        (SIMBAD/NED BibCode)
+================================================================================
+ADC_Keywords: Active gal. nuclei ; Binaries, X-ray ; X-ray sources
+Keywords: catalogs - X-rays: general - X-rays: binaries - X-rays: galaxies -
+          methods: statistical
+
+Abstract:
+    With the advent of very large X-ray surveys, an automated
+    classification of X-ray sources becomes increasingly valuable. This
+    work proposes a revisited naive Bayes classification of the X-ray
+    sources in the Swift-XRT and XMM- Newton catalogs into four classes -
+    AGN, stars, X-ray binaries (XRBs), and cataclysmic variables (CVs) -
+    based on their spatial, spectral, and timing properties and their
+    multiwavelength counterparts. An outlier measure is used to identify
+    objects of other natures. The classifier is optimized to maximize the
+    classification performance of a chosen class (here XRBs), and it is
+    adapted to data mining purposes. We augmented the X-ray catalogs with
+    multiwavelength data, source class, and variability properties. We
+    then built a reference sample of about 25000 X-ray sources of known
+    nature. From this sample, the distribution of each property was
+    carefully estimated and taken as reference to assign probabilities of
+    belonging to each class. The classification was then performed on the
+    whole catalog, combining the information from each property. Using the
+    algorithm on the Swift reference sample, we retrieved 99%, 98%, 92%,
+    and 34% of AGN, stars, XRBs, and CVs, respectively, and the false
+    positive rates are 3%, 1%, 9%, and 15%. Similar results are obtained
+    on XMM sources. When applied to a carefully selected test sample,
+    representing 55% of the X-ray catalog, the classification gives
+    consistent results in terms of distributions of source properties. A
+    substantial fraction of sources not belonging to any class is
+    efficiently retrieved using the outlier measure, as well as AGN and
+    stars with properties deviating from the bulk of their class. Our
+    algorithm is then compared to a random forest method; the two showed
+    similar performances, but the algorithm presented in this paper
+    improved insight into the grounds of each classification. This robust
+    classification method can be tailored to include additional or
+    different source classes and can be applied to other X-ray catalogs.
+    The transparency of the classification compared to other methods makes
+    it a useful tool in the search for homogeneous populations or rare
+    source types, including multi-messenger events. Such a tool will be
+    increasingly valuable with the development of surveys of unprecedented
+    size, such as LSST, SKA, and Athena, and the search for counterparts
+    of multi-messenger events.
+
+Description:
+    The following tables represent 72% and 84% of the Swift and XMM-Newton
+    catalogs, respectively, taken as input of the classifier. They contain
+    all information used in the classification, as well as the output
+    results.
+
+File Summary:
+--------------------------------------------------------------------------------
+ FileName      Lrecl  Records   Explanations
+--------------------------------------------------------------------------------
+ReadMe            80        .   This file
+table6.dat       495   148438   Classification of 2SXPS sources
+table7.dat       484   482771   Classification of 4XMM-DR10 sources
+--------------------------------------------------------------------------------
+
+See also:
+   VII/281 : GLADE v2.3 catalog (Dalya+, 2018)
+    IX/58  : 2SXPS Swift X-ray telescope point source catalogue (Evans+, 2020)
+    IX/59  : XMM-Newton Serendipitous Source Catalogue 4XMM-DR9 (Webb+, 2020)
+
+Byte-by-byte Description of file: table6.dat
+--------------------------------------------------------------------------------
+   Bytes Format Units   Label         Explanations
+--------------------------------------------------------------------------------
+   1- 22  A22   ---     2SXPS         IAUNAME in 2SXPS
+  24- 32  F9.5  deg     RAdeg         Right ascension (J2000) of the X-ray
+                                       source, from 2SXPS
+  34- 42  F9.5  deg     DEdeg         Declination (J2000) of the X-ray source,
+                                       from 2SXPS
+  44- 47  F4.2  arcsec  Err1sigma     X-ray 1 sigma positional error from 2SXPS
+      49  I1    ---     DetFlag       [0/1] Detection flag, from 2SXPS
+      51  I1    ---     FieldFlag     [0/1] Field flad, from 2SXPS
+  53- 58  F6.2  ---     SNR           ? Signal-to-noise ratio,
+                                       from 2SXPS flux and error
+  60- 68  E9.3  mW/m2   Flux          ? The mean X-ray observed flux
+                                       (0.3-10keV, powerlaw fit) from 2SXPS
+  70- 72  I3    ---     Ndet          Number of X-ray detections of the source
+                                       from XMM, Swift and Chandra
+      74  I1    ---     Quality       Number of quality rules followed by the
+                                       source (>=2 : Test Sample)
+  76- 84  F9.5  deg     GLAT          Galactic latitude
+  86- 93  F8.3  mas/yr  pmGAIA        ? Totla proper motion of the best GAIA
+                                       counterpart, if any
+  95-103  E9.3  10-7W   LXGAIA        ? Luminosity of the GAIA counterpart using
+                                       its parallax-based distance
+ 105-113  F9.5  deg     RAGdeg        ? Right ascension (J2000) of the presumed
+                                       host center, from GLADE
+ 115-123  F9.5  deg     DEGdeg        ? Declination (J2000) of the presumed
+                                       host center, from GLADE
+ 125-133  F9.4  Mpc     DistGLADE     ? Luminosity distance of the presumed
+                                       host, from GLADE
+ 135-140  F6.4  ---     SepGLADE      ? Angular separation to the host center,
+                                       relative to its semi-major axis
+ 142-150  E9.3  10-7W   LXGLADE       ? Mean X-ray luminosity, computed using
+                                       the host distance
+ 152-157  F6.3  ---     HR1           ? First hardness ratio, from 2SXPS
+ 159-164  F6.3  ---     HR2           ? Second hardness ratio, from 2SXPS
+ 166-173  F8.4  ---     FitPowGamma   ? Powerlaw photon index of the best
+                                       powerlaw spectral fit, from 2SXPS
+ 175-181  F7.4  ---     IntPowGamma   ? Powerlaw photon index interpolated from
+                                       hardness ratios, from 2SXPS
+ 183-189  F7.4  keV     FitAPECkT     ? Temperature APEC parameter of the best
+                                       APEC fit, from 2SXPS
+ 191-197  F7.4  keV     IntAPECkT     ? Temperature parameter interpolated from
+                                       hardness ratios, from 2SXPS
+ 199-206  F8.6  ---     p-any-Opt     ? Probability that the source have an
+                                       optical counterpart, from NWAY
+ 208-212  F5.2  arcsec  sepOpt        ? Angular separation to the optical
+                                       counterpart
+ 214-222  A9    ---     RefOpt        Origin of the optical counterpart
+ 224-228  F5.2  [-]     logFX/Fb      ? Log. of the X-ray to b-band flux ratio,
+                                       from optical counterpart
+ 230-234  F5.2  [-]     logFX/Fr      ? Log. of the X-ray to r-band flux ratio,
+                                       from optical counterpart
+ 236-243  F8.6  ---     p-any-IR      ? Probability that the source have an
+                                       infrared counterpart, from NWAY
+ 245-249  F5.2  arcsec  sepIR         ? Angular separation to the infrared
+                                       counterpart
+ 251-257  A7    ---     RefIR         Origin of the infrared counterpart
+ 259-264  F6.2  [-]     logFX/FW1     ? Log. of the X-ray to W1 (or K) flux
+                                       ratio, from IR counterpart
+ 266-271  F6.2  [-]     logFX/FW2     ? Log. of the X-ray to W2 (or K) flux
+                                       ratio, from IR counterpart
+ 273-277  F5.2  [-]     logFratioSnap ? Log of max-to-med ratio from Swift
+                                       snapshots in most variable band
+ 279-282  F4.2  [-]     logFratioObs  ? Log. of the max-to-min flux ratio,
+                                       from Swift/XMM/Chandra detections
+ 284-291  F8.6  ---     PbaC0         Posterior probability that the source
+                                       is an AGN
+ 293-300  F8.6  ---     PbaC1         Posterior probability that the source
+                                       is a star
+ 302-309  F8.6  ---     PbaC2         Posterior probability that the source
+                                       is an XRB
+ 311-318  F8.6  ---     PbaC3         Posterior probability that the source
+                                       is a CV
+ 320-322  I3    ---     classin       ? Input class, for sources in the
+                                       reference sample
+     324  I1    ---     classout      Output class, given by the classification
+ 326-344  A19   ---     AltClass      Alternative classifications (0-3)
+                                       if a property category is ignored
+ 346-351  F6.3  ---     outlier       Outlier measure
+ 353-360  F8.6  ---     PbaC0loc      Combined likelihood of location properties
+                                       for the class AGN
+ 362-369  F8.6  ---     PbaC1loc      Combined likelihood of location properties
+                                       for the class star
+ 371-378  F8.6  ---     PbaC2loc      Combined likelihood of location properties
+                                       for the class XRB
+ 380-387  F8.6  ---     PbaC3loc      Combined likelihood of location properties
+                                       for the class CV
+ 389-396  F8.6  ---     PbaC0spe      Combined likelihood of spectrum properties
+                                       for the class AGN
+ 398-405  F8.6  ---     PbaC1spe      Combined likelihood of spectrum properties
+                                       for the class star
+ 407-414  F8.6  ---     PbaC2spe      Combined likelihood of spectrum properties
+                                       for the class XRB
+ 416-423  F8.6  ---     PbaC3spe      Combined likelihood of spectrum properties
+                                       for the class CV
+ 425-432  F8.6  ---     PbaC0mul      Combined likelihood of multiwavelength
+                                       properties for the class AGN
+ 434-441  F8.6  ---     PbaC1mul      Combined likelihood of multiwavelength
+                                       properties for the class star
+ 443-450  F8.6  ---     PbaC2mul      Combined likelihood of multiwavelength
+                                       properties for the class XRB
+ 452-459  F8.6  ---     PbaC3mul      Combined likelihood of multiwavelength
+                                       properties for the class CV
+ 461-468  F8.6  ---     PbaC0var      Combined likelihood of variability
+                                       properties for the class AGN
+ 470-477  F8.6  ---     PbaC1var      Combined likelihood of variability
+                                       properties for the class star
+ 479-486  F8.6  ---     PbaC2var      Combined likelihood of variability
+                                       properties for the class XRB
+ 488-495  F8.6  ---     PbaC3var      Combined likelihood of variability
+                                       properties for the class CV
+--------------------------------------------------------------------------------
+
+Byte-by-byte Description of file: table7.dat
+--------------------------------------------------------------------------------
+   Bytes Format Units   Label        Explanations
+--------------------------------------------------------------------------------
+   1- 21  A21   ---     4XMM         IAUNAME in 4XMM-DR10
+  23- 31  F9.5  deg     RAdeg        Right ascension (J2000) of the X-ray
+                                      source, from 4XMM-DR10
+  33- 41  F9.5  deg     DEdeg        Declination (J2000) of the X-ray source,
+                                      from 4XMM-DR10
+  43- 46  F4.2  arcsec  Err1sigma    X-ray 1 sigma positional error from
+                                      4XMM-DR10
+      48  I1    ---     SC-SUM-FLAG  Summary flag, from 4XMM-DR10
+  50- 59  F10.1 ---     SC-DET-ML    Detection maximum likelihood,
+                                      from 4XMM-DR10
+  61- 71  E11.5 mW/m2   Flux         The mean X-ray observed flux (0.2-12keV)
+                                      from 4XMM-DR10
+  73- 75  I3    ---     Ndet         Number of X-ray detections of the source
+                                      from XMM, Swift and Chandra
+      77  I1    ---     Quality      Number of quality rules followed by the
+                                      source (>=2 : Test Sample)
+  79- 87  F9.5  deg     GLAT         Galactic latitude
+  89- 96  F8.3  mas/yr  pmGAIA       ? Total proper motion of the best GAIA
+                                      counterpart, if any
+  98-106  E9.3  10-7W   LXGAIA       ? Luminosity of the GAIA counterpart using
+                                      its parallax-based distance
+ 108-116  F9.5  deg     RAGdeg       ? Right ascension (J2000) of the presumed
+                                      host center, from GLADE
+ 118-126  F9.5  deg     DEGdeg       ? Declination (J2000) of the presumed
+                                      host center, from GLADE
+ 128-137  F10.4 Mpc     DistGLADE    ? Luminosity distance of the presumed
+                                      host of the source, from GLADE
+ 139-144  F6.4  ---     SepGLADE     ? Angular separation to the host center,
+                                      relative to its semi-major axis
+ 146-154  E9.3  10-7W   LXGLADE      ? Mean X-ray luminosity, computed using the
+                                      host distance
+ 156-162  F7.4  ---     SC-HR1       ? 1st hardness ratio, from 4XMM-DR10
+ 164-170  F7.4  ---     SC-HR2       ? 2nd hardness ratio, from 4XMM-DR10
+ 172-178  F7.4  ---     SC-HR3       ? 3rd hardness ratio, from 4XMM-DR10
+ 180-186  F7.4  ---     SC-HR4       ? 4rth hardness ratio, from 4XMM-DR10
+ 188-193  F6.4  ---     WAPO-GAMMA   ? Photon index of the best powerlaw
+                                      spectral fit, from XMMFITCAT
+ 195-202  F8.6  ---     p-any-Opt    ? Probability that the source have an
+                                      optical counterpart, from NWAY
+ 204-207  F4.2  arcsec  sepOpt       ? Angular separation to the optical
+                                      counterpart
+ 209-217  A9    ---     RefOpt       Origin of the optical counterpart
+ 219-223  F5.2  [-]     logFX/Fb     ? Log. of the X-ray to b-band flux
+                                      ratio, from optical counterpart
+ 225-229  F5.2  [-]     logFX/Fr     ? Log. of the X-ray to r-band flux
+                                      ratio, from optical counterpart
+ 231-238  F8.6  ---     p-any-IR     ? Probability that the source have an
+                                      infrared counterpart, from NWAY
+ 240-243  F4.2  arcsec  sepIR        ? Angular separation to the infrared
+                                      counterpart
+ 245-251  A7    ---     RefIR        Origin of the infrared counterpart
+ 253-257  F5.2  [-]     logFX/FW1    ? Log. of the X-ray to W1 (or K) flux
+                                      ratio, from infrared counterpart
+ 259-263  F5.2  [-]     logFX/FW2    ? Log. of the X-ray to W2 (or K) flux
+                                      ratio, from infrared counterpart
+ 265-268  F4.2  [-]     logFratioObs ? Log. of the max-to-min flux ratio,
+                                      from Swift/XMM/Chandra detections
+ 270-277  F8.6  ---     PbaC0        Posterior probability that the source
+                                      is an AGN
+ 279-286  F8.6  ---     PbaC1        Posterior probability that the source
+                                      is a star
+ 288-295  F8.6  ---     PbaC2        Posterior probability that the source
+                                      is an XRB
+ 297-304  F8.6  ---     PbaC3        Posterior probability that the source
+                                      is a CV
+ 306-311  I6    ---     classin      ? Input class, for sources in the
+                                      reference sample
+     313  I1    ---     classout     Output class, given by the classification
+ 315-333  A19   ---     AltClass     Alternative classifications (0-3) if a
+                                      property category is ignored
+ 335-340  F6.3  ---     outlier      Outlier measure
+ 342-349  F8.6  ---     PbaC0loc     Combined likelihood of location properties
+                                      for the class AGN
+ 351-358  F8.6  ---     PbaC1loc     Combined likelihood of location properties
+                                      for the class star
+ 360-367  F8.6  ---     PbaC2loc     Combined likelihood of location properties
+                                      for the class XRB
+ 369-376  F8.6  ---     PbaC3loc     Combined likelihood of location properties
+                                      for the class CV
+ 378-385  F8.6  ---     PbaC0spe     Combined likelihood of spectrum properties
+                                      for the class AGN
+ 387-394  F8.6  ---     PbaC1spe     Combined likelihood of spectrum properties
+                                      for the class star
+ 396-403  F8.6  ---     PbaC2spe     Combined likelihood of spectrum properties
+                                      for the class XRB
+ 405-412  F8.6  ---     PbaC3spe     Combined likelihood of spectrum properties
+                                      for the class CV
+ 414-421  F8.6  ---     PbaC0mul     Combined likelihood of multiwavelength
+                                      properties for the class AGN
+ 423-430  F8.6  ---     PbaC1mul     Combined likelihood of multiwavelength
+                                      properties for the class star
+ 432-439  F8.6  ---     PbaC2mul     Combined likelihood of multiwavelength
+                                      properties for the class XRB
+ 441-448  F8.6  ---     PbaC3mul     Combined likelihood of multiwavelength
+                                      properties for the class CV
+ 450-457  F8.6  ---     PbaC0var     Combined likelihood of variability
+                                      properties for the class AGN
+ 459-466  F8.6  ---     PbaC1var     Combined likelihood of variability
+                                      properties for the class star
+ 468-475  F8.6  ---     PbaC2var     Combined likelihood of variability
+                                      properties for the class XRB
+ 477-484  F8.6  ---     PbaC3var     Combined likelihood of variability
+                                      properties for the class CV
+--------------------------------------------------------------------------------
+
+Acknowledgements:
+    Hugo Tranin, hugo.tranin(at)irap.omp.eu
+
+================================================================================
+(End)                                    Patricia Vannier [CDS]      08-Nov-2021

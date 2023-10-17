@@ -14,10 +14,10 @@ Simbad_dict = {'AGN':['QSO','AGN','Galaxy','Seyfert_1','Seyfert_2','EmG','RadioG
         'HM-STAR':['Ma*','bC*','s*b','WR*','BlueSG*','Be*','PulsV*bCep'],
         'LM-STAR':['low-mass*','brownD*'],
         'CV':['CataclyV*','CV*','XB','XRB','Nova'],#'CV*_Candidate'
-        'NS':['Neutron*','Pulsar','N*','Psr'], 
+        'NS':['Neutron*','Pulsar','N*','Psr','SNR','Radio','Star'], 
         'NS_BIN':['Neutron*','Pulsar','N*','Psr'],
-        'HMXB':['HMXB','HXB'], #'HMXB_Candidate'
-        'LMXB':['LMXB','LXB'],
+        'HMXB':['HMXB','HXB','Pulsar','Be*','BlueSG*','NIR','Star'], #'HMXB_Candidate'
+        'LMXB':['LMXB','LXB','Pulsar','Star','X'],
         'XRB':['XB','XRB'],#'XB*_Candidate',
         'Common':['X','IR','NIR','Radio','MIR','UV','gamma','Radio(cm)','EmObj'],
         'Uncla': ['Planet','EB*_Candidate','Cl*','Unknown_Candidate','GlCl','ULX?_Candidate','HII','PN',\
@@ -59,7 +59,7 @@ crowd_fields_dict = {'NGC_55':      {'ra':3.723333,                 'dec':-39.19
                 'NGC_4214':    {'ra':183.913333,               'dec':36.326944 ,            'r':7.05*180/(2*2.9e3*np.pi)},   
                 'NGC_4278':    {'ra':(12+(20+6.8/60)/60)*15,   'dec':29+(16+51/60)/60,      'r':2.1/60},
                 'NGC_4697':    {'ra':(12+(48+35.9/60)/60)*15,  'dec':-(5+(48+2.5/60)/60),   'r':2.2/60},
-                'Cen_A':       {'ra':(13+(25+27.604/60)/60)*15,'dec':-(41+(1+9.49/60)/60),  'r':10./60},
+                'Cen_A':       {'ra':(13+(25+27.604/60)/60)*15,'dec':-(43+(1+8.8/60)/60),  'r':25.7/60},
                 'NGC_5457':    {'ra':(14+(3+12.583/60)/60)*15, 'dec':(54+(20+55.5/60)/60),  'r':10./60},
                 'Circinus':    {'ra':213.29125,                'dec':-65.339167,            'r':6.9/60},
                 'M_13':        {'ra':(16+(41+41.24/60)/60)*15, 'dec':36+(27+35.5/60)/60,    'r':10./60},
@@ -71,7 +71,10 @@ crowd_fields_dict = {'NGC_55':      {'ra':3.723333,                 'dec':-39.19
                 'M_28':        {'ra':(18+(24+32.89/60)/60)*15, 'dec':-(24+(52+11.4/60)/60), 'r':5.6/60},
                 'NGC_6652':    {'ra':(18+(35+45.6/60)/60)*15,  'dec':-(32+(59+26.6/60)/60), 'r':2./60}, 
                 'NGC_6791':    {'ra':290.22083,                'dec':37.771667,             'r':16./60}, 
-                'M_27':        {'ra':299.901417,               'dec':22.721136,             'r':8./60}
+                'M_27':        {'ra':299.901417,               'dec':22.721136,             'r':8./60},
+                'NGC_1399':    {'ra':(3+(38+29.083/60)/60)*15,  'dec':-(35+(27+2.67/60)/60), 'r':7.6/(60)}, 
+                'NGC_4594':    {'ra':(12+(39+59.4/60)/60)*15,  'dec':-(11+(37+22.996/60)/60), 'r':8.5/(2*60)}, # M 104
+                'NGC_4649':    {'ra':(12+(43+39.968/60)/60)*15,  'dec':(11+(33+9.696/60)/60), 'r':7.95/(60)}, # M 60
                }
 
 # why are they removed from the old TD?
@@ -104,53 +107,53 @@ rare_sources_removed_dict = {'2CXO J083520.6-451034': 'Vela pulsar, complicated 
                         '2CXO J133833.0+292908': 'CV candidate, Cannot find where the class is coming from.',
                         '2CXO J141106.0+122252': 'CV candidate, do not see any strong H alpha emission features typical of CVs, but maybe it is identified through some other spectroscopic/timing features. See https://www.wis-tns.org/object/2018cjc.',
                         '2CXO J194129.2+401124': 'CV candidate, 2012ApJ...745...57G.',
-                        '2CXO J155246.9-502953':{'CV candidate, from INTEGRAL'},
-                        '2CXO J033108.1+435750':{'CV candidate, from 2005JAD....11....2D'},
-                        '2CXO J183545.7-325923':{'CV candidate, from 2005JAD....11....2D'},
-                        '2CXO J123907.9-453344':{'SIMBAD classified as EB*. 2003AA...404..301R classified as a DN with an Uncertainty flag raised. Unusual variable star?'},
-                        '2CXO J132430.3-631349':{'A new LMXB classified by 2018ApJS..235....4O, SIMBAD identifies as an X-ray source, not too much info.'},
-                        '2CXO J140846.0-610754':{'A new CV from 2018ApJS..235....4O, SIMBAD match to a star 0.28" away while a CV candidate is 2.6" away. IP? from 2016ApJ...816...38T, 2022MNRAS.511.4937S.'},
-                        '2CXO J155748.3-542453':{'a new HMXB classified by 2018ApJS..235....4O (we use the counterpart coordinate while the X-ray coordinate is 2.8 arcmin. away), SIMBAD HXB, 2S 1553-542, is 6.2" away.2022ApJ...927..194M claims that no Gaia nor Chandra sources are found within 5 arcsec from this transient Be/X-ray binary.'},
-                        '2CXO J161736.2-510224':{'LMXB from 2007A&A...469..807L, X from SIMBAD with 0.42" away, with 2E 3623 1.95" away, ambiguous classification.'},
-                        '2CXO J162826.8-502239':{'Comment':'A new LMXB classified by 2018ApJS..235....4O, confirmed by SIMBAD, no individual study.'},
-                        '2CXO J183228.3-075641':{'A new HMXB classified by 2018ApJS..235....4O, SIMBAD identifies as a Gamma-ray source, not too much info'},
-                        '2CXO J182608.6-125631':{'Confused with 2CXO J182608.5-125634'},
-                        '2CXO J181506.2-120545':{'Readout streakm, confused with 2CXO J181506.1-120548'},
-                        '2CXO J181506.1-120548':{'Readout streakm, confused with 2CXO J181506.2-120545'},
-                        '2CXO J170004.3-415805':{'Classified as HMXB from simbad, could be an IP CV see 2010MNRAS.402.2388K'},
-                        '2CXO J145252.7-594908':{'Classified as HMXB from simbad, could be an IP CV see 2009MNRAS.394.1597K'},
-                        '2CXO J140421.8+541921':{'This is controversial. Could be either in another galaxy (ULX?) or a flare in galactic Be star.'},
-                        '2CXO J043715.9-471509X':{'Confused with 2CXO J043715.8-471508.'},
-                        '2CXO J053854.5+261855X':{'Confused with 2CXO J053854.5+261856.'},
-                        '2CXO J063354.3+174614':{'Confused with 2CXO J063354.2+174613.'},
-                        '2CXO J063354.2+174616':{'Confused with 2CXO J063354.2+174613.'},
-                        '2CXO J105007.5-595321':{'Confused with 2CXO J105007.1-595321.'},
-                        '2CXO J112115.1-603725X':{'Confused with 2CXO J112115.1-603725.'},
-                        '2CXO J113106.9-625648X':{'Confused with 2CXO J113106.9-625648.'},
-                        '2CXO J130848.1+212707':{'Confused with 2CXO J130848.2+212706.'},
-                        '2CXO J140045.7-632542X':{'Confused with 2CXO J140045.7-632542.'},
-                        '2CXO J141842.9-605804':{'Confused with 2CXO J141842.6-605802.'},
-                        '2CXO J142008.4-604815':{'Confused with 2CXO J142008.1-604817.'},
-                        '2CXO J155058.3-562835X':{'Confused with 2CXO J155058.6-562835.'},
-                        '2CXO J161243.1-522523X':{'Confused with 2CXO J161243.0-522523.'},
-                        '2CXO J162046.2-513004X':{'Confused with 2CXO J162046.2-513006.'},
-                        '2CXO J170249.4-484723X':{'Confused with 2CXO J170249.3-484723.'},
-                        '2CXO J171810.0-371853':{'Confused with 2CXO J171809.8-371851.'},
-                        '2CXO J171935.9-410054X':{'Confused with 2CXO J171935.8-410053.'},
-                        '2CXO J174354.8-294443':{'Unclear HMXB or LMXB, Confused with 2CXO J174354.9-294444X.'},
-                        '2CXO J174354.9-294444X':{'Unclear HMXB or LMXB, Confused with 2CXO J174354.8-294443.'},
-                        '2CXO J184624.9-025828X':{'Confused with 2CXO J184624.9-025830.'},
-                        '2CXO J191404.2+095258X':{'Confused with 2CXO J191404.2+095258.'},
-                        '2CXO J193029.9+185213X':{'Confused with 2CXO J193030.1+185214.'},
-                        '2CXO J202105.4+365104X':{'Confused with 2CXO J202105.4+365104.'},
-                        '2CXO J203225.7+405728':{'Extremely bright, excluded. Confused with 2CXO J203225.8+405727X.'},
-                        '2CXO J203225.8+405727X':{'Extremely bright, excluded. Confused with 2CXO J203225.7+405728.'},
-                        '2CXO J214441.1+381917':{'Extremely bright, excluded. Confused with 2CXO J214441.2+381916X.'},
-                        '2CXO J214441.2+381916X':{'Extremely bright, excluded. Confused with 2CXO J214441.1+381917.'},
-                        '2CXO J003719.6-721413':{'A CV candidate, SIMBAD classified as XB, in SMC'},
-                        '2CXO J141329.9-620534':{'Confused with 2CXO J141330.2-620535'},
-                        '2CXO J124215.9+323249':{'LMXB from 2003A&A...404..301R, An USS with a 4-h modulation in NGC 4631, 2007A&A...471L..55C'},
-                        '2CXO J174433.0-284426':{'a LMXB in a Galactic bulge, a crowded environment.'}
+                        '2CXO J155246.9-502953':'CV candidate, from INTEGRAL',
+                        '2CXO J033108.1+435750':'CV candidate, from 2005JAD....11....2D',
+                        '2CXO J183545.7-325923':'CV candidate, from 2005JAD....11....2D',
+                        '2CXO J123907.9-453344':'SIMBAD classified as EB*. 2003AA...404..301R classified as a DN with an Uncertainty flag raised. Unusual variable star?',
+                        '2CXO J132430.3-631349':'A new LMXB classified by 2018ApJS..235....4O, SIMBAD identifies as an X-ray source, not too much info.',
+                        '2CXO J140846.0-610754':'A new CV from 2018ApJS..235....4O, SIMBAD match to a star 0.28" away while a CV candidate is 2.6" away. IP? from 2016ApJ...816...38T, 2022MNRAS.511.4937S.',
+                        '2CXO J155748.3-542453':'a new HMXB classified by 2018ApJS..235....4O (we use the counterpart coordinate while the X-ray coordinate is 2.8 arcmin. away), SIMBAD HXB, 2S 1553-542, is 6.2" away.2022ApJ...927..194M claims that no Gaia nor Chandra sources are found within 5 arcsec from this transient Be/X-ray binary.',
+                        '2CXO J161736.2-510224':'LMXB from 2007A&A...469..807L, X from SIMBAD with 0.42" away, with 2E 3623 1.95" away, ambiguous classification.',
+                        '2CXO J162826.8-502239':'A new LMXB classified by 2018ApJS..235....4O, confirmed by SIMBAD, no individual study.',
+                        '2CXO J183228.3-075641':'A new HMXB classified by 2018ApJS..235....4O, SIMBAD identifies as a Gamma-ray source, not too much info',
+                        '2CXO J182608.6-125631':'Confused with 2CXO J182608.5-125634',
+                        '2CXO J181506.2-120545':'Readout streakm, confused with 2CXO J181506.1-120548',
+                        '2CXO J181506.1-120548':'Readout streakm, confused with 2CXO J181506.2-120545',
+                        '2CXO J170004.3-415805':'Classified as HMXB from simbad, could be an IP CV see 2010MNRAS.402.2388K',
+                        '2CXO J145252.7-594908':'Classified as HMXB from simbad, could be an IP CV see 2009MNRAS.394.1597K',
+                        '2CXO J140421.8+541921':'This is controversial. Could be either in another galaxy (ULX?) or a flare in galactic Be star.',
+                        '2CXO J043715.9-471509X':'Confused with 2CXO J043715.8-471508.',
+                        '2CXO J053854.5+261855X':'Confused with 2CXO J053854.5+261856.',
+                        '2CXO J063354.3+174614':'Confused with 2CXO J063354.2+174613.',
+                        '2CXO J063354.2+174616':'Confused with 2CXO J063354.2+174613.',
+                        '2CXO J105007.5-595321':'Confused with 2CXO J105007.1-595321.',
+                        '2CXO J112115.1-603725X':'Confused with 2CXO J112115.1-603725.',
+                        '2CXO J113106.9-625648X':'Confused with 2CXO J113106.9-625648.',
+                        '2CXO J130848.1+212707':'Confused with 2CXO J130848.2+212706.',
+                        '2CXO J140045.7-632542X':'Confused with 2CXO J140045.7-632542.',
+                        '2CXO J141842.9-605804':'Confused with 2CXO J141842.6-605802.',
+                        '2CXO J142008.4-604815':'Confused with 2CXO J142008.1-604817.',
+                        '2CXO J155058.3-562835X':'Confused with 2CXO J155058.6-562835.',
+                        '2CXO J161243.1-522523X':'Confused with 2CXO J161243.0-522523.',
+                        '2CXO J162046.2-513004X':'Confused with 2CXO J162046.2-513006.',
+                        '2CXO J170249.4-484723X':'Confused with 2CXO J170249.3-484723.',
+                        '2CXO J171810.0-371853':'Confused with 2CXO J171809.8-371851.',
+                        '2CXO J171935.9-410054X':'Confused with 2CXO J171935.8-410053.',
+                        '2CXO J174354.8-294443':'Unclear HMXB or LMXB, Confused with 2CXO J174354.9-294444X.',
+                        '2CXO J174354.9-294444X':'Unclear HMXB or LMXB, Confused with 2CXO J174354.8-294443.',
+                        '2CXO J184624.9-025828X':'Confused with 2CXO J184624.9-025830.',
+                        '2CXO J191404.2+095258X':'Confused with 2CXO J191404.2+095258.',
+                        '2CXO J193029.9+185213X':'Confused with 2CXO J193030.1+185214.',
+                        '2CXO J202105.4+365104X':'Confused with 2CXO J202105.4+365104.',
+                        '2CXO J203225.7+405728':'Extremely bright, excluded. Confused with 2CXO J203225.8+405727X.',
+                        '2CXO J203225.8+405727X':'Extremely bright, excluded. Confused with 2CXO J203225.7+405728.',
+                        '2CXO J214441.1+381917':'Extremely bright, excluded. Confused with 2CXO J214441.2+381916X.',
+                        '2CXO J214441.2+381916X':'Extremely bright, excluded. Confused with 2CXO J214441.1+381917.',
+                        '2CXO J003719.6-721413':'A CV candidate, SIMBAD classified as XB, in SMC',
+                        '2CXO J141329.9-620534':'Confused with 2CXO J141330.2-620535',
+                        '2CXO J124215.9+323249':'LMXB from 2003A&A...404..301R, An USS with a 4-h modulation in NGC 4631, 2007A&A...471L..55C',
+                        '2CXO J174433.0-284426':'a LMXB in a Galactic bulge, a crowded environment.'
                          
                         
 }
@@ -169,13 +172,18 @@ rare_sources_saving_dict = {# Reclassification
                        '2CXO J153709.9+115555':{'Class':'NS', 'Comment':'change from NS_BIN to NS since it is a double pulsar system'},
                        '2CXO J112401.1-365319':{'Class':'NS_BIN', 'Comment':'change from NS to NS_BIN as a black widow pulsar'},
                        '2CXO J185843.6+032606':{'Class':'LMXB', 'Comment':'2021ApJ...909..154T'},
-                       '2CXO J130247.6-635008':{'Class':'HMXB', 'Comment':'recorded in the ATNF catalog'},
-                       '2CXO J203213.1+412724':{'Class':'HMXB', 'Comment':'recorded in the ATNF catalog, SIMBAD classified as a Be*'},
+                       '2CXO J130247.6-635008':{'Class':'HMGB', 'Comment':'recorded in the ATNF catalog'},
+                       '2CXO J203213.1+412724':{'Class':'HMGB', 'Comment':'recorded in the ATNF catalog, SIMBAD classified as a Be*'},
                        '2CXO J124850.7-412654':{'Class':'YSO', 'Comment': 'A CV candidate from Open CV catalog, but Spectra taken by two independent groups classify this source as a Classic T Tauri Type YSO.'},
     
                         # sources with Ambiguous classifications 
                        '2CXO J122637.5-624613':{'Class':'HMXB', 'Comment':'https://www.aanda.org/articles/aa/full_html/2019/09/aa36045-19/aa36045-19.html'},
+<<<<<<< HEAD
                        '2CXO J163553.8-472540':{'Class':'HMXB', 'Comment':'https://www.aanda.org/articles/aa/pdf/2008/24/aa8774-07.pdf'},
+=======
+                       '2CXO J163553.8-472540':{'Class':'LMXB', 'Comment':'https://www.aanda.org/articles/aa/pdf/2008/24/aa8774-07.pdf'}, # from https://binary-revolution.github.io/HMXBwebcat/ group,  IGR J16358-4726 did not make it to their HMXB catalogue: 2010A&A...516A..94N find with K-band spectroscopy that the companion star is a cool, low mass star with CO absorption bands. These features are not seen in sgB[e] systems such as IGR J16318-4848 and as such the source was re-classified as a symbiotic LMXB.
+
+>>>>>>> origin/main
                        '2CXO J180438.9-145647':{'Class':'CV', 'Comment':'https://arxiv.org/pdf/1108.1105.pdf'},
                        '2CXO J230108.2+585244':{'Class':'NS', 'Comment':'Magnetar'},
                        '2CXO J182608.5-125634':{'Class':'NS', 'Comment':' It is an isolated pulsar with compact faint PWN. see 2005AJ....129.1993M, 2019MNRAS.487.1964K, 2015ApJ...814..128K'},
@@ -211,7 +219,7 @@ rare_sources_saving_dict = {# Reclassification
                        '2CXO J185610.6+011322':{'Class':'NS', 'Comment':'SIMBAD classified as SNR'},
     
                        '2CXO J131145.7-343030':{'Class':'NS_BIN', 'Comment':'SIMBAD offset by 24" since it uses Gamma coordinate'},
-                       '2CXO J195936.7+204814':{'Class':'NS_BIN', 'Comment':'SIMBAD match to another source while Psr is exact the same distance away(0.25")'},
+                       '2CXO J195936.7+204814':{'Class':'NS_BIN', 'Comment':'PSR J1959+2048 (The Black Widow Pulsar), SIMBAD match to another source while Psr is exact the same distance away(0.25")'},
                        '2CXO J141730.5-440257':{'Class':'NS_BIN', 'Comment':'SIMBAD misclassifed as NS, Redback? 2019MNRAS.483.4495D'}, 
     
                        '2CXO J030346.9+645435':{'Class':'CV', 'Comment':'SIMBAD classified as a PN'}, 
@@ -239,8 +247,8 @@ rare_sources_saving_dict = {# Reclassification
                        '2CXO J191116.0+003505':{'Class':'LMXB', 'Comment':'SIMBAD match to another source (0.42") while LMXB is a little far away with 0.51" sep'},
                        '2CXO J162802.8-491154':{'Class':'LMXB', 'Comment':'4U 1624-49 in SIMBAD is 53 arcsec away using maybe Swift-BAT coordinate'},
                        '2CXO J114800.0-621224':{'Class':'HMXB', 'Comment':'SIMBAD classified as a Be*'},
-                       '2CXO J205107.5-082737':{'Class':'LMXB', 'Comment':'V* LY Aqr, black-widow pulsar,2021MNRAS.506.2824L.'},
-                       '2CXO J224142.0-523636':{'Class':'LMXB', 'Comment':'PSR J2241-5236, black-widow pulsar,2018ApJ...868L...8A  .'},
+                       '2CXO J205107.5-082737':{'Class':'NS_BIN', 'Comment':'V* LY Aqr, black-widow pulsar,2021MNRAS.506.2824L.'},
+                       '2CXO J224142.0-523636':{'Class':'NS_BIN', 'Comment':'PSR J2241-5236, black-widow pulsar,2018ApJ...868L...8A  .'},
                        '2CXO J143308.3-611540':{'Class':'HMXB', 'Comment':'IGR J14331-6112, IR identified from 2013A&A...560A.108C'},
                        
                        #  literature wrong info. 
@@ -277,7 +285,7 @@ rare_sources_saving_dict = {# Reclassification
                       
                      ### New sources solely from SIMBAD ordered by nbref
     
-                     '2CXO J043715.8-471508':{'Class':'NS', 'Comment':'PSR J0437-47, 2008ApJ...685L..67D, however there is a nearby source 2CXO J043715.9-471509X 1.3" away'},
+                     '2CXO J043715.8-471508':{'Class':'NS_BIN', 'Comment':'PSR J0437-47, 2008ApJ...685L..67D, however there is a nearby source 2CXO J043715.9-471509X 1.3" away'},
                      ## '2CXO J182608.6-125631':{'Class':'NS', 'Comment':'PSR J1826-1256, 2019MNRAS.487.1964K, 2015ApJ...814..128K'},
                      '2CXO J162636.5-515630':{'Class':'HMXB', 'Comment':'SWIFT J1626.5-5156, classified as a HMXB by 2013ApJ...762...61D and BAT-105, the BAT counterpart is 4.3" away from the X-ray source while the SIMBAD coordinate is more accurate with 0.12" sep'},
                      '2CXO J063344.1+063230':{'Class':'NS', 'Comment':'PSR J0633+0632, a gamma-ray NS. identified by the 1FGL catalog (2010ApJS..188..405A), with a refined coordinate from 2015ApJ...814..128K and 2020MNRAS.493.1874D'},
@@ -293,7 +301,7 @@ rare_sources_saving_dict = {# Reclassification
                      '2CXO J124846.4-623743':{'Class':'CV', 'Comment':'https://arxiv.org/pdf/2210.10363.pdf'},
                      '2CXO J132426.6-620119':{'Class':'HMXB', 'Comment':''},
                      '2CXO J182154.8-134726':{'Class':'HMXB', 'Comment':'This object is identified by Brendan as BeXR, see 2022ApJ...927..139O'},
-                     '2CXO J181642.7-161322':{'Class':'HMXB', 'Comment':'According to 2019A%26A...622A.198N they identified B0-2e counterpart hence it is an likely accreting X--ray pulsar'},
+                     '2CXO J181642.7-161322':{'Class':'HMXB', 'Comment':'According to 2019A&A...622A.198N they identified B0-2e counterpart hence it is an likely accreting X--ray pulsar'},
                          
                      #### confused X-ray sources
                      '2CXO J053854.5+261856':{'Class':'HMXB', 'Comment':'confused with 2CXO J053854.5+261855X'},
