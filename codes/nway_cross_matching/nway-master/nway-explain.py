@@ -31,6 +31,9 @@ parser.add_argument('matchcatalogue', type=str,
 parser.add_argument('id', type=str,
 	help='ID to explain (from primary catalogue)')
 
+parser.add_argument('name_col', type=str,
+	help='Name column to label plots (from primary catalogue)', default=None)
+
 
 
 # parsing arguments
@@ -52,6 +55,13 @@ else:
 if mask.sum() == 0:
 	print('ERROR: ID not found. Was searching for %s == %s' % (primary_id_col, args.id))
 	sys.exit(1)
+
+if args.name_col is not None:
+	# check if name column exists
+	if args.name_col not in data.dtype.names:
+		print('ERROR: name column %s not found' % args.name_col)
+		sys.exit(1)
+
 #print()
 # make a plot of the positions
 
@@ -253,14 +263,20 @@ for i in numpy.where(mask2)[0]:
 
 plt.xlabel('$\Delta$RA [arcsec]')
 plt.ylabel('$\Delta$DEC [arcsec]')
-plt.title('Source %s, p_any=%.2f' % (args.id, p_any))
+if args.name_col is not None:
+	plt.title('Source %s, p_any=%.2f' % (data[args.name_col][mask][0], p_any))
+else:
+	plt.title('Source %s, p_any=%.2f' % (args.id, p_any))
 xlo, xhi = plt.xlim()
 ylo, yhi = plt.ylim()
 hi = max(-xlo, xhi, -ylo, yhi)
 plt.ylim(-hi, hi) # DEC
 plt.xlim(hi, -hi) # RA goes the other way
 plt.legend(loc='best', numpoints=1, prop=dict(size=8))
-outfilename = '%s_explain_%s.png' % (args.matchcatalogue, args.id)
+if args.name_col is not None:
+	outfilename = '%s_explain_%s.png' % (args.matchcatalogue, data[args.name_col][mask][0])
+else:
+	outfilename = '%s_explain_%s.png' % (args.matchcatalogue, args.id)
 print('plotting to %s' % outfilename)
 print()
 print("Disclaimer: These results assume that the input (sky densities, positional errors, and priors) are correct.")

@@ -443,7 +443,7 @@ def CMweight_probability(df, class_labels, TD_evaluation):
 
     return df
      
-def combine_class_result(field_name, data_dir, dir_out, class_labels,TD_evaluation,region_size,weight_CM=False):
+def combine_class_result(field_name, data_dir, dir_out, class_labels,TD_evaluation,region_size=np.nan,weight_CM=False):
 
     df_all = pd.read_csv(f'{dir_out}/classes.csv')
     df_mean = df_all.groupby('name').mean().iloc[:,:len(class_labels)]
@@ -488,19 +488,29 @@ def combine_class_result(field_name, data_dir, dir_out, class_labels,TD_evaluati
     df = confident_flag(df, class_cols=class_labels)
     df = confident_sigma(df, class_cols=class_labels)
 
-    df_MW = pd.read_csv(f'{data_dir}/{field_name}_MW_remove.csv')
-    df_MW = prepare_cols(df_MW, cp_thres=0, vphas=False,gaiadata=False)
-
-    df_comb = pd.merge(df, df_MW, on="name")
+    # df_MW only needed for weighted probabilities (multiplied by the confusion matrix)? 
+    try: 
+        df_MW = pd.read_csv(f'{data_dir}/{field_name}_MW.csv')
+        df_MW = prepare_cols(df_MW, cp_thres=0, vphas=False,gaiadata=False)
+        print('test')
+        print(df_MW.columns)
+        df_comb = pd.merge(df, df_MW, on="name")
+    except Exception as e:
+        print(e)
+        df_comb = df
 
 
     #df_per   = pd.read_csv(f'{data_dir}/{field_name}_per.csv')
     #df_per['name'] = df_per['name'].str.lstrip()
     #df_per = df_per[['name','ra','dec']].drop_duplicates(subset=['name'])
 
-    df_TD_src = pd.read_csv(f'{data_dir}/TD_{field_name}_MW_remove.csv')
+    try:
+        df_TD_src = pd.read_csv(f'{data_dir}/TD_{field_name}_MW_remove.csv')
 
-    df_TD_src = df_TD_src.rename(columns={'Class':'true_Class'})
+        df_TD_src = df_TD_src.rename(columns={'Class':'true_Class'})
+    except Exception as e:
+        print(e)
+        df_TD_src = pd.DataFrame()
 
     # if df_TD_src is empty, then dtypes will be object, leading to all columns being object when concat
     if df_TD_src.empty:
