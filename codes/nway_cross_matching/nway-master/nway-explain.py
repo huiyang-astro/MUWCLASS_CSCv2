@@ -110,7 +110,7 @@ def print_option(name, i):
 	print()
 
 def convx(ra):
-	return (ra - center_ra) * 3600
+	return (ra - center_ra) * 3600 * numpy.cos(center_dec*numpy.pi/180) # added correction for declination
 def convy(dec):
 	return (dec - center_dec) * 3600
 def converr(err):
